@@ -231,6 +231,21 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		boost::asio::spawn(io_service, boost::bind(&avkernel_impl::async_recvfrom_op, shared_from_this(), boost::ref(target), boost::ref(data), handler, _1 ));
 	}
 
+	int recvfrom(std::string & target, std::string &data)
+	{
+		boost::system::error_code ec;
+
+		boost::mutex m;
+		boost::unique_lock< boost::mutex > l(m);
+		boost::condition_variable ready;
+
+		async_recvfrom(target, data, [&ec, &ready](const boost::system::error_code & _ec)
+			{ ec = _ec; ready.notify_all();});
+
+		ready.wait(l);
+		return ec.value();
+	}
+
 	// 内部的一个协程循环，用来执行串行发送，保证数据包次序
 	void interface_writer(avif avinterface, boost::asio::yield_context yield_context)
 	{
@@ -388,17 +403,16 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	int sendto(const std::string & target, const std::string & data)
 	{
 		boost::system::error_code ec;
-		boost::atomic_bool done;
-		done = false;
 
-		async_sendto(target, data, [&ec, &done](const boost::system::error_code & _ec)
-			{ ec = _ec; done = true;});
+		boost::mutex m;
+		boost::unique_lock< boost::mutex > l(m);
+		boost::condition_variable ready;
 
-		while( ! done )
-		{
-			int ret = io_service.run_one();
-			BOOST_ASSERT(ret != 0 );
-		}
+		async_sendto(target, data, [&ec, &ready](const boost::system::error_code & _ec)
+			{ ec = _ec; ready.notify_all();});
+
+
+		ready.wait(l);
 		return ec.value();
 	}
 
@@ -500,6 +514,11 @@ bool avkernel::add_route(std::string targetAddress, std::string gateway, std::st
 int avkernel::sendto(const std::string & target, const std::string & data)
 {
 	return _impl->sendto(target, data);
+}
+
+int avkernel::recvfrom(std::string & target, std::string &data)
+{
+	return _impl->recvfrom(target, data);
 }
 
 void avkernel::async_sendto(const std::string & target, const std::string & data, ReadyHandler handler)
