@@ -1,6 +1,7 @@
 
 #include <openssl/x509.h>
 #include <openssl/rsa.h>
+#include <openssl/crypto.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -23,7 +24,11 @@ std::string avtcpif::allocate_ifname()
 avtcpif::~avtcpif()
 {
    RSA_free(_rsa);
-//   X509_free(_x509);
+
+	if(0==CRYPTO_add(&_x509->references, -1, CRYPTO_LOCK_X509))
+    {
+	   X509_free(_x509);
+	}
 }
 
 avtcpif::avtcpif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock, std::string local_addr, RSA * _key, X509 * cert)
@@ -31,6 +36,7 @@ avtcpif::avtcpif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock, std::str
 	, _x509(cert)
 {
 	RSA_up_ref(_rsa);
+	CRYPTO_add(&_x509->references, 1, CRYPTO_LOCK_X509);
 	m_sock = _sock;
 	ifname = allocate_ifname();
 
