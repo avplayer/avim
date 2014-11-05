@@ -40,11 +40,25 @@ message avPacket{
 }
 
 // avnet Group Message Protocol, 类似 IGMP 消息在 IP 网中的作用
-// 主要作用为证书的传递，注意，单纯的询问 工钥，使用 pkask 消息
+// 主要作用为证书的传递，注意，单纯的询问 证书，使用 pkask 消息
 // 在 avPacket::upperlayerpotocol 里这个协议是 "agmp"
 message aGMP {
 
+	message PKREPLY{
+		required bytes x509_cert = 1;
+	};
 
+	message NOROUTTOHOST{
+		required avAddress host = 1;
+	};
+
+	message TTLOUT{
+		required avAddress host = 1;
+	};
+
+	optional PKREPLY pkreply = 1;
+	optional NOROUTTOHOST noroutetohost = 2;
+	optional TTLOUT ttlout = 3;
 }
 
 // 这个是在 TCP 链路上传输的包格式

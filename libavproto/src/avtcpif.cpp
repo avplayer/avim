@@ -112,11 +112,12 @@ bool avtcpif::slave_handshake(bool as_master)
 	std::ostream outstream(&m_send_buf);
 	boost::system::error_code ec;
 
-	boost::scoped_ptr<proto::base::avTCPPacket> pkt(new proto::base::avTCPPacket);
-	pkt->set_type(1);
+	proto::base::avTCPPacket pkt;
+	pkt.set_type(1);
 
-	* pkt->mutable_endpoint_address() = * m_local_addr;
-	pkt->SerializeToOstream(&outstream);
+	* pkt.mutable_endpoint_address() = * m_local_addr;
+
+	pkt.SerializeToOstream(&outstream);
 
 	// 返回服务器地址
 
@@ -135,13 +136,13 @@ bool avtcpif::slave_handshake(bool as_master)
 
 	std::istream inputstream(&m_recv_buf);
 
-	pkt->Clear();
-	pkt->ParseFromIstream(&inputstream);
+	pkt.Clear();
+	pkt.ParseFromIstream(&inputstream);
 
-	if(pkt->type() != 1)
+	if(pkt.type() != 1)
 		return false;
 
-	m_remote_addr.reset( new proto::base::avAddress(pkt->endpoint_address()));
+	m_remote_addr.reset( new proto::base::avAddress(pkt.endpoint_address()));
 
 	// TODO 检查证书
 
