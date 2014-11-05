@@ -8,6 +8,9 @@ set_target_properties(avproto++ PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_link_libraries(avproto++ avimproto-base ${PROTOBUF_LIBRARIES})
 
+if(MSVC)
+set_source_files_properties(src/avC_stub.cpp PROPERTIES COMPILE_FLAGS "/DDLL_EXPORTS=1")
+endif()
 
 add_library( avproto SHARED src/avC_stub.cpp)
 target_link_libraries(avproto avproto++)

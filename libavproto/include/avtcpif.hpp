@@ -5,7 +5,6 @@
 
 #include "avif.hpp"
 
-
 // 这个是 TCP 协议的接口
 struct avtcpif : boost::noncopyable
 {
