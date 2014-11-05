@@ -39,15 +39,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 endif()
 
-link_libraries(${PROTOBUF_LIBRARIES})
-
 add_subdirectory(protocol)
-
-link_libraries(avimproto-base)
-
 add_subdirectory(libavproto)
 
-link_libraries(avprotocol)
+link_libraries(avproto++)
 
 add_executable(avrouter router.cpp)
 
