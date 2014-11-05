@@ -67,18 +67,18 @@ int main()
 	int port = 24950; // "av" = 0x6176 = 24950
 	// 开启 av协议处理
 
-	boost::shared_ptr<BIO> keyfile(BIO_new_file("avim.key", "r"), BIO_free);
+	boost::shared_ptr<BIO> keyfile(BIO_new_file("route.key", "r"), BIO_free);
 	if(!keyfile)
 	{
-		std::cerr << "can not open avim.key" << std::endl;
+		std::cerr << "can not open route.key" << std::endl;
 		exit(1);
 	}
 	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, 0, 0);
 
-	boost::shared_ptr<BIO> certfile(BIO_new_file("avim.crt", "r"), BIO_free);
+	boost::shared_ptr<BIO> certfile(BIO_new_file("route.crt", "r"), BIO_free);
 	if(!certfile)
 	{
-		std::cerr << "can not open avim.crt" << std::endl;
+		std::cerr << "can not open route.crt" << std::endl;
 		exit(1);
 	}
 	X509 * x509_cert = PEM_read_bio_X509(certfile.get(), 0, 0, 0);
