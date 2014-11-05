@@ -11,3 +11,11 @@ target_link_libraries(avproto++ avimproto-base ${PROTOBUF_LIBRARIES})
 
 add_library( avproto SHARED src/avC_stub.cpp)
 target_link_libraries(avproto avproto++)
+
+if(MSVC)
+set_target_properties(avproto
+		PROPERTIES
+		OUTPUT_NAME avproto
+		PREFIX ""
+		CLEAN_DIRECT_OUTPUT 1)
+endif()
