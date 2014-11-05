@@ -1,4 +1,8 @@
 
+#ifdef _MSC_VER
+#pragma comment(lib,"avproto.lib")
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
