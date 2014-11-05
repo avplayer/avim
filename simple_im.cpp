@@ -35,15 +35,15 @@ static void msg_reader(boost::asio::yield_context yield_context)
 
 int main(int argv, char * argc[])
 {
-	boost::shared_ptr<BIO> keyfile(BIO_new_file("avim.key", "r"), BIO_free);
+	boost::shared_ptr<BIO> keyfile(BIO_new_file("test.key", "r"), BIO_free);
 	if(!keyfile)
 	{
-		std::cerr << "can not open avim.key" << std::endl;
+		std::cerr << "can not open test.key" << std::endl;
 		exit(1);
 	}
 	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, 0, 0);
 
-	boost::shared_ptr<BIO> certfile(BIO_new_file("avim.crt", "r"), BIO_free);
+	boost::shared_ptr<BIO> certfile(BIO_new_file("test.crt", "r"), BIO_free);
 	if(!certfile)
 	{
 		std::cerr << "can not open avim.crt" << std::endl;
