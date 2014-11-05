@@ -34,16 +34,24 @@ static void msg_reader(boost::asio::yield_context yield_context)
 
 int main(int argv, char * argc[])
 {
-	BIO * keyfile;
-	keyfile = BIO_new_file("avim.key", "r");
-	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile, 0, 0, 0);
-	BIO_free(keyfile);
+	boost::shared_ptr<BIO> keyfile(BIO_new_file("avim.key", "r"), BIO_free);
+	if(!keyfile)
+	{
+		std::cerr << "can not open avim.key" << std::endl;
+		exit(1);
+	}
+	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, 0, 0);
 
-	BIO * certfile;// = BIO_new_mem_buf((void*)pem_private_key_s, strlen(pem_private_key_s));
-	certfile = BIO_new_file("avim.crt", "r");
-	X509 * x509_cert = PEM_read_bio_X509(certfile, 0, 0, 0);
-	BIO_free(certfile);
+	boost::shared_ptr<BIO> certfile(BIO_new_file("avim.crt", "r"), BIO_free);
+	if(!certfile)
+	{
+		std::cerr << "can not open avim.crt" << std::endl;
+		exit(1);
+	}
+	X509 * x509_cert = PEM_read_bio_X509(certfile.get(), 0, 0, 0);
 
+	certfile.reset();
+	keyfile.reset();
 
 	// 连接到 im.avplayer.org:24950
 
@@ -54,12 +62,10 @@ int main(int argv, char * argc[])
 	// 连接到 im.avplayer.org:24950
 	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("im.avplayer.org", "24950")));
 
-	// TODO 修正登录过程
-
 	std::string me_addr = "test@avplayer.org";
 
 	// 构造 avtcpif
-	// 创建一个 tcp 的 avif 设备，然后添加进去, TODO, 证书也应该传进去
+	// 创建一个 tcp 的 avif 设备，然后添加进去
 	boost::shared_ptr<avtcpif> avinterface;
 
 	avinterface.reset(new avtcpif(avserver, me_addr, rsa_key, x509_cert) );
