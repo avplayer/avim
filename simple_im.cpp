@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/thread.hpp>
 
 #include <avtcpif.hpp>
 #include <avproto.hpp>
@@ -78,7 +79,11 @@ int main(int argv, char * argc[])
 	avcore.add_route(".+@.+", me_addr, avinterface->get_ifname(), 100);
 
 	// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
-	avcore.sendto("test@avplayer.org", "test, me are testing you stupid avim");
+	boost::async(
+		[](){
+			avcore.sendto("test@avplayer.org", "test, me are testing you stupid avim");
+		}
+	);
 
 	// 开协程异步接收消息
 
