@@ -35,6 +35,7 @@ avtcpif::avtcpif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock, std::str
 	: _rsa(_key)
 	, _x509(cert)
 {
+	m_root_ca = nullptr;
 	RSA_up_ref(_rsa);
 	CRYPTO_add(&_x509->references, 1, CRYPTO_LOCK_X509);
 	m_sock = _sock;
@@ -58,6 +59,11 @@ RSA* avtcpif::get_rsa_key()
     return _rsa;
 }
 
+void avtcpif::set_root_ca(X509* ca)
+{
+    m_root_ca = ca;
+}
+
 const proto::base::avAddress* avtcpif::if_address() const
 {
     return m_local_addr.get();
@@ -66,6 +72,19 @@ const proto::base::avAddress* avtcpif::if_address() const
 const proto::base::avAddress * avtcpif::remote_address() const
 {
 	return m_remote_addr.get();
+}
+
+bool avtcpif::check_cert(const std::string& cert)
+{
+	const unsigned char * in = (const unsigned char *) cert.data();
+	boost::shared_ptr<X509> endpoint_cert(d2i_X509(nullptr, & in, cert.length()), X509_free);
+
+	if(! endpoint_cert )
+		return false;
+
+	boost::shared_ptr<EVP_PKEY> pubkey_or_root_ca(X509_get_pubkey(m_root_ca), EVP_PKEY_free);
+
+	return X509_verify(endpoint_cert.get(), pubkey_or_root_ca.get());
 }
 
 bool avtcpif::async_master_handshake(bool as_master, boost::asio::yield_context yield_context)
@@ -82,24 +101,39 @@ bool avtcpif::async_master_handshake(bool as_master, boost::asio::yield_context 
 
 	std::istream inputstream(&m_recv_buf);
 
-	boost::scoped_ptr<proto::base::avTCPPacket> pkt(new proto::base::avTCPPacket);
+	proto::base::avTCPPacket pkt;
 
-	pkt->ParseFromIstream(&inputstream);
+	pkt.ParseFromIstream(&inputstream);
 
-	if(pkt->type() != 1)
+	if(pkt.type() != 1)
 		return false;
 
-	m_remote_addr.reset(new proto::base::avAddress(pkt->endpoint_address()));
+	m_remote_addr.reset(new proto::base::avAddress(pkt.endpoint_address()));
+
+	if(! pkt.has_endpoint_cert() )
+	{
+		return false;
+	}
 
 	// TODO 检查证书
 
-	* pkt->mutable_endpoint_address() = * m_local_addr;
+	if(!check_cert(pkt.endpoint_cert()))
+	{
+		return false;
+	}
 
-	pkt->clear_endpoint_cert();
+	// 开始构造返回数据
+	* pkt.mutable_endpoint_address() = * m_local_addr;
+
+	pkt.clear_endpoint_cert();
+	unsigned char * out = nullptr;
+	int der_length = i2d_X509(_x509, &out);
+	pkt.set_endpoint_cert(out, der_length);
+	OPENSSL_free(out);
 
 	std::ostream outstream(&m_send_buf);
 
-	pkt->SerializeToOstream(&outstream);
+	pkt.SerializeToOstream(&outstream);
 
 	// 返回服务器地址
 
@@ -123,7 +157,11 @@ bool avtcpif::slave_handshake(bool as_master)
 
 	* pkt.mutable_endpoint_address() = * m_local_addr;
 
+	unsigned char * out = nullptr;
+	int der_length = i2d_X509(_x509, &out);
+	pkt.set_endpoint_cert(out, der_length);
 	pkt.SerializeToOstream(&outstream);
+	OPENSSL_free(out);
 
 	// 返回服务器地址
 
@@ -150,9 +188,7 @@ bool avtcpif::slave_handshake(bool as_master)
 
 	m_remote_addr.reset( new proto::base::avAddress(pkt.endpoint_address()));
 
-	// TODO 检查证书
-
-	return true;
+	return pkt.has_endpoint_cert() && check_cert(pkt.endpoint_cert());
 }
 
 std::string avtcpif::remote_addr()

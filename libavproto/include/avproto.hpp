@@ -56,4 +56,5 @@ public:
 	// 因为不作为 header only 实现，故而不想在这里使用模板，所以只能重载了
 	void async_recvfrom(std::string & target, std::string & data, boost::asio::yield_context yield_context);
 	void async_recvfrom(std::string & target, std::string & data, ReadyHandler handler);
+    const X509 * get_root_ca();
 };

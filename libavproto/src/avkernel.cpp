@@ -9,6 +9,7 @@
 #include <boost/range/algorithm.hpp>
 
 #include <openssl/x509.h>
+#include <openssl/pem.h>
 
 #include "avif.hpp"
 #include "avproto.hpp"
@@ -472,8 +473,8 @@ public:
 		: io_service(_io_service)
 		, m_recv_buffer(io_service)
 		, m_root_ca_cert([](){
-			const unsigned char * in = (const unsigned char *) avim_root_ca_certificate_string;
-			return d2i_X509(NULL, &in, strlen((const char *)in));
+			boost::shared_ptr<BIO> bp(BIO_new_mem_buf((void*)avim_root_ca_certificate_string, strlen(avim_root_ca_certificate_string)), BIO_free);
+			return PEM_read_bio_X509(bp.get(), 0, 0, 0);
 		}())
 	{
 
@@ -553,4 +554,9 @@ void avkernel::async_recvfrom(std::string & target, std::string & data, boost::a
 	async_recvfrom(target, data, init.handler);
 
 	return init.result.get();
+}
+
+const X509 * avkernel::get_root_ca()
+{
+	return (const X509 *)_impl->m_root_ca_cert;
 }

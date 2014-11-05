@@ -119,12 +119,10 @@ struct avif
 		return _impl->remote_address();
 	}
 
-
 	RSA * get_rsa_key()
 	{
 		return _impl->get_rsa_key();
 	}
-
 	// 读取 av数据包
 	boost::shared_ptr<proto::base::avPacket> async_read_packet(boost::asio::yield_context yield_context);
 

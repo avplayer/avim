@@ -37,13 +37,14 @@ static void process_client(boost::asio::yield_context yielder, boost::shared_ptr
 	boost::shared_ptr<avtcpif> avinterface;
 
 	avinterface.reset(new avtcpif(client_sock, me_addr, rsa_key, x509_cert) );
+	avinterface->set_root_ca((X509*)avcore.get_root_ca());
 
-	avinterface->async_master_handshake(1, yielder[ec]);
-
-	avcore.add_interface(avinterface);
-
-	// 添加路由表
-	avcore.add_route(avinterface->remote_addr(), me_addr, avinterface->get_ifname(), 0);
+	if(	avinterface->async_master_handshake(1, yielder[ec]) )
+	{
+		avcore.add_interface(avinterface);
+		// 添加路由表
+		avcore.add_route(avinterface->remote_addr(), me_addr, avinterface->get_ifname(), 0);
+	}
 }
 
 static void async_acceptor(boost::asio::yield_context yielder, int port, RSA * privatekey, X509 * x509_cert)

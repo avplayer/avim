@@ -27,8 +27,12 @@ public: // 下面是实现 avif 接口
 	const proto::base::avAddress * if_address() const;
 	const proto::base::avAddress * remote_address() const;
 	RSA * get_rsa_key();
+	void set_root_ca(X509 * ca);
 	boost::shared_ptr<proto::base::avPacket> async_read_packet(boost::asio::yield_context yield_context);
     bool async_write_packet(proto::base::avPacket*, boost::asio::yield_context yield_context);
+
+protected:
+	bool check_cert(const std::string & cert);
 
 private:
 	// 分配一个 if 接口名字
@@ -36,7 +40,7 @@ private:
 
 	std::string ifname;
 	RSA * _rsa;
-	X509 * _x509;
+	X509 * _x509, *m_root_ca;
 	boost::scoped_ptr<proto::base::avAddress> m_local_addr;
 	boost::scoped_ptr<proto::base::avAddress> m_remote_addr;
 	boost::shared_ptr<boost::asio::ip::tcp::socket> m_sock;
