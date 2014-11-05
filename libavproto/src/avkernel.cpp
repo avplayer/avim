@@ -8,7 +8,7 @@
 #include <boost/regex.hpp>
 #include <boost/range/algorithm.hpp>
 
-#include <openssl/err.h>
+#include <openssl/x509.h>
 
 #include "avif.hpp"
 #include "avproto.hpp"
@@ -47,6 +47,8 @@ bool operator<(const RouteItem& lhs, const RouteItem& rhs) { return lhs.metric <
 
 class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this<avkernel_impl>
 {
+	const X509 * const m_root_ca_cert;
+
 	boost::asio::io_service & io_service;
 	std::map<std::string, avif> m_avifs;
 	std::vector<RouteItem> m_routes;
@@ -455,7 +457,17 @@ public:
 	avkernel_impl(boost::asio::io_service & _io_service)
 		: io_service(_io_service)
 		, m_recv_buffer(io_service)
+		, m_root_ca_cert([](){
+			const unsigned char * in = (const unsigned char *) avim_root_ca_certificate_string;
+			return d2i_X509(NULL, &in, strlen((const char *)in));
+		}())
 	{
+
+	}
+
+	~avkernel_impl()
+	{
+		X509_free((X509*)m_root_ca_cert);
 	}
 
 	friend avkernel;
