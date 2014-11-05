@@ -84,3 +84,17 @@ int connect_to_avrouter(const char * key, const char * cert, const char * self_a
 	// 添加路由表, metric越大，优先级越低
 	avkernel_intance->add_route(".+@.+", self_addr, avinterface->get_ifname(), 100);
 }
+
+int av_sendto(const char * dest_address, const char * message, int len)
+{
+	return avkernel_intance->sendto(dest_address, std::string(message, len));
+}
+
+int av_recvfrom(char * dest_address, char * message)
+{
+	std::string dest, msg;
+	auto ret = avkernel_intance->recvfrom(dest, msg);
+	strcpy(dest_address, dest.c_str());
+	memcpy(message, msg.c_str(), msg.length());
+	return ret;
+}

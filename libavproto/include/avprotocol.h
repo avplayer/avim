@@ -20,7 +20,7 @@ int connect_to_avrouter(const char * key, const char * cert, const char * self_a
 int av_sendto(const char * dest_address, const char * message, int len);
 
 // 接收数据
-int av_recvfrom(const char * dest_address, const char * message);
+int av_recvfrom(char * dest_address, char * message, int & len);
 
 #ifdef __cplusplus
 }

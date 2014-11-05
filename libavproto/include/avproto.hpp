@@ -45,7 +45,7 @@ public:
 	bool add_route(std::string targetAddress, std::string gateway, std::string ifname, int metric);
 
 	int sendto(const std::string & target, const std::string & data);
-	int av_recvfrom(std::string & target, std::string &data);
+	int recvfrom(std::string & target, std::string &data);
 
 	// 两个重载的异步发送，分别用于协程和回调
 	// 因为不作为 header only 实现，故而不想在这里使用模板，所以只能重载了
