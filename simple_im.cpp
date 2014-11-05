@@ -13,6 +13,7 @@
 
 #include <openssl/x509.h>
 #include <openssl/pem.h>
+#include <openssl/evp.h>
 
 // 一个非常非常简单的 IM 实现，测试用途
 
@@ -33,15 +34,35 @@ static void msg_reader(boost::asio::yield_context yield_context)
 	}
 }
 
+int pass_cb(char *buf, int size, int rwflag, void *u)
+{
+	int len;
+	char *tmp;
+	/* We'd probably do something else if 'rwflag' is 1 */
+	printf("Enter pass phrase for \"%s\"\n", u);
+
+	/* get pass phrase, length 'len' into 'tmp' */
+	tmp = "test";
+	len = strlen(tmp);
+
+	if (len <= 0) return 0;
+	/* if too long, truncate */
+	if (len > size) len = size;
+	memcpy(buf, tmp, len);
+	return len;
+}
+
 int main(int argv, char * argc[])
 {
+	OpenSSL_add_all_algorithms();
+
 	boost::shared_ptr<BIO> keyfile(BIO_new_file("test.key", "r"), BIO_free);
 	if(!keyfile)
 	{
 		std::cerr << "can not open test.key" << std::endl;
 		exit(1);
 	}
-	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, 0, 0);
+	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, pass_cb,(void*) "test.key");
 
 	boost::shared_ptr<BIO> certfile(BIO_new_file("test.crt", "r"), BIO_free);
 	if(!certfile)

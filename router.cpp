@@ -9,6 +9,7 @@
 
 #include <openssl/pem.h>
 #include <openssl/x509.h>
+#include <openssl/evp.h>
 
 #include <avtcpif.hpp>
 #include <avproto.hpp>
@@ -62,18 +63,39 @@ static void async_acceptor(boost::asio::yield_context yielder, int port, RSA * p
 	}
 }
 
+int pass_cb(char *buf, int size, int rwflag, void *u)
+{
+	int len;
+	char *tmp;
+	/* We'd probably do something else if 'rwflag' is 1 */
+	printf("Enter pass phrase for \"%s\"\n", u);
+
+	/* get pass phrase, length 'len' into 'tmp' */
+	tmp = "route";
+	len = strlen(tmp);
+
+	if (len <= 0) return 0;
+	/* if too long, truncate */
+	if (len > size) len = size;
+	memcpy(buf, tmp, len);
+	return len;
+}
+
 int main()
 {
+	OpenSSL_add_all_algorithms();
+
 	int port = 24950; // "av" = 0x6176 = 24950
 	// 开启 av协议处理
 
-	boost::shared_ptr<BIO> keyfile(BIO_new_file("route.key", "r"), BIO_free);
+	boost::shared_ptr<BIO> keyfile(BIO_new_file("route.key","r"), BIO_free);
 	if(!keyfile)
 	{
 		std::cerr << "can not open route.key" << std::endl;
 		exit(1);
 	}
-	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, 0, 0);
+
+	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, (pem_password_cb*) pass_cb, (void*)"route");
 
 	boost::shared_ptr<BIO> certfile(BIO_new_file("route.crt", "r"), BIO_free);
 	if(!certfile)
