@@ -15,6 +15,8 @@
 #include "async_coro_queue.hpp"
 #include "protocol/avim-base.pb.h"
 
+extern const char * avim_root_ca_certificate_string;
+
 template<typename C, typename Pred>
 auto container_remove_all(C & c, Pred pred) -> decltype(std::begin(c))
 {
