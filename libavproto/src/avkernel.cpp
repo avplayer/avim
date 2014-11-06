@@ -591,17 +591,30 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		m_async_wait_packet_pred_handler_postprocess_list.erase(it);
 	}
 
-	void timer_start()
+	void timer1_start()
 	{
 		if( m_quitting )
 			return;
-		timer.expires_from_now(boost::posix_time::milliseconds(500));
-		timer.async_wait(boost::bind(&avkernel_impl::timer_tick, shared_from_this(),_1));
+		timer1.expires_from_now(boost::posix_time::milliseconds(500));
+		timer1.async_wait(boost::bind(&avkernel_impl::timer1_tick, shared_from_this(),_1));
 	}
 
-	void timer_tick(boost::system::error_code ec)
+	void timer2_start()
 	{
-		timer_start();
+		if( m_quitting )
+			return;
+		timer2.expires_from_now(boost::posix_time::seconds(300));
+		timer2.async_wait(boost::bind(&avkernel_impl::timer2_tick, shared_from_this(),_1));
+	}
+	void timer2_tick(boost::system::error_code ec)
+	{
+		timer2_start();
+		purge_RSA_pubkey();
+	}
+
+	void timer1_tick(boost::system::error_code ec)
+	{
+		timer1_start();
 
 		auto now = boost::posix_time::microsec_clock::local_time();
 
@@ -631,7 +644,8 @@ public:
 			boost::shared_ptr<BIO> bp(BIO_new_mem_buf((void*)avim_root_ca_certificate_string, strlen(avim_root_ca_certificate_string)), BIO_free);
 			return PEM_read_bio_X509(bp.get(), 0, 0, 0);
 		}())
-		, timer(io_service)
+		, timer1(io_service)
+		, timer2(io_service)
 	{
 		m_quitting = false;
 	}
@@ -642,7 +656,7 @@ public:
 	}
 
 	boost::atomic<bool> m_quitting;
-	boost::asio::deadline_timer timer;
+	boost::asio::deadline_timer timer1, timer2;
 	friend avkernel;
 };
 
@@ -652,7 +666,8 @@ avkernel::avkernel(boost::asio::io_service & _io_service)
 	: io_service(_io_service)
 {
 	_impl = boost::make_shared<detail::avkernel_impl>(boost::ref(io_service));
-	_impl->timer_start();
+	_impl->timer1_start();
+	_impl->timer2_start();
 }
 
 avkernel::~avkernel()
