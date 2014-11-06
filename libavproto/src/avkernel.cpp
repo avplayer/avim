@@ -76,7 +76,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	> m_recv_buffer;
 
 	struct async_wait_packet_pred_handler{
-		boost::asio::deadline_timer * deadline;
+		boost::posix_time::ptime deadline;
 		boost::function<bool (const proto::base::avPacket &)> pred;
 		boost::function<void (boost::system::error_code)> handler;
 	};
@@ -367,7 +367,10 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 				// TODO 发送 askpk 消息获取共钥
 				// TODO 如果配置了公钥服务器，尝试去公钥服务器获取
-				boost::asio::deadline_timer deadline(io_service);
+				boost::posix_time::ptime deadline = boost::posix_time::microsec_clock::local_time();
+
+				deadline += boost::posix_time::seconds(8);
+
 				async_wait_processed_packet(deadline, [target](const proto::base::avPacket & pkt){
 					return pkt.has_publickey() && av_address_to_string(pkt.src()) == target;
 				}, yield_context);
@@ -521,7 +524,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	}
 
 	template<class Pred, class CompleteHandler>
-	void async_wait_processed_packet(boost::asio::deadline_timer & deadline, Pred pred, CompleteHandler handler)
+	void async_wait_processed_packet(const boost::posix_time::ptime & deadline, Pred pred, CompleteHandler handler)
 	{
 		using namespace boost::asio;
 
@@ -531,7 +534,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 
 		async_wait_packet_pred_handler item;
-		item.deadline = & deadline;
+		item.deadline = deadline;
 		item.pred = pred;
 		item.handler = init.handler;
 
