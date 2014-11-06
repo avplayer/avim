@@ -561,6 +561,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		* pkt.mutable_src() = * interface->if_address();
 		* pkt.mutable_dest() = av_address_from_string(target);
 		pkt.set_upperlayerpotocol("pkask");
+		pkt.set_time_to_live(64);
 
 		avif::auto_avPacketPtr pktptr(& pkt, [](void*){});
 

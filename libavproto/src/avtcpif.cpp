@@ -204,9 +204,8 @@ bool avtcpif::async_write_packet(proto::base::avPacket* avpkt, boost::asio::yiel
 	std::ostream outstream(&m_send_buf);
 
 	pkt.set_type(0);
-	pkt.set_allocated_avpacket(avpkt);
+	*pkt.mutable_avpacket() = *avpkt;
 	pkt.SerializeToOstream(&outstream);
-	pkt.release_avpacket();
 
 	boost::uint32_t l = htonl(m_send_buf.size());
 
