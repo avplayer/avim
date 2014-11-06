@@ -34,10 +34,10 @@ static void msg_reader(boost::asio::yield_context yield_context)
 	}
 }
 
-int pass_cb(char *buf, int size, int rwflag, void *u)
+int pass_cb(char *buf, int size, int rwflag, char *u)
 {
 	int len;
-	char *tmp;
+	const char *tmp;
 	/* We'd probably do something else if 'rwflag' is 1 */
 	printf("Enter pass phrase for \"%s\"\n", u);
 
