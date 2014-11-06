@@ -157,7 +157,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		if( avPacket->upperlayerpotocol() == "pkask" )
 		{
 			// 发回 自己的公钥
-			async_send_agmp_pkreply(&avinterface, add);
+			return async_send_agmp_pkreply(&avinterface, add);
 		}
 
 		if( avPacket->upperlayerpotocol() == "pkreply" )
@@ -175,6 +175,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 						   rsa, std::time(0) + 3600000
 			);
 			RSA_free(rsa);
+			return ;
 		}
 		// 有  payload ， 那就一定要解密，呵呵
 		if( avPacket->has_payload() )
@@ -193,10 +194,15 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		BOOST_SCOPE_EXIT_ALL(this, avPacket)
 		{
 			// 这里是数据包的后处理
-			for( async_wait_packet_pred_handler  & i : m_async_wait_packet_pred_handler_postprocess_list)
+			auto it = m_async_wait_packet_pred_handler_postprocess_list.begin();
+			while( it != m_async_wait_packet_pred_handler_postprocess_list.end())
 			{
-				if( i.pred(boost::ref(*avPacket)) )
-					i.handler(boost::system::error_code());
+				if( it->pred(boost::ref(*avPacket)) )
+				{
+					it->handler(boost::system::error_code());
+					m_async_wait_packet_pred_handler_postprocess_list.erase(it++);
+				}else
+					it ++;
 			}
 
 		};
@@ -366,10 +372,15 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 			if(avpkt)
 			{
 				// 这里是数据包的前置处理
-				for( async_wait_packet_pred_handler  & i : m_async_wait_packet_pred_handler_preprocess_list)
+				auto it = m_async_wait_packet_pred_handler_preprocess_list.begin();
+				while( it != m_async_wait_packet_pred_handler_preprocess_list.end())
 				{
-					if( i.pred(boost::ref(*avpkt)) )
-						i.handler(boost::system::error_code());
+					if( it->pred(boost::ref(*avpkt)) )
+					{
+						it->handler(boost::system::error_code());
+						m_async_wait_packet_pred_handler_preprocess_list.erase(it++);
+					}else
+						it ++;
 				}
 
 				boost::asio::spawn(io_service, boost::bind(&avkernel_impl::process_recived_packet, shared_from_this(), avpkt, avinterface, _1));
@@ -421,9 +432,9 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 				deadline += boost::posix_time::seconds(8);
 
-				async_wait_processed_packet(deadline, [target](const proto::base::avPacket & pkt){
-					return pkt.has_publickey() && av_address_to_string(pkt.src()) == target;
-				}, yield_context);
+				async_wait_processed_packet(deadline, [this, target](const proto::base::avPacket & pkt)->bool{
+					return av_address_to_string(pkt.src()) == target && find_RSA_pubkey(target);
+				}, yield_context[ec]);
 				target_pubkey = find_RSA_pubkey(target);
 			}
 
@@ -643,11 +654,9 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		item.pred = pred;
 		item.handler = init.handler;
 
-		auto it = m_async_wait_packet_pred_handler_postprocess_list.insert(m_async_wait_packet_pred_handler_postprocess_list.end(), std::move(item));
+		m_async_wait_packet_pred_handler_postprocess_list.push_back(std::move(item));
 
 		init.result.get();
-
-		m_async_wait_packet_pred_handler_postprocess_list.erase(it);
 	}
 
 	void timer1_start()
@@ -677,21 +686,29 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 		auto now = boost::posix_time::microsec_clock::local_time();
 
+		auto it = m_async_wait_packet_pred_handler_postprocess_list.begin();
+
 		// 检查有无过期的
-		for(const auto & it : m_async_wait_packet_pred_handler_postprocess_list)
+		while( it != m_async_wait_packet_pred_handler_postprocess_list.end())
 		{
-			if( it.deadline < now)
+			if( it->deadline < now)
 			{
-				it.handler(boost::asio::error::timed_out);
-			}
+				it->handler(boost::asio::error::timed_out);
+				m_async_wait_packet_pred_handler_postprocess_list.erase(it++);
+			}else
+				it ++;
 		}
 
-		for(const auto & it : m_async_wait_packet_pred_handler_preprocess_list)
+		it = m_async_wait_packet_pred_handler_preprocess_list.begin();
+
+		while( it != m_async_wait_packet_pred_handler_preprocess_list.end())
 		{
-			if( it.deadline < now)
+			if( it->deadline < now)
 			{
-				it.handler(boost::asio::error::timed_out);
-			}
+				it->handler(boost::asio::error::timed_out);
+				m_async_wait_packet_pred_handler_preprocess_list.erase(it++);
+			}else
+				it ++;
 		}
 	}
 
