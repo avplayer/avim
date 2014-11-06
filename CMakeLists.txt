@@ -14,6 +14,7 @@ endif()
 endif()
 
 option(RUN_PROTOC "run protoc to generate protobuf protocol parser" ON)
+option(BUILD_C_WRAPPER "build a libavproto that exports C interface" OFF)
 
 find_package(Threads REQUIRED)
 find_package(Boost 1.54 REQUIRED thread system coroutine context regex)
