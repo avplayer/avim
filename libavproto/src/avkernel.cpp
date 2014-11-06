@@ -181,9 +181,18 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 			// 因此加到 TODO 列表
 
 		}
-		else if(!stored_key && ! avPacket->has_publickey())
+		else if(!stored_key && avPacket->has_publickey())
 		{
 			// TODO, 执行 证书请求，并在请求通过后，验证数据包接受该
+
+			// 等待  hyq 的校验完成
+			// 暂时直接信任然后添加吧
+			RSA * rsa = RSA_new();
+			rsa->e = BN_new();
+			BN_set_word(rsa->e, 65537);
+			rsa->n = BN_bin2bn((const unsigned char *) avPacket->publickey().data(), avPacket->publickey().length(), 0);
+			add_RSA_pubkey(av_address_to_string(avPacket->src()), rsa, std::time(0) + 3600000);
+			RSA_free(rsa);
 		}else
 		{
 			 // TODO 执行 证书请求，并在请求通过后，验证数据包接受该
