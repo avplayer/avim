@@ -38,6 +38,7 @@ public:
 	typedef boost::function<void(boost::system::error_code)> ReadyHandler;
 
 	avkernel(boost::asio::io_service &);
+	~avkernel();
 
 	bool add_interface(avif interface);
 
