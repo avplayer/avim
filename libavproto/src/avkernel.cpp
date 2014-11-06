@@ -462,19 +462,42 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	{
 		if(trusted_pubkey.count(address) > 0)
 		{
-			return trusted_pubkey.at(address).keys.back().rsa.get();
+			return trusted_pubkey.at(address).keys.front().rsa.get();
 		}
 		return NULL;
 	}
 
 	void add_RSA_pubkey(std::string address, RSA* pubkey, std::time_t valid_until)
 	{
-		trusted_pubkey[address].avaddr = address;
+		auto& key_item = trusted_pubkey[address];
+		key_item.avaddr = address;
 		AVPubKey key;
 		RSA_up_ref(pubkey);
 		key.rsa = boost::shared_ptr<RSA>(pubkey, RSA_free);
 		key.valid_until = valid_until;
-		trusted_pubkey[address].keys.push_back(key);
+		key_item.keys.push_back(key);
+		std::sort(key_item.keys.begin(), key_item.keys.end(), [](const AVPubKey& lhs, const AVPubKey& rhs){ return lhs.valid_until > rhs.valid_until; });
+	}
+
+	void purge_RSA_pubkey()
+	{
+		std::time_t now = time(NULL);
+		for(auto iter = trusted_pubkey.begin(); iter != trusted_pubkey.end(); ++iter)
+		{
+			auto& keys = iter->second.keys;
+			for(int i = 0; i < keys.size(); ++i)
+			{
+				if(keys[i].valid_until < now)
+				{
+					keys.erase(keys.begin() + i, keys.end());
+					break;
+				}
+			}
+			if(keys.size() == 0)
+			{
+				trusted_pubkey.erase(iter++);
+			}
+		}
 	}
 
 	// 移除接口的时候调用
