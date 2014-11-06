@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.9)
 # include(./FindProtobuf.cmake)
 
 PROTOBUF_GENERATE_CPP(PROTO_BASE PROTO_BASE_HDRS avim-base.proto)
-PROTOBUF_GENERATE_CPP(PROTO_IM PROTO_IN_HDRS avim-im.proto)
+PROTOBUF_GENERATE_CPP(PROTO_IM PROTO_IM_HDRS avim-im.proto)
 
 add_library(avimproto-base STATIC ${PROTO_BASE})
 target_link_libraries(avimproto-base ${PROTOBUF_LIBRARIES})
