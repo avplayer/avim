@@ -560,29 +560,21 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		auto now = boost::posix_time::microsec_clock::local_time();
 
 		// 检查有无过期的
-		auto it = m_async_wait_packet_pred_handler_postprocess_list.begin();
-
-		while( it != m_async_wait_packet_pred_handler_postprocess_list.end())
+		for(const auto & it : m_async_wait_packet_pred_handler_postprocess_list)
 		{
-			if( it->deadline < now)
+			if( it.deadline < now)
 			{
-				m_async_wait_packet_pred_handler_postprocess_list.erase(it++);
-			}else
-				it ++;
+				it.handler(boost::asio::error::timed_out);
+			}
 		}
 
-				// 检查有无过期的
-		it = m_async_wait_packet_pred_handler_preprocess_list.begin();
-
-		while( it != m_async_wait_packet_pred_handler_preprocess_list.end())
+		for(const auto & it : m_async_wait_packet_pred_handler_preprocess_list)
 		{
-			if( it->deadline < now)
+			if( it.deadline < now)
 			{
-				m_async_wait_packet_pred_handler_preprocess_list.erase(it++);
-			}else
-				it ++;
+				it.handler(boost::asio::error::timed_out);
+			}
 		}
-
 	}
 
 public:
