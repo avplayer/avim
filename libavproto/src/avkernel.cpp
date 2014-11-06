@@ -98,26 +98,8 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		return false;
 	}
 
-	// TODO 数据包接收过程的完整实现， 目前只实现个基础的垃圾
-	void process_recived_packet_to_me(boost::shared_ptr<proto::base::avPacket> avPacket, avif avinterface, boost::asio::yield_context yield_context)
+	std::string decrypt_recived_packet_payload(autoRSAptr rsa, boost::shared_ptr<proto::base::avPacket> avPacket)
 	{
-		std::cerr << "one pkt from " <<  av_address_to_string(avPacket->src()) << " sended to me" << std::endl;
-		std::string add, data;
-
-		// TODO 处理 agmp 协议等等等等
-		if( ! avPacket->has_payload() )
-			return ;
-
-		add = av_address_to_string(avPacket->src());
-
-		avPacket->publickey();
-
-		autoRSAptr rsa(RSA_new(), RSA_free);
-
-		rsa->e = BN_new();
-		BN_set_word(rsa->e, 65537);
-		rsa->n = BN_bin2bn((const unsigned char*) avPacket->publickey().data(), avPacket->publickey().length(), rsa->n);
-
 		// 第一阶段解密，先使用发送者的公钥解密
 		std::string stage1decypted;
 		stage1decypted.resize(RSA_size(rsa.get()) + avPacket->payload().length());
@@ -135,6 +117,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		// 第二阶段解密，用自己的私钥解密
 		// 因为 find_RSA_pubkey 还没实现，所以发送方没有加密
 		// 暂时跳过
+		std::string data = stage1decypted;
 #if 0
 		data.resize( RSA_size(avinterface.get_rsa_key()) + stage1decypted.length() );
 
@@ -148,10 +131,60 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 			)
 		);
 #endif
-		data = stage1decypted;
+
+		return data;
+	}
+
+	// TODO 数据包接收过程的完整实现， 目前只实现个基础的垃圾
+	void process_recived_packet_to_me(boost::shared_ptr<proto::base::avPacket> avPacket, avif avinterface, boost::asio::yield_context yield_context)
+	{
+		std::cerr << "one pkt from " <<  av_address_to_string(avPacket->src()) << " sended to me" << std::endl;
+		std::string add;
+		std::string payload;
+
+		// TODO 处理 agmp 协议等等等等
+
+		add = av_address_to_string(avPacket->src());
+
+		avPacket->publickey();
+
+		autoRSAptr rsa(RSA_new(), RSA_free);
+
+		rsa->e = BN_new();
+		BN_set_word(rsa->e, 65537);
+		rsa->n = BN_bin2bn((const unsigned char*) avPacket->publickey().data(), avPacket->publickey().length(), rsa->n);
+
+		if( avPacket->upperlayerpotocol() == "pkask" )
+		{
+			// 发回 自己的公钥
+			async_send_agmp_pkreply(&avinterface, add);
+		}
+
+		if( avPacket->upperlayerpotocol() == "pkreply" )
+		{
+			// TODO 验证并提取公钥，添加到存储中心
+			const unsigned char * in = (const unsigned char *) avPacket->payload().data();
+			X509 * crt = d2i_X509(0, &in, avPacket->payload().length());
+			auto pkey = X509_get_pubkey(crt);
+			X509_free(crt);
+			RSA * rsa = EVP_PKEY_get1_RSA(pkey);
+			EVP_PKEY_free(pkey);
+
+			add_RSA_pubkey(
+				av_address_to_string(avPacket->src()),
+						   rsa, std::time(0) + 3600000
+			);
+			RSA_free(rsa);
+		}
+		// 有  payload ， 那就一定要解密，呵呵
+		if( avPacket->has_payload() )
+		{
+			payload = decrypt_recived_packet_payload(rsa, avPacket);
+		}
 
 		// 挂入本地接收列队，等待上层读取
-		m_recv_buffer.push(std::make_pair(add, data));
+		if( avPacket->upperlayerpotocol() == "avim")
+			m_recv_buffer.push(std::make_pair(add, payload));
 	}
 
 
@@ -231,7 +264,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		std::cerr << " , now routing with " << interface->get_ifname() << std::endl;
 
 		// 转发过去
-		async_interface_write_packet(interface, avPacket, yield_context);
+		async_interface_write_packet(interface, avPacket);
 
 		std::cerr << "routed ! " << std::endl;
 	}
@@ -310,6 +343,16 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		return init.result.get();
 	}
 
+	void async_interface_write_packet(avif * avinterface, avif::auto_avPacketPtr avPacket)
+	{
+		std::pair<avif::auto_avPacketPtr, boost::function<void(boost::system::error_code)> > value(
+			avPacket,
+			[](boost::system::error_code){}
+		);
+
+		avinterface->_write_queue->push(value);
+	}
+
 	// 读取这个接口上的数据，然后转发数据！
 	void interface_runner(avif avinterface, boost::asio::yield_context yield_context)
 	{
@@ -370,7 +413,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 			{
 				// 进入 askpk 模式
 				// TODO 如果如果已经有一个了，则不用发送，直接等待
-				async_send_agmp_pkask(interface, target, yield_context);
+				async_send_agmp_pkask(interface, target);
 
 				// TODO 发送 askpk 消息获取共钥
 				// TODO 如果配置了公钥服务器，尝试去公钥服务器获取
@@ -555,17 +598,34 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		}
 	}
 
-	void async_send_agmp_pkask(avif * interface, const std::string & target, boost::asio::yield_context yield_context)
+	void async_send_agmp_pkask(avif * interface, const std::string & target)
 	{
- 		proto::base::avPacket pkt;
-		* pkt.mutable_src() = * interface->if_address();
-		* pkt.mutable_dest() = av_address_from_string(target);
-		pkt.set_upperlayerpotocol("pkask");
-		pkt.set_time_to_live(64);
+ 		avif::auto_avPacketPtr pkt(new proto::base::avPacket);
 
-		avif::auto_avPacketPtr pktptr(& pkt, [](void*){});
+		* pkt->mutable_src() = * interface->if_address();
+		* pkt->mutable_dest() = av_address_from_string(target);
+		pkt->set_upperlayerpotocol("pkreply");
+		pkt->set_upperlayerpotocol("pkask");
+		pkt->set_time_to_live(64);
 
-		async_interface_write_packet(interface, pktptr, yield_context);
+		async_interface_write_packet(interface, pkt);
+	}
+
+	void async_send_agmp_pkreply(avif * interface, const std::string & target)
+	{
+ 		avif::auto_avPacketPtr pkt(new proto::base::avPacket);
+
+		* pkt->mutable_src() = * interface->if_address();
+		* pkt->mutable_dest() = av_address_from_string(target);
+		pkt->set_upperlayerpotocol("pkreply");
+		pkt->set_time_to_live(64);
+
+		unsigned char * out = NULL;
+		int certlen = i2d_X509((X509*)m_root_ca_cert, &out);
+		pkt->set_payload(out, certlen);
+		OPENSSL_free(out);
+
+ 		async_interface_write_packet(interface, pkt);
 	}
 
 	template<class Pred, class CompleteHandler>
