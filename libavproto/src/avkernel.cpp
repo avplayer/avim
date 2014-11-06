@@ -292,9 +292,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	}
 
 	template<class RealHandler>
-	inline BOOST_ASIO_INITFN_RESULT_TYPE(RealHandler,
-		void(boost::system::error_code))
-	async_interface_write_packet(avif * avinterface, avif::auto_avPacketPtr avPacket, BOOST_ASIO_MOVE_ARG(RealHandler) handler)
+	void async_interface_write_packet(avif * avinterface, avif::auto_avPacketPtr avPacket, BOOST_ASIO_MOVE_ARG(RealHandler) handler)
 	{
 		using namespace boost::asio;
 
