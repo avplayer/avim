@@ -337,6 +337,10 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 		if( ! target_pubkey )
 		{
+			// 进入 askpk 模式
+			// TODO 如果如果已经有一个了，则不用发送，直接等待
+			async_send_agmp_pkask(interface, target, yield_context);
+
 			// TODO 发送 askpk 消息获取共钥
 			// TODO 如果配置了公钥服务器，尝试去公钥服务器获取
 		}
@@ -466,6 +470,15 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		{
 			return false;
 		}
+	}
+
+	void async_send_agmp_pkask(avif * interface, const std::string & target, boost::asio::yield_context yield_context)
+	{
+ 		proto::base::avPacket pkt;
+		* pkt.mutable_src() = * interface->if_address();
+		* pkt.mutable_dest() = av_address_from_string(target);
+		pkt.set_upperlayerpotocol("pkask");
+
 	}
 
 public:
