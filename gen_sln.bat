@@ -27,8 +27,8 @@ CHOICE /C 123 /M "Enter your choice:"
 
 :: Note - list ERRORLEVELS in decreasing order
 IF ERRORLEVEL 3 GOTO ENDSCRIPT
-IF ERRORLEVEL 2 GOTO Win64
-IF ERRORLEVEL 1 GOTO Win32
+IF ERRORLEVEL 2 GOTO Win32
+IF ERRORLEVEL 1 GOTO Win64
 
 echo "calling cmake to generate MSVC projects now!"
 
