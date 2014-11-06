@@ -29,6 +29,8 @@ namespace detail {
 
 	struct avif_implement_interface{
 
+		virtual ~avif_implement_interface(){};
+
 		virtual boost::asio::io_service & get_io_service() const = 0;
 
 		virtual std::string get_ifname() const = 0 ;
