@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="中国技术第一的开源社区打造的AVIM，它是基于TCP/IP层协议支持分布式部署且运用C++编写的非对称加密的绝对军用级别的安全聊天工具">
+    <meta name="author" content="Avplay.org社区荣誉出品">
+    <meta name="keyword" content="AVIM 安全 IM 聊天工具 加密 RSA avplayer">
+    <link rel="shortcut icon" href="img/favicon.ico">
+
+    <title>AVIM - avplay.org社区荣誉出品</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/theme.css" rel="stylesheet">
+    <link href="css/bootstrap-reset.css" rel="stylesheet">
+    <!--external css-->
+    <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/flexslider.css"/>
+    <link href="assets/bxslider/jquery.bxslider.css" rel="stylesheet" />
+    <link href="assets/fancybox/source/jquery.fancybox.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="assets/revolution_slider/css/rs-style.css" media="screen">
+    <link rel="stylesheet" href="assets/revolution_slider/rs-plugin/css/settings.css" media="screen">
+
+    <!-- Custom styles for this template -->
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/style-responsive.css" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <!--header start-->
+    <header class="header-frontend">
+        <div class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <img src="img/logo.png" class="navbar-brand"/>
+                </div>
+                <div class="navbar-collapse collapse ">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">首页</a></li>
+                        <li><a href="#">账户</a></li>
+                        <li><a href="#">社区</a></li>
+                        <li><a href="#">关于</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--header end-->
+
+     <!-- revolution slider start -->
+     <div class="fullwidthbanner-container main-slider">
+         <div class="fullwidthabnner">
+             <ul id="revolutionul" style="display:none;">
+                 <!-- 1st slide -->
+                 <li data-transition="fade" data-slotamount="8" data-masterspeed="1000" data-delay="9400" data-thumb="">
+                     <div class="caption lfl slide_item_left"
+                          data-x="10"
+                          data-y="70"
+                          data-speed="400"
+                          data-start="1500"
+                          data-easing="easeOutBack">
+                         <img src="img/banner/ban2.png" alt="Image 1">
+                     </div>
+                     <div class="caption lfr slide_title"
+                          data-x="670"
+                          data-y="120"
+                          data-speed="400"
+                          data-start="1000"
+                          data-easing="easeOutExpo">
+                         avplayer.org
+                     </div>
+
+                     <div class="caption lfr slide_subtitle dark-text"
+                          data-x="670"
+                          data-y="190"
+                          data-speed="400"
+                          data-start="2000"
+                          data-easing="easeOutExpo">
+                         中国技术第一的开源社区
+                     </div>
+                     <div class="caption lfr slide_desc"
+                          data-x="670"
+                          data-y="260"
+                          data-speed="400"
+                          data-start="2500"
+                          data-easing="easeOutExpo">
+                 社区由志愿者运作，目前的管理者是jack/microcai/peter_future, webmaster hyq。<br/>
+                 分别来自四个不同的地外文明，来到中国献身伟大的开源事业。<br/>
+                 此外还有来自中国的数十W成员在贡献代码。<br/>
+                     </div>
+                     <a class="caption lfr btn yellow slide_btn" href="http://avplayer.org/" target="_blank"
+                        data-x="670"
+                        data-y="400"
+                        data-speed="400"
+                        data-start="3500"
+                        data-easing="easeOutExpo">
+                         加入社区
+                     </a>
+
+                 </li>
+
+                 <!-- 3rd slide  -->
+                 <li data-transition="fade" data-slotamount="7" data-masterspeed="1000" data-delay="10000" data-thumb="">
+                     <img src="img/banner/red-bg.jpg" alt="">
+                     <div class="caption lfl slide_item_right"
+                          data-x="10"
+                          data-y="105"
+                          data-speed="1200"
+                          data-start="1500"
+                          data-easing="easeOutBack">
+                         <img src="img/banner/imac.png" alt="Image 1">
+                     </div>
+                     <div class="caption lfl slide_item_right"
+                          data-x="25"
+                          data-y="345"
+                          data-speed="1200"
+                          data-start="2000"
+                          data-easing="easeOutBack">
+                         <img src="img/banner/tab.png" alt="Image 1">
+                     </div>
+                     <div class="caption lfl slide_item_right"
+                          data-x="200"
+                          data-y="330"
+                          data-speed="1200"
+                          data-start="2500"
+                          data-easing="easeOutBack">
+                         <img src="img/banner/mobile.png" alt="Image 1">
+                     </div>
+                     <div class="caption lfl slide_item_right"
+                          data-x="250"
+                          data-y="230"
+                          data-speed="1200"
+                          data-start="3000"
+                          data-easing="easeOutBack">
+                         <img src="img/banner/laptop.png" alt="Image 1">
+                     </div>
+                     <div class="caption lfl slide_item_right"
+                          data-x="165"
+                          data-y="30"
+                          data-speed="500"
+                          data-start="5000"
+                          data-easing="easeOutBack">
+                         <img src="img/banner/text_imac.png" id="rev-hint1" alt="Image 1">
+                     </div>
+
+                     <div class="caption lfr slide_title slide_item_left yellow-txt"
+                          data-x="670"
+                          data-y="145"
+                          data-speed="400"
+                          data-start="3500"
+                          data-easing="easeOutExpo">
+                         AVIM
+                     </div>
+                     <div class="caption lfr slide_subtitle slide_item_left"
+                          data-x="670"
+                          data-y="200"
+                          data-speed="400"
+                          data-start="4000"
+                          data-easing="easeOutExpo">
+                         安全聊天软件
+                     </div>
+                     <div class="caption lfr slide_desc slide_item_left"
+                          data-x="670"
+                          data-y="280"
+                          data-speed="400"
+                          data-start="4500"
+                          data-easing="easeOutExpo">
+                   中国技术第一的开源社区打造的AVIM，它是基于TCP/IP层协议支持分布式部署，<br/>
+                   运用C++编写的非对称加密的军用级别的安全聊天软件。<br>
+                   支持WinXP/Win7/Win8/Mac/Android/IOS/Linux/HTML5各种客户端。<br/>
+                   目前对外开放注册，使用它您只需要向我们提交申请。<br/>
+                     </div>
+                     <a class="caption lft slide_btn btn slide_item_left" href="#" 
+                        data-x="670"
+                        data-y="430"
+                        data-speed="400"
+                        data-start="4900"
+                        data-easing="easeOutExpo" style="background: none repeat scroll 0 0 #78cd51;">
+                         立即申请
+                     </a>
+                 </li>
+                 
+                 <!-- 2nd slide  -->
+                 <li data-transition="fade" data-slotamount="8" data-masterspeed="1000" data-delay="10000" data-thumb="">
+                     <!-- THE MAIN IMAGE IN THE FIRST SLIDE -->
+                     <img src="img/banner/banner_bg.jpg" alt="">
+                     <div class="caption lft slide_title"
+                          data-x="10"
+                          data-y="125"
+                          data-speed="400"
+                          data-start="1500"
+                          data-easing="easeOutExpo">
+                         信息安全的重要性
+                     </div>
+                     <div class="caption lft slide_subtitle dark-text"
+                          data-x="10"
+                          data-y="180"
+                          data-speed="400"
+                          data-start="2000"
+                          data-easing="easeOutExpo">
+                         欧美女星艳照、心脏出血、棱镜门等等
+                     </div>
+                     <div class="caption lft slide_desc dark-text"
+                          data-x="10"
+                          data-y="240"
+                          data-speed="400"
+                          data-start="2500"
+                          data-easing="easeOutExpo">
+                   一件一件涉及网络信息安全的轰动的事情相继发生，<br>
+                   难道你还一直无动于衷么，仍然每天使用着微信？QQ？MSN？Skype？<br/>
+                   和你的亲人朋友聊天么？<br>
+                   真的一点也没有想要改变一下意思么？
+                     </div>
+                     <div class="caption lft start"
+                          data-x="640"
+                          data-y="55"
+                          data-speed="400"
+                          data-start="2000"
+                          data-easing="easeOutBack"  >
+                         <img src="img/banner/man.png" alt="man">
+                     </div>
+                     <div class="caption lft slide_item_right"
+                          data-x="330"
+                          data-y="20"
+                          data-speed="500"
+                          data-start="3000"
+                          data-easing="easeOutBack">
+                         <img src="img/banner/test_man.png" id="rev-hint2" alt="txt img">
+                     </div>
+
+                 </li>
+
+             </ul>
+            <div class="tp-bannertimer tp-top"></div>
+         </div>
+     </div>
+     <!-- revolution slider end -->
+
+    <!--container start-->
+    <div class="container">
+        <div class="row">
+            <!--feature start-->
+            <div class="text-center feature-head">
+                <h1>关注avim的开发</h1>
+                <p>我们欢迎任何有开源精神的人加入，为avim提供自己的代码。</p>
+            </div>
+            <div class="col-lg-4 col-sm-4">
+                <section>
+                    <div class="f-box">
+                        <i class=" icon-desktop"></i>
+                        <h2>Excellent Design</h2>
+                        <p class="f-text">优秀的设计</p>
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-4 col-sm-4">
+                <section>
+                    <div class="f-box">
+                        <i class=" icon-code"></i>
+                        <h2>Friendly Codes</h2>
+                        <p class="f-text">完全现代C++风格</p>
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-4 col-sm-4">
+                <section>
+                    <div class="f-box">
+                        <i class="icon-gears"></i>
+                        <h2>Extendible Library</h2>
+                        <p class="f-text">易于扩展的avim库</p>
+                    </div>
+                </section>
+            </div>
+            <!--feature end-->
+        </div>
+        <div class="row">
+            <!--quote start-->
+            <div class="quote">
+                <div class="col-lg-3 col-sm-3">
+                    <a href="https://www.avboost.com" class="btn btn-success">
+                    <i class="icon-cloud"></i> 社区论坛 </a>
+                </div>
+                
+                <div class="col-lg-3 col-sm-3">
+                    <a href="https://github.com/avplayer/avim" class="btn btn-success">
+                    <i class="icon-github"></i> GitHub仓库 </a>
+                </div>
+                
+                <div class="col-lg-3 col-sm-3">
+                    <a href="https://wiki.avplayer.org/avim" class="btn btn-success">
+                    <i class="icon-gift"></i> Avim wiki </a>
+                </div>
+                
+                <div class="col-lg-3 col-sm-3">
+                    <a href="https://avplayer.org" class="btn btn-success">
+                    <i class="icon-gift"></i> avplayer.org首页 </a>
+                </div>
+            </div>
+            <!--quote end-->
+        </div>
+    </div>
+
+
+    <!-- js placed at the end of the document so the pages load faster -->
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/hover-dropdown.js"></script>
+    <script defer src="js/jquery.flexslider.js"></script>
+    <script type="text/javascript" src="assets/bxslider/jquery.bxslider.js"></script>
+
+    <script type="text/javascript" src="js/jquery.parallax-1.1.3.js"></script>
+
+    <script src="js/jquery.easing.min.js"></script>
+    <script src="js/link-hover.js"></script>
+
+    <script src="assets/fancybox/source/jquery.fancybox.pack.js"></script>
+
+    <script type="text/javascript" src="assets/revolution_slider/rs-plugin/js/jquery.themepunch.plugins.min.js"></script>
+    <script type="text/javascript" src="assets/revolution_slider/rs-plugin/js/jquery.themepunch.revolution.min.js"></script>
+
+    <!--common script for all pages-->
+    <script src="js/common-scripts.js"></script>
+
+    <script src="js/revulation-slide.js"></script>
+
+
+  <script>
+
+      RevSlide.initRevolutionSlider();
+
+      $(window).load(function() {
+          $('[data-zlname = reverse-effect]').mateHover({
+              position: 'y-reverse',
+              overlayStyle: 'rolling',
+              overlayBg: '#fff',
+              overlayOpacity: 0.7,
+              overlayEasing: 'easeOutCirc',
+              rollingPosition: 'top',
+              popupEasing: 'easeOutBack',
+              popup2Easing: 'easeOutBack'
+          });
+      });
+
+      $(window).load(function() {
+          $('.flexslider').flexslider({
+              animation: "slide",
+              start: function(slider) {
+                  $('body').removeClass('loading');
+              }
+          });
+      });
+
+      //    fancybox
+      jQuery(".fancybox").fancybox();
+
+
+
+  </script>
+
+  </body>
+</html>
