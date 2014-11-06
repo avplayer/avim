@@ -76,7 +76,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	> m_recv_buffer;
 
 	struct async_wait_packet_pred_handler{
-		boost::asio::deadline_timer * deadline;
+		boost::posix_time::ptime deadline;
 		boost::function<bool (const proto::base::avPacket &)> pred;
 		boost::function<void (boost::system::error_code)> handler;
 	};
@@ -367,7 +367,10 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 				// TODO 发送 askpk 消息获取共钥
 				// TODO 如果配置了公钥服务器，尝试去公钥服务器获取
-				boost::asio::deadline_timer deadline(io_service);
+				boost::posix_time::ptime deadline = boost::posix_time::microsec_clock::local_time();
+
+				deadline += boost::posix_time::seconds(8);
+
 				async_wait_processed_packet(deadline, [target](const proto::base::avPacket & pkt){
 					return pkt.has_publickey() && av_address_to_string(pkt.src()) == target;
 				}, yield_context);
@@ -558,7 +561,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	}
 
 	template<class Pred, class CompleteHandler>
-	void async_wait_processed_packet(boost::asio::deadline_timer & deadline, Pred pred, CompleteHandler handler)
+	void async_wait_processed_packet(const boost::posix_time::ptime & deadline, Pred pred, CompleteHandler handler)
 	{
 		using namespace boost::asio;
 
@@ -568,7 +571,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 
 		async_wait_packet_pred_handler item;
-		item.deadline = & deadline;
+		item.deadline = deadline;
 		item.pred = pred;
 		item.handler = init.handler;
 
@@ -579,6 +582,38 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		m_async_wait_packet_pred_handler_postprocess_list.erase(it);
 	}
 
+	void timer_start()
+	{
+		if( m_quitting )
+			return;
+		timer.expires_from_now(boost::posix_time::milliseconds(500));
+		timer.async_wait(boost::bind(&avkernel_impl::timer_tick, shared_from_this(),_1));
+	}
+
+	void timer_tick(boost::system::error_code ec)
+	{
+		timer_start();
+
+		auto now = boost::posix_time::microsec_clock::local_time();
+
+		// 检查有无过期的
+		for(const auto & it : m_async_wait_packet_pred_handler_postprocess_list)
+		{
+			if( it.deadline < now)
+			{
+				it.handler(boost::asio::error::timed_out);
+			}
+		}
+
+		for(const auto & it : m_async_wait_packet_pred_handler_preprocess_list)
+		{
+			if( it.deadline < now)
+			{
+				it.handler(boost::asio::error::timed_out);
+			}
+		}
+	}
+
 public:
 	avkernel_impl(boost::asio::io_service & _io_service)
 		: io_service(_io_service)
@@ -587,8 +622,9 @@ public:
 			boost::shared_ptr<BIO> bp(BIO_new_mem_buf((void*)avim_root_ca_certificate_string, strlen(avim_root_ca_certificate_string)), BIO_free);
 			return PEM_read_bio_X509(bp.get(), 0, 0, 0);
 		}())
+		, timer(io_service)
 	{
-
+		m_quitting = false;
 	}
 
 	~avkernel_impl()
@@ -596,6 +632,8 @@ public:
 		X509_free((X509*)m_root_ca_cert);
 	}
 
+	boost::atomic<bool> m_quitting;
+	boost::asio::deadline_timer timer;
 	friend avkernel;
 };
 
@@ -605,6 +643,12 @@ avkernel::avkernel(boost::asio::io_service & _io_service)
 	: io_service(_io_service)
 {
 	_impl = boost::make_shared<detail::avkernel_impl>(boost::ref(io_service));
+	_impl->timer_start();
+}
+
+avkernel::~avkernel()
+{
+	_impl->m_quitting = true;
 }
 
 bool avkernel::add_interface(avif avinterface)
