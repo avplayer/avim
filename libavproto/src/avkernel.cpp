@@ -55,7 +55,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	std::map<std::string, avif> m_avifs;
 	std::vector<RouteItem> m_routes;
 
-	struct AVPubKey : boost::noncopyable {
+	struct AVPubKey {
 		autoRSAptr rsa;
 		// valid_until this time
 		std::time_t valid_until;
@@ -461,9 +461,23 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	}
 
 	// 从本地数据找 RSA 公钥，找不到就返回 NULL , 让 agmp 协议其作用
-	RSA * find_RSA_pubkey(std::string address)
+	RSA * find_RSA_pubkey(std::string address) const
 	{
+		if(trusted_pubkey.count(address) > 0)
+		{
+			return trusted_pubkey.at(address).keys.back().rsa.get();
+		}
 		return NULL;
+	}
+
+	void add_RSA_pubkey(std::string address, RSA* pubkey, std::time_t valid_until)
+	{
+		trusted_pubkey[address].avaddr = address;
+		AVPubKey key;
+		RSA_up_ref(pubkey);
+		key.rsa = boost::shared_ptr<RSA>(pubkey, RSA_free);
+		key.valid_until = valid_until;
+		trusted_pubkey[address].keys.push_back(key);
 	}
 
 	// 移除接口的时候调用
