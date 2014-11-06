@@ -1,12 +1,12 @@
 
 @echo off
 
-echo "setting build environment"
+echo setting build environment
 
-echo "make sure your boost installed on c:\boost"
-echo "make sure your openssl installed on c:\openssl"
+echo make sure your boost installed on c:\boost
+echo make sure your openssl installed on c:\openssl
 
-echo "make sure protobuf is built first !!!!"
+echo make sure protobuf is built first !!!!
 
 set BOOST_ROOT="c:/boost"
 set OPENSSL_ROOT="c:/openssl"
@@ -43,4 +43,6 @@ GOTO End
 ENDSCRIPT:
 GOTO End
 
-:End1
+:End
+cd ..
+pause
