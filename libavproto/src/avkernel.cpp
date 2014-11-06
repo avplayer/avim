@@ -5,6 +5,7 @@
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/scope_exit.hpp>
 #include <boost/regex.hpp>
 #include <boost/range/algorithm.hpp>
 
@@ -74,8 +75,14 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		>
 	> m_recv_buffer;
 
-	// 缓存接收到的包以便后续处理的那种
-	std::list<avif::auto_avPacketPtr> m_recv_cache;
+	struct async_wait_packet_pred_handler{
+		boost::asio::deadline_timer * deadline;
+		boost::function<bool (const proto::base::avPacket &)> pred;
+		boost::function<void (boost::system::error_code)> handler;
+	};
+
+	std::list<async_wait_packet_pred_handler> m_async_wait_packet_pred_handler_preprocess_list;
+	std::list<async_wait_packet_pred_handler> m_async_wait_packet_pred_handler_postprocess_list;
 
 	bool is_to_me(const proto::base::avAddress & addr)
 	{
@@ -150,6 +157,16 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 	void process_recived_packet(boost::shared_ptr<proto::base::avPacket> avPacket, avif avinterface, boost::asio::yield_context yield_context)
 	{
+		BOOST_SCOPE_EXIT_ALL(this, avPacket)
+		{
+			// 这里是数据包的后处理
+			for( async_wait_packet_pred_handler  & i : m_async_wait_packet_pred_handler_postprocess_list)
+			{
+				if( i.pred(boost::ref(*avPacket)) )
+					i.handler(boost::system::error_code());
+			}
+
+		};
 
 		RSA * stored_key = find_RSA_pubkey(av_address_to_string(avPacket->src()));
 
@@ -208,7 +225,6 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		async_interface_write_packet(interface, avPacket, yield_context);
 
 		std::cerr << "routed ! " << std::endl;
-
 	}
 
 	void async_recvfrom_op(std::string & target, std::string & data, avkernel::ReadyHandler handler, boost::asio::yield_context yield_context)
@@ -299,8 +315,14 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 			if(avpkt)
 			{
-				// boost::asio::spawn(io_service, boost::bind(&avkernel_impl::process_recived_packet, shared_from_this(), avpkt, avinterface, _1));
-				process_recived_packet(avpkt, avinterface, yield_context);
+				// 这里是数据包的前置处理
+				for( async_wait_packet_pred_handler  & i : m_async_wait_packet_pred_handler_preprocess_list)
+				{
+					if( i.pred(boost::ref(*avpkt)) )
+						i.handler(boost::system::error_code());
+				}
+
+				boost::asio::spawn(io_service, boost::bind(&avkernel_impl::process_recived_packet, shared_from_this(), avpkt, avinterface, _1));
 			}else
 			{
 				* avinterface.quitting = true;
@@ -337,12 +359,26 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 		if( ! target_pubkey )
 		{
-			// 进入 askpk 模式
-			// TODO 如果如果已经有一个了，则不用发送，直接等待
-			async_send_agmp_pkask(interface, target, yield_context);
+			for(int i=0; !target_pubkey && i < 3; i++)
+			{
+				// 进入 askpk 模式
+				// TODO 如果如果已经有一个了，则不用发送，直接等待
+				async_send_agmp_pkask(interface, target, yield_context);
 
-			// TODO 发送 askpk 消息获取共钥
-			// TODO 如果配置了公钥服务器，尝试去公钥服务器获取
+				// TODO 发送 askpk 消息获取共钥
+				// TODO 如果配置了公钥服务器，尝试去公钥服务器获取
+				boost::asio::deadline_timer deadline(io_service);
+				async_wait_processed_packet(deadline, [target](const proto::base::avPacket & pkt){
+					return pkt.has_publickey() && av_address_to_string(pkt.src()) == target;
+				}, yield_context);
+				target_pubkey = find_RSA_pubkey(target);
+			}
+
+			if( ! target_pubkey)
+			{
+				return handler(	boost::asio::error::network_unreachable );
+			}
+
 		}
 
 		// TODO 构造 avPacket
@@ -479,6 +515,31 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		* pkt.mutable_dest() = av_address_from_string(target);
 		pkt.set_upperlayerpotocol("pkask");
 
+		avif::auto_avPacketPtr pktptr(& pkt, [](void*){});
+
+		async_interface_write_packet(interface, pktptr, yield_context);
+	}
+
+	template<class Pred, class CompleteHandler>
+	void async_wait_processed_packet(boost::asio::deadline_timer & deadline, Pred pred, CompleteHandler handler)
+	{
+		using namespace boost::asio;
+
+		boost::asio::detail::async_result_init<
+			CompleteHandler, void(boost::system::error_code)> init(
+			BOOST_ASIO_MOVE_CAST(CompleteHandler)(handler));
+
+
+		async_wait_packet_pred_handler item;
+		item.deadline = & deadline;
+		item.pred = pred;
+		item.handler = init.handler;
+
+		auto it = m_async_wait_packet_pred_handler_postprocess_list.insert(m_async_wait_packet_pred_handler_postprocess_list.end(), std::move(item));
+
+		init.result.get();
+
+		m_async_wait_packet_pred_handler_postprocess_list.erase(it);
 	}
 
 public:
