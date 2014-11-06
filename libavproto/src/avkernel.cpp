@@ -30,6 +30,34 @@ auto container_remove_all(C & c, Pred pred) -> decltype(std::begin(c))
 	return it;
 }
 
+class root_cert
+	: boost::noncopyable
+{
+	X509_STORE* m_store;
+public:
+	root_cert(X509* ca)
+	{
+		m_store = X509_STORE_new();
+
+		X509_STORE_add_cert(m_store, ca);    
+		X509_STORE_set_default_paths(m_store);
+	}
+
+	~root_cert()
+	{
+		X509_STORE_free(m_store);
+	}
+
+	bool verity(X509* cert)
+	{
+		boost::shared_ptr<X509_STORE_CTX> storeCtx(X509_STORE_CTX_new(), X509_STORE_CTX_free);
+		X509_STORE_CTX_init(storeCtx.get(), m_store,cert,NULL);
+		X509_STORE_CTX_set_flags(storeCtx.get(), X509_V_FLAG_CB_ISSUER_CHECK);
+		return X509_verify_cert(storeCtx.get());
+	}
+
+};
+
 class avkernel;
 namespace detail
 {
