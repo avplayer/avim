@@ -106,7 +106,8 @@ int main(int argv, char * argc[])
 	boost::shared_ptr<boost::asio::ip::tcp::socket> avserver( new boost::asio::ip::tcp::socket(io_service));
 
 	// 连接到 im.avplayer.org:24950
-	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("58.100.74.176", "5432")));
+//	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("58.100.74.176", "5432")));
+	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("127.0.0.1", "5432")));
 
 	avinterface.reset(new avjackif(avserver) );
 

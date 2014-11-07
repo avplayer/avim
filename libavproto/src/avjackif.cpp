@@ -32,13 +32,15 @@ void avjackif::async_handshake(std::string login_username, std::string login_pas
 	client_hello.set_client("avim");
 	client_hello.set_version(0001);
 
-	unsigned char to[100];
+	unsigned char to[512];
 
 	auto dh = DH_new();
 	DH_generate_parameters_ex(dh,64,DH_GENERATOR_5,NULL);
+	DH_generate_key(dh);
 
-	// 把 g 和 pubkey 传过去
+	// 把 g,p, pubkey 传过去
 	client_hello.set_random_g((const void*)to, BN_bn2bin(dh->g, to));
+	client_hello.set_random_p((const void*)to, BN_bn2bin(dh->p, to));
 	client_hello.set_random_pub_key((const void*)to, BN_bn2bin(dh->pub_key, to));
 
 	auto tobesend = av_router::encode(client_hello);
@@ -58,13 +60,12 @@ void avjackif::async_handshake(std::string login_username, std::string login_pas
 	// 解码
 	boost::scoped_ptr<proto::server_hello> server_hello((proto::server_hello*)av_router::decode(buf));
 
-	DH_generate_key(dh);
-	dh->p = BN_bin2bn((const unsigned char *) server_hello->random_p().data(), server_hello->random_p().length(), dh->p);
-	dh->pub_key = BN_bin2bn((const unsigned char *) server_hello->random_pub_key().data(), server_hello->random_pub_key().length(), dh->pub_key);
+	auto server_pubkey = BN_bin2bn((const unsigned char *) server_hello->random_pub_key().data(), server_hello->random_pub_key().length(), NULL);
 
 	m_shared_key.resize(DH_size(dh));
 	// 密钥就算出来啦！
-	DH_compute_key(&m_shared_key[0], dh->pub_key, dh);
+	DH_compute_key(&m_shared_key[0], server_pubkey, dh);
+	BN_free(server_pubkey);
 
     printf("key = 0x");
     for (int i=0; i<DH_size(dh); ++i) {
