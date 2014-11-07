@@ -1,3 +1,6 @@
 [submodule "avproxy"]
 	path = avproxy
 	url = git://github.com/avplayer/avproxy.git
+[submodule "avim_proto"]
+	path = avim_proto
+	url = git://github.com/avplayer/avim_proto_doc.git
