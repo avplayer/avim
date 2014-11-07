@@ -20,7 +20,7 @@
 extern const char * avim_root_ca_certificate_string;
 
 template<typename C, typename Pred>
-auto container_remove_all(C & c, Pred pred) -> decltype(std::begin(c))
+auto container_remove_if_all(C & c, Pred pred) -> decltype(std::begin(c))
 {
 	auto it = std::begin(c);
 	while( (it = std::find_if(it, std::end(c), pred) ) != std::end(c))
@@ -39,7 +39,7 @@ public:
 	{
 		m_store = X509_STORE_new();
 
-		X509_STORE_add_cert(m_store, ca);    
+		X509_STORE_add_cert(m_store, ca);
 		X509_STORE_set_default_paths(m_store);
 	}
 
@@ -86,7 +86,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	struct AVPubKey {
 		autoRSAptr rsa;
 		// valid_until this time
-		std::time_t valid_until;
+		boost::posix_time::ptime valid_until;
 	};
 
 	struct AVdbitem{
@@ -200,7 +200,8 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 			add_RSA_pubkey(
 				av_address_to_string(avPacket->src()),
-						   rsa, std::time(0) + 3600000
+					rsa,
+					boost::posix_time::microsec_clock::local_time() + boost::posix_time::hours(500)
 			);
 			RSA_free(rsa);
 			return ;
@@ -258,7 +259,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 			rsa->e = BN_new();
 			BN_set_word(rsa->e, 65537);
 			rsa->n = BN_bin2bn((const unsigned char *) avPacket->publickey().data(), avPacket->publickey().length(), 0);
-			add_RSA_pubkey(av_address_to_string(avPacket->src()), rsa, std::time(0) + 3600000);
+			add_RSA_pubkey(av_address_to_string(avPacket->src()), rsa, boost::posix_time::microsec_clock::local_time() + boost::posix_time::hours(500));
 			RSA_free(rsa);
 		}else
 		{
@@ -559,7 +560,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		return NULL;
 	}
 
-	void add_RSA_pubkey(std::string address, RSA* pubkey, std::time_t valid_until)
+	void add_RSA_pubkey(std::string address, RSA* pubkey, boost::posix_time::ptime valid_until)
 	{
 		auto& key_item = trusted_pubkey[address];
 		key_item.avaddr = address;
@@ -573,7 +574,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 	void purge_RSA_pubkey()
 	{
-		std::time_t now = time(NULL);
+		boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
 		for(auto iter = trusted_pubkey.begin(); iter != trusted_pubkey.end(); ++iter)
 		{
 			auto& keys = iter->second.keys;
