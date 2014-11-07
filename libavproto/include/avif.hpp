@@ -19,10 +19,8 @@ namespace boost {
 }
 
 namespace proto{
-	namespace base{
-		class avPacket;
-		class avAddress;
-	}
+	class avPacket;
+	class avAddress;
 }
 
 namespace detail {
@@ -35,17 +33,17 @@ namespace detail {
 
 		virtual std::string get_ifname() const = 0 ;
 
-		virtual const proto::base::avAddress * if_address() const = 0;
-		virtual const proto::base::avAddress * remote_address() const = 0 ;
+		virtual const proto::avAddress * if_address() const = 0;
+		virtual const proto::avAddress * remote_address() const = 0 ;
 
 		virtual RSA * get_rsa_key() = 0;
 		virtual X509 * get_cert() = 0;
 
 		// 读取 av数据包
-		virtual boost::shared_ptr<proto::base::avPacket> async_read_packet(boost::asio::yield_context yield_context) = 0;
+		virtual boost::shared_ptr<proto::avPacket> async_read_packet(boost::asio::yield_context yield_context) = 0;
 
 		// 发送 av数据包
-		virtual bool async_write_packet(proto::base::avPacket*, boost::asio::yield_context yield_context) = 0;
+		virtual bool async_write_packet(proto::avPacket*, boost::asio::yield_context yield_context) = 0;
 	};
 
 	template<class RealImpl>
@@ -61,12 +59,12 @@ namespace detail {
 			return _impl->get_ifname();
 		};
 
-		const proto::base::avAddress * if_address() const
+		const proto::avAddress * if_address() const
 		{
 			return _impl->if_address();
 		}
 
-		const proto::base::avAddress * remote_address() const
+		const proto::avAddress * remote_address() const
 		{
 			return _impl->remote_address();
 		}
@@ -82,13 +80,13 @@ namespace detail {
 			return _impl->get_cert();
 		}
 		// 读取 av数据包
-		boost::shared_ptr<proto::base::avPacket> async_read_packet(boost::asio::yield_context yield_context)
+		boost::shared_ptr<proto::avPacket> async_read_packet(boost::asio::yield_context yield_context)
 		{
 			return _impl->async_read_packet(yield_context);
 		}
 
 		// 发送 av数据包
-		bool async_write_packet(proto::base::avPacket* pkt, boost::asio::yield_context yield_context)
+		bool async_write_packet(proto::avPacket* pkt, boost::asio::yield_context yield_context)
 		{
 			return _impl->async_write_packet(pkt, yield_context);
 		}
@@ -117,12 +115,12 @@ struct avif
 		return _impl->get_ifname();
 	};
 
-	const proto::base::avAddress * if_address() const
+	const proto::avAddress * if_address() const
 	{
 		return _impl->if_address();
 	}
 
-	const proto::base::avAddress * remote_address() const
+	const proto::avAddress * remote_address() const
 	{
 		return _impl->remote_address();
 	}
@@ -138,10 +136,10 @@ struct avif
 	}
 
 	// 读取 av数据包
-	boost::shared_ptr<proto::base::avPacket> async_read_packet(boost::asio::yield_context yield_context);
+	boost::shared_ptr<proto::avPacket> async_read_packet(boost::asio::yield_context yield_context);
 
 	// 发送 av数据包
-	bool async_write_packet(proto::base::avPacket* pkt, boost::asio::yield_context yield_context);
+	bool async_write_packet(proto::avPacket* pkt, boost::asio::yield_context yield_context);
 
 	template<class AV_IF_IMPL>
 	avif(boost::shared_ptr<AV_IF_IMPL> impl)
@@ -166,7 +164,7 @@ struct avif
 
 	boost::shared_ptr< boost::atomic<bool> > quitting;
 
-	typedef boost::shared_ptr<proto::base::avPacket> auto_avPacketPtr;
+	typedef boost::shared_ptr<proto::avPacket> auto_avPacketPtr;
 
 	boost::shared_ptr<
 		boost::async_coro_queue<
@@ -184,5 +182,5 @@ private:
 	boost::shared_ptr<detail::avif_implement_interface> _impl;
 };
 
-proto::base::avAddress av_address_from_string(std::string av_address);
-std::string av_address_to_string(const proto::base::avAddress & addr);
+proto::avAddress av_address_from_string(std::string av_address);
+std::string av_address_to_string(const proto::avAddress & addr);

@@ -1,0 +1,47 @@
+package proto;
+
+// ===========================================================================
+//   这个是新的 JACK 写的router服务器所使用的协议层消息定义 用户登录相关协议
+// ===========================================================================
+
+
+message client_hello
+{
+	required string client = 1;
+	required uint32 version = 2;
+	optional bytes random_key = 3;
+}
+
+message server_hello
+{
+	required string servername = 1;
+	required uint32 version = 2;
+	required bytes random_key = 3;
+}
+
+message login
+{
+	required string user_name = 1;
+	required bytes encryped_radom_key = 2;
+	optional string other_info = 3;
+}
+
+message login_result
+{
+	// 0 表示成功， 其他数字表示失败原因
+  enum login_result_code {
+    LOGIN_SUCCEED = 0;
+    NO_SUCH_USER = 1;
+    PEREMISSON_DENIED = 2;
+    PUBLIC_KEY_MISMATCH = 3;
+  }
+  required login_result_code result = 1;
+ // TODO 其他信息
+}
+
+message user_register{
+	required string user_name = 1;
+	required bytes rsa_pubkey = 2;
+	optional string mail_address = 3;
+	optional string cell_phone = 4;
+}

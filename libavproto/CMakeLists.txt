@@ -6,7 +6,7 @@ project(libavprotocol)
 add_library(avproto++ STATIC src/root_ca.cpp src/avkernel.cpp src/avif.cpp src/avtcpif.cpp)
 set_target_properties(avproto++ PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-target_link_libraries(avproto++ avimproto-base ${PROTOBUF_LIBRARIES})
+target_link_libraries(avproto++ avimproto ${PROTOBUF_LIBRARIES})
 
 if(MSVC)
 set_source_files_properties(src/avC_stub.cpp PROPERTIES COMPILE_FLAGS "/DDLL_EXPORTS=1")

@@ -17,7 +17,7 @@
 #include "avif.hpp"
 #include "avproto.hpp"
 #include "async_coro_queue.hpp"
-#include "protocol/avim-base.pb.h"
+#include "avim_proto_doc/message.pb.h"
 
 extern const char * avim_root_ca_certificate_string;
 
@@ -201,14 +201,14 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 	struct async_wait_packet_pred_handler{
 		boost::posix_time::ptime deadline;
-		boost::function<bool (const proto::base::avPacket &)> pred;
+		boost::function<bool (const proto::avPacket &)> pred;
 		boost::function<void (boost::system::error_code)> handler;
 	};
 
 	std::list<async_wait_packet_pred_handler> m_async_wait_packet_pred_handler_preprocess_list;
 	std::list<async_wait_packet_pred_handler> m_async_wait_packet_pred_handler_postprocess_list;
 
-	bool is_to_me(const proto::base::avAddress & addr)
+	bool is_to_me(const proto::avAddress & addr)
 	{
 		// 遍历 interface 做比较
 		for( const auto & i : m_avifs)
@@ -223,7 +223,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	}
 
 	// TODO 数据包接收过程的完整实现， 目前只实现个基础的垃圾
-	void process_recived_packet_to_me(boost::shared_ptr<proto::base::avPacket> avPacket, avif avinterface, boost::asio::yield_context yield_context)
+	void process_recived_packet_to_me(boost::shared_ptr<proto::avPacket> avPacket, avif avinterface, boost::asio::yield_context yield_context)
 	{
 		std::cerr << "one pkt from " <<  av_address_to_string(avPacket->src()) << " sended to me" << std::endl;
 		std::string add;
@@ -280,7 +280,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 	}
 
 
-	void process_recived_packet(boost::shared_ptr<proto::base::avPacket> avPacket, avif avinterface, boost::asio::yield_context yield_context)
+	void process_recived_packet(boost::shared_ptr<proto::avPacket> avPacket, avif avinterface, boost::asio::yield_context yield_context)
 	{
 		BOOST_SCOPE_EXIT_ALL(this, avPacket)
 		{
@@ -458,7 +458,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		for(; ! (* avinterface.quitting) ;)
 		{
 			// 读取一个数据包
-			boost::shared_ptr<proto::base::avPacket> avpkt = avinterface.async_read_packet(yield_context[ec]);
+			boost::shared_ptr<proto::avPacket> avpkt = avinterface.async_read_packet(yield_context[ec]);
 
 			if(avpkt)
 			{
@@ -523,7 +523,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 				deadline += boost::posix_time::seconds(8);
 
-				async_wait_processed_packet(deadline, [this, target](const proto::base::avPacket & pkt)->bool{
+				async_wait_processed_packet(deadline, [this, target](const proto::avPacket & pkt)->bool{
 					return av_address_to_string(pkt.src()) == target && find_RSA_pubkey(target);
 				}, yield_context[ec]);
 				target_pubkey = find_RSA_pubkey(target);
@@ -538,7 +538,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 		// TODO 构造 avPacket
 
-		proto::base::avPacket avpkt;
+		proto::avPacket avpkt;
 
 //		target_pubkey = interface->get_rsa_key();
 		// 第一次加密
@@ -685,7 +685,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 	void async_send_agmp_pkask(avif * interface, const std::string & target)
 	{
- 		avif::auto_avPacketPtr pkt(new proto::base::avPacket);
+ 		avif::auto_avPacketPtr pkt(new proto::avPacket);
 
 		* pkt->mutable_src() = * interface->if_address();
 		* pkt->mutable_dest() = av_address_from_string(target);
@@ -698,7 +698,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 	void async_send_agmp_pkreply(avif * interface, const std::string & target)
 	{
- 		avif::auto_avPacketPtr pkt(new proto::base::avPacket);
+ 		avif::auto_avPacketPtr pkt(new proto::avPacket);
 
 		* pkt->mutable_src() = * interface->if_address();
 		* pkt->mutable_dest() = av_address_from_string(target);

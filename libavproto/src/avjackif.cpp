@@ -1,4 +1,6 @@
 
+#include <openssl/dh.h>
+
 #include "serialization.hpp"
 
 #include "avjackif.hpp"
@@ -12,5 +14,13 @@
 avjackif::avjackif(boost::asio::io_service & _io_service,
 	std::string login_username, std::string login_password, RSA * _key, X509 *)
 {
+
+}
+
+void avjackif::async_handshake(std::string login_username, std::string login_password, boost::asio::yield_context yield_context)
+{
+	auto dh = DH_new();
+	DH_generate_parameters();
+	DH_generate_key(dh);
 
 }

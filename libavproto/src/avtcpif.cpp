@@ -12,7 +12,8 @@
 
 #include "avtcpif.hpp"
 #include "avproto.hpp"
-#include "protocol/avim-base.pb.h"
+#include "avim_proto_doc/message.pb.h"
+#include "avim_proto_doc/old.pb.h"
 
 static  boost::atomic<uint64_t> ifcounts;// = 0ul;
 
@@ -41,7 +42,7 @@ avtcpif::avtcpif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock, std::str
 	m_sock = _sock;
 	ifname = allocate_ifname();
 
-	m_local_addr.reset( new proto::base::avAddress(av_address_from_string(local_addr)));
+	m_local_addr.reset( new proto::avAddress(av_address_from_string(local_addr)));
 }
 
 boost::asio::io_service& avtcpif::get_io_service() const
@@ -64,12 +65,12 @@ void avtcpif::set_root_ca(X509* ca)
     m_root_ca = ca;
 }
 
-const proto::base::avAddress* avtcpif::if_address() const
+const proto::avAddress* avtcpif::if_address() const
 {
     return m_local_addr.get();
 }
 
-const proto::base::avAddress * avtcpif::remote_address() const
+const proto::avAddress * avtcpif::remote_address() const
 {
 	return m_remote_addr.get();
 }
@@ -101,14 +102,14 @@ bool avtcpif::async_master_handshake(bool as_master, boost::asio::yield_context 
 
 	std::istream inputstream(&m_recv_buf);
 
-	proto::base::avTCPPacket pkt;
+	avoldtcpproto::avTCPPacket pkt;
 
 	pkt.ParseFromIstream(&inputstream);
 
 	if(pkt.type() != 1)
 		return false;
 
-	m_remote_addr.reset(new proto::base::avAddress(pkt.endpoint_address()));
+	m_remote_addr.reset(new proto::avAddress(pkt.endpoint_address()));
 
 	if(! pkt.has_endpoint_cert() )
 	{
@@ -152,7 +153,7 @@ bool avtcpif::slave_handshake(bool as_master)
 	std::ostream outstream(&m_send_buf);
 	boost::system::error_code ec;
 
-	proto::base::avTCPPacket pkt;
+	avoldtcpproto::avTCPPacket pkt;
 	pkt.set_type(1);
 
 	* pkt.mutable_endpoint_address() = * m_local_addr;
@@ -186,7 +187,7 @@ bool avtcpif::slave_handshake(bool as_master)
 	if(pkt.type() != 1)
 		return false;
 
-	m_remote_addr.reset( new proto::base::avAddress(pkt.endpoint_address()));
+	m_remote_addr.reset( new proto::avAddress(pkt.endpoint_address()));
 
 	return pkt.has_endpoint_cert() && check_cert(pkt.endpoint_cert());
 }
@@ -196,10 +197,10 @@ std::string avtcpif::remote_addr()
 	return m_remote_addr->username() + "@" + m_remote_addr->domain();
 }
 
-bool avtcpif::async_write_packet(proto::base::avPacket* avpkt, boost::asio::yield_context yield_context)
+bool avtcpif::async_write_packet(proto::avPacket* avpkt, boost::asio::yield_context yield_context)
 {
 	boost::system::error_code ec;
-	proto::base::avTCPPacket pkt;
+	avoldtcpproto::avTCPPacket pkt;
 
 	std::ostream outstream(&m_send_buf);
 
@@ -215,10 +216,10 @@ bool avtcpif::async_write_packet(proto::base::avPacket* avpkt, boost::asio::yiel
 	return ! ec;
 }
 
-boost::shared_ptr<proto::base::avPacket> avtcpif::async_read_packet(boost::asio::yield_context yield_context)
+boost::shared_ptr<proto::avPacket> avtcpif::async_read_packet(boost::asio::yield_context yield_context)
 {
 	do {
-		proto::base::avTCPPacket pkt;
+		avoldtcpproto::avTCPPacket pkt;
 		boost::uint32_t l;
 		boost::system::error_code ec;
 		// 接收用户的 av地址
@@ -241,8 +242,8 @@ boost::shared_ptr<proto::base::avPacket> avtcpif::async_read_packet(boost::asio:
 
 		if(pkt.type() == 0)
 		{
-			boost::shared_ptr<proto::base::avPacket> avPacket;
-			avPacket.reset(new proto::base::avPacket);
+			boost::shared_ptr<proto::avPacket> avPacket;
+			avPacket.reset(new proto::avPacket);
 			avPacket->CopyFrom(pkt.avpacket());
 			return avPacket;
 		}

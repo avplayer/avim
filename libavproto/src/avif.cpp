@@ -11,16 +11,16 @@
 
 #include <avif.hpp>
 
-#include "protocol/avim-base.pb.h"
+#include "avim_proto_doc/message.pb.h"
 #include "async_coro_queue.hpp"
 
-proto::base::avAddress av_address_from_string(std::string av_address)
+proto::avAddress av_address_from_string(std::string av_address)
 {
     boost::regex re("([^@]*)@([^/]*)(/(.*))?");
     boost::smatch m;
     if(boost::regex_search(av_address, m, re))
     {
-        proto::base::avAddress addr;
+        proto::avAddress addr;
         addr.set_username(m[1]);
         addr.set_domain(m[2]);
         if(m[3].matched)
@@ -29,10 +29,10 @@ proto::base::avAddress av_address_from_string(std::string av_address)
         }
         return addr;
     }
-    return proto::base::avAddress();
+    return proto::avAddress();
 }
 
-std::string av_address_to_string(const proto::base::avAddress & addr)
+std::string av_address_to_string(const proto::avAddress & addr)
 {
 	if(addr.has_resource())
 	{
@@ -49,12 +49,12 @@ void avif::construct()
 	);
 }
 
-boost::shared_ptr<proto::base::avPacket> avif::async_read_packet(boost::asio::yield_context yield_context)
+boost::shared_ptr<proto::avPacket> avif::async_read_packet(boost::asio::yield_context yield_context)
 {
     return _impl->async_read_packet(yield_context);
 }
 
-bool avif::async_write_packet(proto::base::avPacket* pkt, boost::asio::yield_context yield_context)
+bool avif::async_write_packet(proto::avPacket* pkt, boost::asio::yield_context yield_context)
 {
     return _impl->async_write_packet(pkt, yield_context);
 }
