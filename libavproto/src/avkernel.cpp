@@ -11,6 +11,8 @@
 
 #include <openssl/x509.h>
 #include <openssl/pem.h>
+#include <openssl/err.h>
+#include <openssl/rand.h>
 
 #include "avif.hpp"
 #include "avproto.hpp"
@@ -57,6 +59,100 @@ public:
 	}
 
 };
+
+
+/*
+ * 顾名思义，这个是简单 RSA , c++ 封装，专门对付 openssl 烂接口烂源码烂文档这种弱智库的
+ */
+
+std::string RSA_public_encrypt(RSA * rsa, const std::string & from)
+{
+	std::string result;
+	const int keysize = RSA_size(rsa);
+	std::vector<unsigned char> block(keysize);
+	const int chunksize = keysize  - RSA_PKCS1_PADDING_SIZE;
+	int inputlen = from.length();
+
+	for(int i = 0 ; i < inputlen; i+= chunksize)
+	{
+		auto resultsize = RSA_public_encrypt(std::min(chunksize, inputlen - i), (uint8_t*) &from[i],  &block[0], (RSA*) rsa, RSA_PKCS1_PADDING);
+		result.append((char*)block.data(), resultsize);
+	}
+	return result;
+}
+
+std::string RSA_private_decrypt(RSA * rsa, const std::string & from)
+{
+	std::string result;
+	const int keysize = RSA_size(rsa);
+	std::vector<unsigned char> block(keysize);
+
+	for(int i = 0 ; i < from.length(); i+= keysize)
+	{
+		auto resultsize = RSA_private_decrypt(std::min<int>(keysize, from.length() - i), (uint8_t*) &from[i],  &block[0], rsa, RSA_PKCS1_PADDING);
+		result.append((char*)block.data(), resultsize);
+	}
+	return result;
+}
+
+std::string RSA_private_encrypt(RSA * rsa, const std::string & from)
+{
+	std::string result;
+	const int keysize = RSA_size(rsa);
+	std::vector<unsigned char> block(keysize);
+	const int chunksize = keysize  - RSA_PKCS1_PADDING_SIZE;
+	int inputlen = from.length();
+
+	RAND_poll();
+
+	for(int i = 0 ; i < from.length(); i+= chunksize)
+	{
+		int flen = std::min<int>(chunksize, inputlen - i);
+
+		std::fill(block.begin(),block.end(), 0);
+
+		auto resultsize = RSA_private_encrypt(
+			flen,
+			(uint8_t*) &from[i],
+			&block[0],
+			rsa,
+			RSA_PKCS1_PADDING
+		);
+		result.append((char*)block.data(), resultsize);
+	}
+	return result;
+}
+
+std::string RSA_public_decrypt(RSA * rsa, const std::string & from)
+{
+	std::string result;
+	const int keysize = RSA_size(rsa);
+	std::vector<unsigned char> block(keysize);
+
+	int inputlen = from.length();
+
+	for(int i = 0 ; i < from.length(); i+= keysize)
+	{
+		int flen = std::min(keysize, inputlen - i);
+
+		auto resultsize = RSA_public_decrypt(
+			flen,
+			(uint8_t*) &from[i],
+			&block[0],
+			rsa,
+			RSA_PKCS1_PADDING
+		);
+		if( resultsize < 0)
+		{
+			auto e = ERR_get_error();
+
+			auto err = ERR_error_string(e , 0);
+		}
+		result.append((char*)block.data(), resultsize);
+	}
+	return result;
+}
+
 
 class avkernel;
 namespace detail
@@ -126,43 +222,6 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		return false;
 	}
 
-	std::string decrypt_recived_packet_payload(autoRSAptr rsa, boost::shared_ptr<proto::base::avPacket> avPacket)
-	{
-		// 第一阶段解密，先使用发送者的公钥解密
-		std::string stage1decypted;
-		stage1decypted.resize(RSA_size(rsa.get()) + avPacket->payload().length());
-		// data.res
-		stage1decypted.resize(
-			RSA_public_decrypt(
-				avPacket->payload().length(),
-				(uint8_t*) avPacket->payload().data(),
-				(uint8_t*) &stage1decypted[0],
-				rsa.get(),
-				RSA_PKCS1_PADDING
-			)
-		);
-
-		// 第二阶段解密，用自己的私钥解密
-		// 因为 find_RSA_pubkey 还没实现，所以发送方没有加密
-		// 暂时跳过
-		std::string data = stage1decypted;
-#if 0
-		data.resize( RSA_size(avinterface.get_rsa_key()) + stage1decypted.length() );
-
-		data.resize(
-			RSA_private_decrypt(
-				stage1decypted.length(),
-				(uint8_t*) stage1decypted.data(),
-				(uint8_t*) &data[0],
-				avinterface.get_rsa_key(),
-				RSA_PKCS1_OAEP_PADDING
-			)
-		);
-#endif
-
-		return data;
-	}
-
 	// TODO 数据包接收过程的完整实现， 目前只实现个基础的垃圾
 	void process_recived_packet_to_me(boost::shared_ptr<proto::base::avPacket> avPacket, avif avinterface, boost::asio::yield_context yield_context)
 	{
@@ -209,7 +268,10 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		// 有  payload ， 那就一定要解密，呵呵
 		if( avPacket->has_payload() )
 		{
-			payload = decrypt_recived_packet_payload(rsa, avPacket);
+			// 第一阶段解密，先使用发送者的公钥解密
+			std::string stage1decypted = RSA_public_decrypt(rsa.get(), avPacket->payload());
+			// 第二阶段解密，用自己的私钥解密
+			payload = RSA_private_decrypt(avinterface.get_rsa_key(), stage1decypted);
 		}
 
 		// 挂入本地接收列队，等待上层读取
@@ -478,28 +540,11 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 		proto::base::avPacket avpkt;
 
+//		target_pubkey = interface->get_rsa_key();
 		// 第一次加密
-		std::string first_pubencode;
-
-		int encrypted_size;
-		// target_pubkey 没实现，为了测试暂时不加密
-//		first_pubencode.resize(RSA_size(target_pubkey) + data.length());
-//		first_pubencode.resize(RSA_public_encrypt(data.length(), (uint8_t*) data.data(),(uint8_t*) &first_pubencode[0], target_pubkey, RSA_PKCS1_OAEP_PADDING));
-
-		first_pubencode = data;
-
+		std::string first_pubencode = RSA_public_encrypt(target_pubkey, data);
 		// 第二次签名
-		std::string second_sign;
-		second_sign.resize(RSA_size(interface->get_rsa_key()) + data.length());
-		encrypted_size = RSA_private_encrypt(
-				first_pubencode.length(),
-				(uint8_t*) first_pubencode.data(),
-				(uint8_t*) &second_sign[0],
-				interface->get_rsa_key(),
-				RSA_PKCS1_PADDING
-			);
-
-		second_sign.resize(encrypted_size);
+		std::string second_sign = RSA_private_encrypt(interface->get_rsa_key(), first_pubencode);
 
 		// 把加密后的数据写入avPacket
 		avpkt.set_payload(second_sign);
@@ -661,7 +706,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		pkt->set_time_to_live(64);
 
 		unsigned char * out = NULL;
-		int certlen = i2d_X509((X509*)m_root_ca_cert, &out);
+		int certlen = i2d_X509((X509*)interface->get_cert(), &out);
 		pkt->set_payload(out, certlen);
 		OPENSSL_free(out);
 

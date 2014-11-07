@@ -249,3 +249,8 @@ boost::shared_ptr<proto::base::avPacket> avtcpif::async_read_packet(boost::asio:
 
 	}while(1);
 }
+
+X509* avtcpif::get_cert()
+{
+    return _x509;
+}

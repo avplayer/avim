@@ -39,6 +39,7 @@ namespace detail {
 		virtual const proto::base::avAddress * remote_address() const = 0 ;
 
 		virtual RSA * get_rsa_key() = 0;
+		virtual X509 * get_cert() = 0;
 
 		// 读取 av数据包
 		virtual boost::shared_ptr<proto::base::avPacket> async_read_packet(boost::asio::yield_context yield_context) = 0;
@@ -75,6 +76,11 @@ namespace detail {
 			return _impl->get_rsa_key();
 		}
 
+
+		X509 * get_cert()
+		{
+			return _impl->get_cert();
+		}
 		// 读取 av数据包
 		boost::shared_ptr<proto::base::avPacket> async_read_packet(boost::asio::yield_context yield_context)
 		{
@@ -125,6 +131,12 @@ struct avif
 	{
 		return _impl->get_rsa_key();
 	}
+
+	X509 * get_cert()
+	{
+		return _impl->get_cert();
+	}
+
 	// 读取 av数据包
 	boost::shared_ptr<proto::base::avPacket> async_read_packet(boost::asio::yield_context yield_context);
 
