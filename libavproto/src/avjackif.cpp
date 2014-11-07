@@ -75,7 +75,7 @@ void avjackif::async_handshake(std::string login_username, std::string login_pas
 	DH_free(dh);
 
 	// 接着私钥加密 随机数
-	auto singned = RSA_private_encrypt(_rsa, std::string((const char*)m_shared_key.data(), m_shared_key.size()));
+	auto singned = RSA_private_encrypt(_rsa, server_hello->random_pub_key());
 
 	proto::login login_packet;
 	login_packet.set_user_name(login_username);
