@@ -10,15 +10,17 @@
 struct avjackif : boost::noncopyable
 {
 public:
-	avjackif(boost::shared_ptr<boost::asio::ip::tcp::socket>, std::string local_addr, RSA * _key, X509 *);
+	avjackif(boost::asio::io_service & _io_service);
 	~avjackif();
+
+	viud set_pki(RSA * _key, X509 *);
 
 	// TCP接口，有 master/slave 模式之分 服务器使用 master 模式，客户端则是 slave 模式
 	// 区别只是登录时候的握手不一样，所以就在 handshake 这里直接设定就可以了
-	bool async_master_handshake(bool as_master, boost::asio::yield_context yield_context);
+	void async_handshake(std::string login_username, std::string login_password, boost::asio::yield_context yield_context);
 
-	// 同步模式
-	bool slave_handshake(bool as_master);
+
+	void async_register_new_user(std::string user_name);
 
 	std::string remote_addr();
 
