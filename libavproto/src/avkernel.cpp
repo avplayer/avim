@@ -17,7 +17,7 @@
 #include "avif.hpp"
 #include "avproto.hpp"
 #include "async_coro_queue.hpp"
-#include "avim_proto_doc/message.pb.h"
+#include "avim_proto/message.pb.h"
 
 extern const char * avim_root_ca_certificate_string;
 

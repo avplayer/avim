@@ -12,8 +12,8 @@
 
 #include "avtcpif.hpp"
 #include "avproto.hpp"
-#include "avim_proto_doc/message.pb.h"
-#include "avim_proto_doc/old.pb.h"
+#include "avim_proto/message.pb.h"
+#include "avim_proto/old.pb.h"
 
 static  boost::atomic<uint64_t> ifcounts;// = 0ul;
 
