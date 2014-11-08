@@ -16,11 +16,11 @@
 
 proto::avAddress av_address_from_string(std::string av_address)
 {
+    proto::avAddress addr;
     boost::regex re("([^@]*)@([^/]*)(/(.*))?");
     boost::smatch m;
     if(boost::regex_search(av_address, m, re))
     {
-        proto::avAddress addr;
         addr.set_username(m[1]);
         addr.set_domain(m[2]);
         if(m[3].matched)
@@ -29,7 +29,9 @@ proto::avAddress av_address_from_string(std::string av_address)
         }
         return addr;
     }
-    return proto::avAddress();
+	addr.set_domain("avplayer.org");
+	addr.set_username(av_address);
+    return addr;
 }
 
 std::string av_address_to_string(const proto::avAddress & addr)
