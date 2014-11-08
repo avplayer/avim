@@ -1,3 +1,6 @@
+#include "avif.hpp"
+
+#include <atomic>
 
 #include <openssl/x509.h>
 #include <openssl/rsa.h>
@@ -7,9 +10,6 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
-#include <boost/atomic.hpp>
-
-#include <avif.hpp>
 
 #include "avim_proto/message.pb.h"
 #include "async_coro_queue.hpp"
@@ -45,7 +45,7 @@ std::string av_address_to_string(const proto::avAddress & addr)
 
 void avif::construct()
 {
-	quitting = boost::make_shared< boost::atomic<bool> >(false);
+	quitting = boost::make_shared< std::atomic<bool> >(false);
 	_write_queue = boost::make_shared< boost::async_coro_queue< std::queue< std::pair< auto_avPacketPtr, boost::function<void(boost::system::error_code)> > > > >(
 		boost::ref(get_io_service())
 	);

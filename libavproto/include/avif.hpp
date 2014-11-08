@@ -2,9 +2,10 @@
 #pragma once
 
 #include <queue>
+#include <atomic>
+
 #include <boost/format.hpp>
 #include <boost/function.hpp>
-#include <boost/atomic.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/spawn.hpp>
@@ -162,7 +163,7 @@ struct avif
 		_write_queue = other._write_queue;
 	}
 
-	boost::shared_ptr< boost::atomic<bool> > quitting;
+	boost::shared_ptr< std::atomic<bool> > quitting;
 
 	typedef boost::shared_ptr<proto::avPacket> auto_avPacketPtr;
 

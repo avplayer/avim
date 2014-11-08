@@ -1,7 +1,7 @@
+#include <atomic>
 
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
-#include <boost/atomic.hpp>
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/make_shared.hpp>
@@ -712,7 +712,7 @@ public:
 		X509_free((X509*)m_root_ca_cert);
 	}
 
-	boost::atomic<bool> m_quitting;
+	std::atomic<bool> m_quitting;
 	boost::asio::deadline_timer timer1, timer2;
 	friend avkernel;
 };
