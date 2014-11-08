@@ -13,11 +13,17 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 	endif()
 endif()
 
+if(MSVC)
+	add_definitions(-DNOMINMAX)
+	set (Boost_USE_MULTITHREADED TRUE)
+	set (Boost_USE_STATIC_LIBS TRUE)
+endif()
+
 option(RUN_PROTOC "run protoc to generate protobuf protocol parser" ON)
 option(BUILD_C_WRAPPER "build a libavproto that exports C interface" OFF)
 
 find_package(Threads REQUIRED)
-find_package(Boost 1.54 REQUIRED thread system coroutine context regex)
+find_package(Boost 1.54 COMPONENTS thread system coroutine context regex date_time chrono atomic filesystem REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
 #find_package(PkgConfig REQUIRED)
@@ -32,6 +38,7 @@ include_directories(
 	#${PKCS11_INCLUDE_DIRS}
 	libavproto/include
 )
+link_directories(${Boost_LIB_DIRS})
 
 link_libraries(${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} ${PKCS11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 

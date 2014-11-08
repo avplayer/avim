@@ -3,6 +3,7 @@
 
 #include <string>
 #include <boost/scoped_ptr.hpp>
+#include <algorithm>
 
 #include "avif.hpp"
 
@@ -124,7 +125,7 @@ public:
 	avkernel(boost::asio::io_service &);
 	~avkernel();
 
-	bool add_interface(avif interface);
+	bool add_interface(avif avinterface);
 
 	// 添加一项路由
 	bool add_route(std::string targetAddress, std::string gateway, std::string ifname, int metric);
