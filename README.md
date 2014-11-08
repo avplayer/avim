@@ -1,4 +1,6 @@
 avim-home
 =========
 
-avim website
+AVIM的网站部署在：
+http://avim.avplayer.org/
+
