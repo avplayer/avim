@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.9)
 project(libavprotocol)
 
 
-add_library(avproto++ STATIC src/root_ca.cpp src/avkernel.cpp src/avif.cpp src/avtcpif.cpp src/avjackif.cpp)
+add_library(avproto++ STATIC src/root_ca.cpp src/avkernel.cpp src/avif.cpp src/avjackif.cpp)
 set_target_properties(avproto++ PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_link_libraries(avproto++ avimproto ${PROTOBUF_LIBRARIES})
