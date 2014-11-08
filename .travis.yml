@@ -20,7 +20,9 @@ script:
 
 notifications:
   recipients:
-    - jack.wgm@gmail.com
+    - xosdy.t@gmail.com
+    - peter_future@outlook.com
+    - 13632323692@139.com
   email:
     on_success: change
     on_failure: always
