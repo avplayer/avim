@@ -15,8 +15,9 @@ endif()
 
 if(MSVC)
 	add_definitions(-DNOMINMAX)
-	set (Boost_USE_MULTITHREADED TRUE)
-	set (Boost_USE_STATIC_LIBS TRUE)
+	set(Boost_USE_MULTITHREADED TRUE)
+	set(Boost_USE_STATIC_LIBS TRUE)
+	set(PROTOBUF_SRC_ROOT_FOLDER $ENV{PROTOBUF_SRC_ROOT_FOLDER})
 endif()
 
 option(RUN_PROTOC "run protoc to generate protobuf protocol parser" ON)
