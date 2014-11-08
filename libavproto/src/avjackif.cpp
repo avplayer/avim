@@ -27,7 +27,8 @@ void avjackif::set_pki(RSA* _key, X509* cert)
 	ASN1_STRING *entryData = X509_NAME_ENTRY_get_data( cert_entry );
 	auto strlengh = ASN1_STRING_to_UTF8(&CN, entryData);
 	printf("%s\n",CN);
-	m_local_addr.reset( new proto::avAddress(av_address_from_string(std::string((char*)CN, strlengh))));
+	std::string commonname((char*)CN, strlengh);
+	m_local_addr.reset(new proto::avAddress(av_address_from_string(commonname)));
 	OPENSSL_free(CN);
 }
 
@@ -70,14 +71,16 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 	buf.resize(hostl + 4);
 	memcpy(&buf[0], &l, 4);
 	hostl = boost::asio::async_read(*m_sock, boost::asio::buffer(&buf[4], hostl),
-				boost::asio::transfer_exactly(hostl), yield_context);
+		boost::asio::transfer_exactly(hostl), yield_context);
 
 	// 解码
 	boost::scoped_ptr<proto::server_hello> server_hello((proto::server_hello*)av_router::decode(buf));
 
-	m_remote_addr.reset(new proto::avAddress(av_address_from_string(server_hello->server_av_address())));
+	m_remote_addr.reset(new proto::avAddress(
+		av_address_from_string(server_hello->server_av_address())));
 
-	auto server_pubkey = BN_bin2bn((const unsigned char *) server_hello->random_pub_key().data(), server_hello->random_pub_key().length(), NULL);
+	auto server_pubkey = BN_bin2bn((const unsigned char *) server_hello->random_pub_key().data(),
+		server_hello->random_pub_key().length(), NULL);
 
 	m_shared_key.resize(DH_size(dh));
 	// 密钥就算出来啦！
@@ -98,15 +101,18 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 	login_packet.set_user_name(m_local_addr->username());
 	login_packet.set_encryped_radom_key(singned);
 
-	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(login_packet)), yield_context);
+	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(login_packet)),
+		yield_context);
 
 	// 读取回应
-	boost::asio::async_read(*m_sock, boost::asio::buffer(&l, sizeof(l)), yield_context);
+	boost::asio::async_read(*m_sock, boost::asio::buffer(&l, sizeof(l)),
+		boost::asio::transfer_exactly(hostl), yield_context);
 
 	hostl = htonl(l);
 	buf.resize(htonl(l) + 4);
 	memcpy(&buf[0], &l, 4);
-	boost::asio::async_read(*m_sock, boost::asio::buffer(&buf[4], htonl(l)), yield_context);
+	boost::asio::async_read(*m_sock, boost::asio::buffer(&buf[4], htonl(l)),
+		boost::asio::transfer_exactly(hostl), yield_context);
 	// 解码
 	boost::scoped_ptr<proto::login_result> login_result((proto::login_result*)av_router::decode(buf));
 
@@ -120,7 +126,7 @@ void avjackif::async_register_new_user(std::string user_name)
 
 boost::asio::io_service& avjackif::get_io_service() const
 {
-
+	return m_sock->get_io_service();
 }
 
 std::string avjackif::get_ifname() const
@@ -130,6 +136,7 @@ std::string avjackif::get_ifname() const
 
 const proto::avAddress* avjackif::if_address() const
 {
+	return m_local_addr.get();
 }
 
 const proto::avAddress* avjackif::remote_address() const
@@ -147,9 +154,25 @@ X509* avjackif::get_cert()
 	return _x509;
 }
 
-boost::shared_ptr< proto::avPacket > avjackif::async_read_packet(boost::asio::yield_context yield_context)
-{}
+boost::shared_ptr<proto::avPacket> avjackif::async_read_packet(boost::asio::yield_context yield_context)
+{
+	std::string buf;
+	std::uint32_t l;
+	boost::asio::async_read(*m_sock, boost::asio::buffer(&l, sizeof(l)), yield_context);
 
-bool avjackif::async_write_packet(proto::avPacket*, boost::asio::yield_context yield_context)
-{}
+	auto hostl = htonl(l);
+	buf.resize(htonl(l) + 4);
+	memcpy(&buf[0], &l, 4);
+	boost::asio::async_read(*m_sock, boost::asio::buffer(&buf[4], htonl(l)),
+		boost::asio::transfer_exactly(hostl), yield_context);
+
+	return boost::shared_ptr<proto::avPacket>(dynamic_cast<proto::avPacket*>(av_router::decode(buf)));
+}
+
+bool avjackif::async_write_packet(proto::avPacket* pkt, boost::asio::yield_context yield_context)
+{
+	boost::system::error_code ec;
+	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(*pkt)), yield_context[ec]);
+	return !ec;
+}
 
