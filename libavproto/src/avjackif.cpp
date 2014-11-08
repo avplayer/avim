@@ -12,11 +12,18 @@
 /*
  * 这个类呢，是用来实现和 JACK 实现的那个 AVROUTER 对接的。也就是 JACK 版本的 AV NETWORK SERVICE PROVIDER
  */
+void avjackif::set_pki(RSA* _key, X509* cert)
+{
+    _rsa = _key;
+	_x509 = cert;
+}
 
 // av地址可以从证书里获取，所以外面无需传递进来
 avjackif::avjackif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock)
 	: m_sock(_sock)
 {
+	m_remote_addr.reset( new   proto::avAddress(av_address_from_string("unknow@unknow.com")));
+	m_local_addr.reset( new proto::avAddress(av_address_from_string("unknow@unknow.com")));
 
 }
 
@@ -26,7 +33,7 @@ avjackif::~avjackif()
 }
 
 
-void avjackif::async_handshake(std::string login_username, std::string login_password, boost::asio::yield_context yield_context)
+bool avjackif::async_handshake(std::string login_username, std::string login_password, boost::asio::yield_context yield_context)
 {
 	proto::client_hello client_hello;
 	client_hello.set_client("avim");
@@ -92,4 +99,47 @@ void avjackif::async_handshake(std::string login_username, std::string login_pas
 	boost::asio::async_read(*m_sock, boost::asio::buffer(&buf[4], htonl(l)), yield_context);
 	// 解码
 	boost::scoped_ptr<proto::login_result> login_result((proto::login_result*)av_router::decode(buf));
+
+	return login_result.get()->result() == proto::login_result_login_result_code_LOGIN_SUCCEED;
 }
+
+void avjackif::async_register_new_user(std::string user_name)
+{
+
+}
+
+boost::asio::io_service& avjackif::get_io_service() const
+{
+
+}
+
+std::string avjackif::get_ifname() const
+{
+	return "new_protocol_designed_by_jack";
+}
+
+const proto::avAddress* avjackif::if_address() const
+{
+}
+
+const proto::avAddress* avjackif::remote_address() const
+{
+	return m_remote_addr.get();
+}
+
+RSA* avjackif::get_rsa_key()
+{
+	return _rsa;
+}
+
+X509* avjackif::get_cert()
+{
+	return _x509;
+}
+
+boost::shared_ptr< proto::avPacket > avjackif::async_read_packet(boost::asio::yield_context yield_context)
+{}
+
+bool avjackif::async_write_packet(proto::avPacket*, boost::asio::yield_context yield_context)
+{}
+
