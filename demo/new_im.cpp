@@ -51,7 +51,7 @@ static void msg_login_and_send(boost::asio::yield_context yield_context)
 	// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
 	boost::async(
 		[](){
-			avcore.sendto("test@avplayer.org", "test, me are testing you stupid avim");
+			avcore.sendto("test-client@avplayer.org", "test, me are testing you stupid avim");
 		}
 	);
 
