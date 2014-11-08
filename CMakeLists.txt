@@ -40,7 +40,17 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 endif()
 
+if(EXISTS ${PROJECT_SOURCE_DIR}/avim_proto/CMakeLists.txt )
+
 add_subdirectory(avim_proto)
+
+else()
+
+message( FATAL_ERROR "please run 'git submodule update --init' to get avim_proto")
+
+endif()
+
+
 add_subdirectory(libavproto)
 
 link_libraries(avproto++)
