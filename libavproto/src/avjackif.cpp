@@ -42,6 +42,15 @@ avjackif::~avjackif()
 {
 }
 
+static std::string i2d_X509(X509 * x509)
+{
+	unsigned char * out = NULL;
+	int l = i2d_X509(x509, & out);
+	std::string ret((char*)out, l);
+	OPENSSL_free(out);
+	return ret;
+}
+
 bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 {
 	proto::client_hello client_hello;
@@ -98,7 +107,7 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 	auto singned = RSA_private_encrypt(_rsa, server_hello->random_pub_key());
 
 	proto::login login_packet;
-	login_packet.set_user_name(m_local_addr->username());
+	login_packet.set_user_cert( i2d_X509(_x509) );
 	login_packet.set_encryped_radom_key(singned);
 
 	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(login_packet)),
