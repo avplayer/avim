@@ -8,8 +8,10 @@ echo make sure your openssl installed on c:\openssl
 
 echo make sure protobuf is built first !!!!
 
-set BOOST_ROOT="c:/boost"
-set OPENSSL_ROOT="c:/openssl"
+:: 每人的硬盘及使用情况都不一样，请勿统一目录,
+:: 各位根据自家情况把boost根目录设为BOOST_ROOT环境变量，OpenSSL同理
+set BOOST_ROOT=%BOOST_ROOT%
+set OPENSSL_ROOT=%OPENSSL_ROOT%
 set PROTOBUF_SRC_ROOT_FOLDER=%~dp0\third_party\protobuf-2.6.1\
 
 
