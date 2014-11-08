@@ -26,7 +26,7 @@
 namespace av_router {
 
 	// 创建type_name指定的名字的Message对象.
-	inline google::protobuf::Message* create_message(const std::string& type_name)
+	static inline google::protobuf::Message* create_message(const std::string& type_name)
 	{
 		google::protobuf::Message* message = NULL;
 		const google::protobuf::Descriptor* descriptor =
@@ -42,7 +42,7 @@ namespace av_router {
 	}
 
 	// 序列化消息.
-	inline std::string encode(const google::protobuf::Message& message)
+	std::string encode(const google::protobuf::Message& message)
 	{
 		std::string result;
 		const std::string& type_name = message.GetTypeName();
@@ -69,7 +69,7 @@ namespace av_router {
 	}
 
 	// 反序列化消息.
-	inline google::protobuf::Message* decode(const std::string& buf)
+	google::protobuf::Message* decode(const std::string& buf)
 	{
 		static const int header_len = sizeof(boost::int32_t);
 		boost::int32_t len = static_cast<boost::int32_t>(buf.size());
