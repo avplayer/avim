@@ -17,7 +17,9 @@ if(MSVC)
 	add_definitions(-DNOMINMAX)
 	set(Boost_USE_MULTITHREADED TRUE)
 	set(Boost_USE_STATIC_LIBS TRUE)
-	set(PROTOBUF_SRC_ROOT_FOLDER $ENV{PROTOBUF_SRC_ROOT_FOLDER})
+	if(${PROTOBUF_SRC_ROOT_FOLDER} STREQUAL "")
+		set(PROTOBUF_SRC_ROOT_FOLDER $ENV{PROTOBUF_SRC_ROOT_FOLDER})
+	endif()
 endif()
 
 option(RUN_PROTOC "run protoc to generate protobuf protocol parser" ON)
@@ -31,7 +33,7 @@ find_package(OpenSSL REQUIRED)
 
 #pkg_check_modules(PKCS11 REQUIRED libpkcs11-helper-1 )
 
-include_directories(	
+include_directories(
 	${PROTOBUF_INCLUDE_DIRS}
 	${CMAKE_CURRENT_BINARY_DIR}
 	${Boost_INCLUDE_DIRS}
