@@ -75,6 +75,12 @@ int pass_cb(char *buf, int size, int rwflag, char *u)
 	return len;
 }
 
+// 真 main 在这里, 这里是个臭协程
+static void real_main(boost::asio::yield_context yield_context)
+{
+
+}
+
 int main(int argv, char * argc[])
 {
 	OpenSSL_add_all_algorithms();
@@ -112,6 +118,7 @@ int main(int argv, char * argc[])
 
 	avinterface->set_pki(rsa_key, x509_cert);
 
+	boost::asio::spawn(io_service, boost::bind(&real_main, _1));
 
 	boost::asio::spawn(io_service, msg_login_and_send);
 

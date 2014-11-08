@@ -5,8 +5,6 @@
 // Email:  jack.wgm at gmail dot com
 //
 
-#pragma once
-
 #include <string>
 
 #include <boost/assert.hpp>
