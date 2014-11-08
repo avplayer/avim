@@ -9,7 +9,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 		set(CMAKE_COMPILER_IS_UNIX_ICC 1)
 	else()
 		# CMAKE_COMPILER_IS_WIN_ICC 的 c++11 模式命令行参数不一样
-	set(CMAKE_COMPILER_IS_WIN_ICC 1)
+		set(CMAKE_COMPILER_IS_WIN_ICC 1)
 	endif()
 endif()
 
