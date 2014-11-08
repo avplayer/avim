@@ -740,7 +740,7 @@ bool avkernel::add_interface(avif avinterface)
 	_impl->m_avifs.insert(std::make_pair(avinterface.get_ifname(), avinterface));
 	boost::asio::spawn(io_service, boost::bind(&detail::avkernel_impl::interface_runner, _impl, avinterface, _1));
 	boost::asio::spawn(io_service, boost::bind(&detail::avkernel_impl::interface_writer, _impl, avinterface, _1));
-	return true;
+	return _impl->m_avifs.find(avinterface.get_ifname()) != _impl->m_avifs.end();
 }
 
 bool avkernel::add_route(std::string targetAddress, std::string gateway, std::string ifname, int metric)

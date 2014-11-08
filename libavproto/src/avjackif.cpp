@@ -1,5 +1,6 @@
 
 #include <openssl/dh.h>
+#include <openssl/x509.h>
 
 #include "serialization.hpp"
 
@@ -16,24 +17,31 @@ void avjackif::set_pki(RSA* _key, X509* cert)
 {
     _rsa = _key;
 	_x509 = cert;
+
+	unsigned char * CN = NULL;
+
+	auto cert_name = X509_get_subject_name(cert);
+	auto cert_entry = X509_NAME_get_entry(cert_name,
+		X509_NAME_get_index_by_NID(cert_name, NID_commonName, 0)
+	);
+	ASN1_STRING *entryData = X509_NAME_ENTRY_get_data( cert_entry );
+	auto strlengh = ASN1_STRING_to_UTF8(&CN, entryData);
+	printf("%s\n",CN);
+	m_local_addr.reset( new proto::avAddress(av_address_from_string(std::string((char*)CN, strlengh))));
+	OPENSSL_free(CN);
 }
 
 // av地址可以从证书里获取，所以外面无需传递进来
 avjackif::avjackif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock)
 	: m_sock(_sock)
 {
-	m_remote_addr.reset( new   proto::avAddress(av_address_from_string("unknow@unknow.com")));
-	m_local_addr.reset( new proto::avAddress(av_address_from_string("unknow@unknow.com")));
-
 }
 
 avjackif::~avjackif()
 {
-
 }
 
-
-bool avjackif::async_handshake(std::string login_username, std::string login_password, boost::asio::yield_context yield_context)
+bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 {
 	proto::client_hello client_hello;
 	client_hello.set_client("avim");
@@ -67,6 +75,8 @@ bool avjackif::async_handshake(std::string login_username, std::string login_pas
 	// 解码
 	boost::scoped_ptr<proto::server_hello> server_hello((proto::server_hello*)av_router::decode(buf));
 
+	m_remote_addr.reset(new proto::avAddress(av_address_from_string(server_hello->server_av_address())));
+
 	auto server_pubkey = BN_bin2bn((const unsigned char *) server_hello->random_pub_key().data(), server_hello->random_pub_key().length(), NULL);
 
 	m_shared_key.resize(DH_size(dh));
@@ -74,18 +84,18 @@ bool avjackif::async_handshake(std::string login_username, std::string login_pas
 	DH_compute_key(&m_shared_key[0], server_pubkey, dh);
 	BN_free(server_pubkey);
 
-    printf("key = 0x");
+    std::printf("key = 0x");
     for (int i=0; i<DH_size(dh); ++i) {
-        printf("%x%x", (m_shared_key[i] >> 4) & 0xf, m_shared_key[i] & 0xf);
+        std::printf("%x%x", (m_shared_key[i] >> 4) & 0xf, m_shared_key[i] & 0xf);
     }
-    printf("\n");
+    std::printf("\n");
 	DH_free(dh);
 
 	// 接着私钥加密 随机数
 	auto singned = RSA_private_encrypt(_rsa, server_hello->random_pub_key());
 
 	proto::login login_packet;
-	login_packet.set_user_name(login_username);
+	login_packet.set_user_name(m_local_addr->username());
 	login_packet.set_encryped_radom_key(singned);
 
 	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(login_packet)), yield_context);

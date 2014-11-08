@@ -42,10 +42,9 @@ static void msg_login_and_send(boost::asio::yield_context yield_context)
 {
 	std::string me_addr = "test@avplayer.org";
 
-	avinterface->async_handshake("test", "test",yield_context);
-
-	avcore.add_interface(avinterface);
-
+	avinterface->async_handshake(yield_context) &&
+	// 添加接口
+	avcore.add_interface(avinterface) &&
 	// 添加路由表, metric越大，优先级越低
 	avcore.add_route(".+@.+", me_addr, avinterface->get_ifname(), 100);
 
@@ -106,7 +105,7 @@ int main(int argv, char * argc[])
 	boost::shared_ptr<boost::asio::ip::tcp::socket> avserver( new boost::asio::ip::tcp::socket(io_service));
 
 	// 连接到 im.avplayer.org:24950
-	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("58.100.74.176", "5432")));
+	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("avim.avplayer.org", "5432")));
 	//boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("127.0.0.1", "5432")));
 
 	avinterface.reset(new avjackif(avserver) );
