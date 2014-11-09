@@ -14,7 +14,7 @@ public:
 	avjackif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock);
 	~avjackif();
 
-	void set_pki(RSA * _key, X509 *);
+	void set_pki(boost::shared_ptr<RSA> _key, boost::shared_ptr<X509>);
 
 	// TCP接口，有 master/slave 模式之分 服务器使用 master 模式，客户端则是 slave 模式
 	// 区别只是登录时候的握手不一样，所以就在 handshake 这里直接设定就可以了
@@ -44,8 +44,10 @@ private:
 	static std::string allocate_ifname();
 
 	std::string ifname;
-	RSA * _rsa;
-	X509 * _x509, *m_root_ca;
+	boost::shared_ptr<RSA> _rsa;
+	boost::shared_ptr<X509> _x509;
+	X509 *m_root_ca;
+
 	boost::scoped_ptr<proto::avAddress> m_local_addr;
 	boost::scoped_ptr<proto::avAddress> m_remote_addr;
 

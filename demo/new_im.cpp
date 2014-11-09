@@ -82,9 +82,20 @@ int pass_cb(char *buf, int size, int rwflag, char *u)
 }
 
 // 真 main 在这里, 这里是个臭协程
-static void real_main(boost::asio::yield_context yield_context)
+static void real_main(boost::asio::yield_context yield_context, boost::shared_ptr<RSA> rsa_key, boost::shared_ptr<X509> x509_cert)
 {
+	boost::asio::ip::tcp::resolver resolver(io_service);
+	boost::shared_ptr<boost::asio::ip::tcp::socket> avserver( new boost::asio::ip::tcp::socket(io_service));
 
+	auto resolved_host_iterator = resolver.async_resolve(boost::asio::ip::tcp::resolver::query("avim.avplayer.org", "24950"), yield_context);
+
+	boost::asio::async_connect(*avserver, resolved_host_iterator, yield_context);
+
+	avinterface.reset(new avjackif(avserver) );
+
+	avinterface->set_pki(rsa_key, x509_cert);
+
+	boost::asio::spawn(io_service, msg_login_and_send);
 }
 
 int main(int argc, char * argv[])
@@ -115,7 +126,11 @@ int main(int argc, char * argv[])
 		std::cerr << "can not open " << key << std::endl;
 		exit(1);
 	}
-	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, (pem_password_cb*)pass_cb,(void*) key.c_str());
+
+	boost::shared_ptr<RSA> rsa_key(
+		PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, (pem_password_cb*)pass_cb,(void*) key.c_str()),
+		RSA_free
+	);
 
 	boost::shared_ptr<BIO> certfile(BIO_new_file(cert.c_str(), "r"), BIO_free);
 	if(!certfile)
@@ -124,25 +139,18 @@ int main(int argc, char * argv[])
 		std::cerr << "can not open "<< cert << std::endl;
 		exit(1);
 	}
-	X509 * x509_cert = PEM_read_bio_X509(certfile.get(), 0, 0, 0);
+
+	boost::shared_ptr<X509> x509_cert(
+		PEM_read_bio_X509(certfile.get(), 0, 0, 0),
+		X509_free
+	);
 
 	certfile.reset();
 	keyfile.reset();
 
-	boost::asio::ip::tcp::resolver resolver(io_service);
-	boost::shared_ptr<boost::asio::ip::tcp::socket> avserver( new boost::asio::ip::tcp::socket(io_service));
-	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("avim.avplayer.org", "24950")));
-
-	avinterface.reset(new avjackif(avserver) );
-
-	avinterface->set_pki(rsa_key, x509_cert);
-
-	boost::asio::spawn(io_service, boost::bind(&real_main, _1));
-
-	boost::asio::spawn(io_service, msg_login_and_send);
+	boost::asio::spawn(io_service, boost::bind(&real_main, _1, rsa_key, x509_cert));
 
 	// 开协程异步接收消息
-
 	boost::asio::spawn(io_service, msg_reader);
 	io_service.run();
 }
