@@ -26,7 +26,7 @@ option(RUN_PROTOC "run protoc to generate protobuf protocol parser" ON)
 option(BUILD_C_WRAPPER "build a libavproto that exports C interface" OFF)
 
 find_package(Threads REQUIRED)
-find_package(Boost 1.54 COMPONENTS thread system coroutine context regex date_time chrono filesystem REQUIRED)
+find_package(Boost 1.54 REQUIRED COMPONENTS thread system program_options coroutine context regex date_time chrono filesystem )
 find_package(Protobuf REQUIRED)
 find_package(OpenSSL REQUIRED)
 #find_package(PkgConfig REQUIRED)

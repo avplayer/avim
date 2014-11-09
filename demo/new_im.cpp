@@ -7,6 +7,10 @@
 #include <boost/asio/spawn.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/thread.hpp>
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 #include <avjackif.hpp>
 #include <avproto.hpp>
@@ -60,18 +64,20 @@ static void msg_login_and_send(boost::asio::yield_context yield_context)
 int pass_cb(char *buf, int size, int rwflag, char *u)
 {
 	int len;
-	const char *tmp;
+	std::string tmp;
 	/* We'd probably do something else if 'rwflag' is 1 */
-	printf("Enter pass phrase for \"%s\"\n", u);
+	std::cout << "Enter pass phrase for " << u << " :";
+	std::flush(std::cout);
+
+	std::cin >> tmp;
 
 	/* get pass phrase, length 'len' into 'tmp' */
-	tmp = "test";
-	len = strlen(tmp);
+	len = tmp.length();
 
 	if (len <= 0) return 0;
 	/* if too long, truncate */
 	if (len > size) len = size;
-	memcpy(buf, tmp, len);
+	memcpy(buf, tmp.data(), len);
 	return len;
 }
 
@@ -81,22 +87,37 @@ static void real_main(boost::asio::yield_context yield_context)
 
 }
 
-int main(int argv, char * argc[])
+int main(int argc, char * argv[])
 {
 	OpenSSL_add_all_algorithms();
+	fs::path key, cert;
 
-	boost::shared_ptr<BIO> keyfile(BIO_new_file("test.key", "r"), BIO_free);
+	po::variables_map vm;
+	po::options_description desc("qqbot options");
+	desc.add_options()
+	("key", po::value<fs::path>(&key)->default_value("avim.key"), "path to private key")
+	("cert", po::value<fs::path>(&cert)->default_value("avim.cert"), "path to cert");
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::notify(vm);
+
+	if (vm.count("help"))
+	{
+		std::cerr <<  desc <<  std::endl;
+		return 1;
+	}
+
+	boost::shared_ptr<BIO> keyfile(BIO_new_file(key.c_str(), "r"), BIO_free);
 	if(!keyfile)
 	{
-		std::cerr << "can not open test.key" << std::endl;
+		std::cerr << "can not open " << key << std::endl;
 		exit(1);
 	}
 	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, (pem_password_cb*)pass_cb,(void*) "test.key");
 
-	boost::shared_ptr<BIO> certfile(BIO_new_file("test.crt", "r"), BIO_free);
+	boost::shared_ptr<BIO> certfile(BIO_new_file(cert.c_str(), "r"), BIO_free);
 	if(!certfile)
 	{
-		std::cerr << "can not open avim.crt" << std::endl;
+		std::cerr << "can not open "<< cert << std::endl;
 		exit(1);
 	}
 	X509 * x509_cert = PEM_read_bio_X509(certfile.get(), 0, 0, 0);
