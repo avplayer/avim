@@ -96,7 +96,9 @@ int main(int argc, char * argv[])
 	po::options_description desc("qqbot options");
 	desc.add_options()
 	("key", po::value<fs::path>(&key)->default_value("avim.key"), "path to private key")
-	("cert", po::value<fs::path>(&cert)->default_value("avim.cert"), "path to cert");
+	("cert", po::value<fs::path>(&cert)->default_value("avim.cert"), "path to cert")
+	("help,h",  "display this help");
+
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 
@@ -109,6 +111,7 @@ int main(int argc, char * argv[])
 	boost::shared_ptr<BIO> keyfile(BIO_new_file(key.c_str(), "r"), BIO_free);
 	if(!keyfile)
 	{
+		std::cerr <<  desc <<  std::endl;
 		std::cerr << "can not open " << key << std::endl;
 		exit(1);
 	}
@@ -117,6 +120,7 @@ int main(int argc, char * argv[])
 	boost::shared_ptr<BIO> certfile(BIO_new_file(cert.c_str(), "r"), BIO_free);
 	if(!certfile)
 	{
+		std::cerr <<  desc <<  std::endl;
 		std::cerr << "can not open "<< cert << std::endl;
 		exit(1);
 	}
