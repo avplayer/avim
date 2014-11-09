@@ -115,7 +115,7 @@ int main(int argc, char * argv[])
 		std::cerr << "can not open " << key << std::endl;
 		exit(1);
 	}
-	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, (pem_password_cb*)pass_cb,(void*) "test.key");
+	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, (pem_password_cb*)pass_cb,(void*) key.c_str());
 
 	boost::shared_ptr<BIO> certfile(BIO_new_file(cert.c_str(), "r"), BIO_free);
 	if(!certfile)
