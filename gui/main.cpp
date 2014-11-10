@@ -2,8 +2,8 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
-#include <QtCore/QStandardPaths>
-#include <QtWidgets/QApplication>
+#include <QStandardPaths>
+#include <QApplication>
 #include "gavim.h"
 
 int main(int argc, char *argv[])

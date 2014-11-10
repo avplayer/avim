@@ -1,9 +1,8 @@
 #ifndef GAVIM_H
 #define GAVIM_H
 
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QWidget>
-#include <QtCore/QThread>
+#include <QWidget>
+#include <QThread>
 #include "ui_gavim.h"
 
 #include <boost/asio.hpp>

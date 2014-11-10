@@ -1,8 +1,8 @@
 ﻿#include "gavim.h"
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
-#include <QtWidgets/QScrollBar>
-#include <QtCore/QStandardPaths>
+#include <QScrollBar>
+#include <QStandardPaths>
 
 #include <boost/bind.hpp>
 #include <boost/asio/spawn.hpp>
@@ -109,6 +109,7 @@ gavim::gavim(QWidget *parent)
 {
 	ui.setupUi(this);
 
+	ui.messageTextEdit->setPlaceholderText("点击此输入聊天内容");
 	// 遍历参数, 选找 --key 哈哈
 
 	// 寻
