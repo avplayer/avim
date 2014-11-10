@@ -10,7 +10,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -qq cmake wget
   - sudo apt-get install -qq boost1.55 libprotobuf-dev protobuf-compiler
-  - sudo apt-get install -qq qtdeclarative5-dev
+  - sudo apt-get install -qq qtcreator qtcreator-dev qtbase5-dev qtbase5-dev-tools libqt5widgets5
   - mkdir -pv build
   - git submodule update --init
 
