@@ -125,7 +125,7 @@ int main(int argc, char * argv[])
 		return 1;
 	}
 
-	boost::shared_ptr<BIO> keyfile(BIO_new_file(key.string().c_str(), "r"), BIO_free);
+	boost::shared_ptr<BIO> keyfile(BIO_new_file(key.c_str(), "r"), BIO_free);
 	if(!keyfile)
 	{
 		std::cerr <<  desc <<  std::endl;
@@ -138,7 +138,7 @@ int main(int argc, char * argv[])
 		RSA_free
 	);
 
-	boost::shared_ptr<BIO> certfile(BIO_new_file(cert.string().c_str(), "r"), BIO_free);
+	boost::shared_ptr<BIO> certfile(BIO_new_file(cert.c_str(), "r"), BIO_free);
 	if(!certfile)
 	{
 		std::cerr <<  desc <<  std::endl;
