@@ -46,6 +46,9 @@ static void msg_login_and_send(std::string to, boost::asio::yield_context yield_
 {
 	std::string me_addr = av_address_to_string(*avinterface->if_address());
 
+	if( to.empty() )
+		to = me_addr;
+
 	avinterface->async_handshake(yield_context) &&
 	// 添加接口
 	avcore.add_interface(avinterface) &&
@@ -54,8 +57,8 @@ static void msg_login_and_send(std::string to, boost::asio::yield_context yield_
 
 	// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
 	boost::async(
-		[](){
-			avcore.sendto("test-client@avplayer.org", "test, me are testing you stupid avim");
+		[to](){
+			avcore.sendto(to, std::string("test, me are sending a test message to ") + to + " stupid!" );
 		}
 	);
 
