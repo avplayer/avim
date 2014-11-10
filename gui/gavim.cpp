@@ -108,8 +108,6 @@ gavim::gavim(QWidget *parent)
 	: avcore_(io_service_)/*, rv_thread_(io_service_, avcore_)*/, QWidget(parent)
 {
 	ui.setupUi(this);
-
-	ui.messageTextEdit->setPlaceholderText("点击此输入聊天内容");
 	// 遍历参数, 选找 --key 哈哈
 
 	// 寻
