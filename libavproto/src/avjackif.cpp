@@ -141,6 +141,7 @@ bool avjackif::handshake()
 		ready.notify_all();
 	});
 	ready.wait(l);
+    return true;
 }
 
 void avjackif::async_register_new_user(std::string user_name)
