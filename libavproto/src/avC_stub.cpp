@@ -4,7 +4,7 @@
 #include <boost/asio.hpp>
 
 #include <avif.hpp>
-#include <avtcpif.hpp>
+#include <avjackif.hpp>
 #include <avproto.hpp>
 
 #include <openssl/bio.h>
@@ -44,10 +44,25 @@ void av_stop()
 	delete avkernelthread;
 }
 
-// FIXME 添加错误处理
-int connect_to_avrouter(const char * key, const char * cert, const char * self_addr, const char * host, const char * port)
+static void jackif_login(boost::shared_ptr<avjackif> avinterface, boost::asio::yield_context yield_context, boost::condition_variable & ready)
 {
-	boost::shared_ptr<BIO> keyfile(BIO_new_file("avim.key", "r"), BIO_free);
+	std::string me_addr = av_address_to_string(*avinterface->if_address());
+
+	avinterface->async_handshake(yield_context) &&
+	// 添加接口
+	avkernel_intance->add_interface(avinterface) &&
+
+	// 添加路由表, metric越大，优先级越低
+	avkernel_intance->add_route(".+@.+", me_addr, avinterface->get_ifname(), 100);
+
+	// 返回
+	ready.notify_all();
+}
+
+// FIXME 添加错误处理
+int connect_to_avrouter(const char * keyfilename, const char * certfilename, const char * self_addr, const char * host, const char * port)
+{
+	boost::shared_ptr<BIO> keyfile(BIO_new_file(keyfilename, "r"), BIO_free);
 	if(!keyfile)
 	{
 		std::cerr << "can not open avim.key" << std::endl;
@@ -55,7 +70,7 @@ int connect_to_avrouter(const char * key, const char * cert, const char * self_a
 	}
 	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, 0, 0);
 
-	boost::shared_ptr<BIO> certfile(BIO_new_file("avim.crt", "r"), BIO_free);
+	boost::shared_ptr<BIO> certfile(BIO_new_file(certfilename, "r"), BIO_free);
 	if(!certfile)
 	{
 		std::cerr << "can not open avim.crt" << std::endl;
@@ -75,14 +90,13 @@ int connect_to_avrouter(const char * key, const char * cert, const char * self_a
 
 	// 构造 avtcpif
 	// 创建一个 tcp 的 avif 设备，然后添加进去
-	boost::shared_ptr<avtcpif> avinterface(new avtcpif(avserver, self_addr, rsa_key, x509_cert) );
+	boost::shared_ptr<avjackif> avinterface(new avjackif(avserver));
 
-	avinterface->slave_handshake(0);
-
-	avkernel_intance->add_interface(avinterface);
-
-	// 添加路由表, metric越大，优先级越低
-	avkernel_intance->add_route(".+@.+", self_addr, avinterface->get_ifname(), 100);
+	boost::mutex m;
+	boost::condition_variable ready;
+	boost::unique_lock<boost::mutex> l(m);
+ 	boost::asio::spawn(*av_service, boost::bind(&jackif_login, avinterface, _1, boost::ref(ready)));
+	ready.wait(l);
 }
 
 int av_sendto(const char * dest_address, const char * message, int len)

@@ -38,13 +38,13 @@ static void msg_reader(boost::asio::yield_context yield_context)
 	{
 		avcore.async_recvfrom(sender, data, yield_context);
 
-		std::cerr << "接收到的数据： " << data << std::endl;
+		std::cerr << "接收到的数据： "  << sender << "说:" << data << std::endl;
 	}
 }
 
-static void msg_login_and_send(boost::asio::yield_context yield_context)
+static void msg_login_and_send(std::string to, boost::asio::yield_context yield_context)
 {
-	std::string me_addr = "test@avplayer.org";
+	std::string me_addr = av_address_to_string(*avinterface->if_address());
 
 	avinterface->async_handshake(yield_context) &&
 	// 添加接口
@@ -82,7 +82,7 @@ int pass_cb(char *buf, int size, int rwflag, char *u)
 }
 
 // 真 main 在这里, 这里是个臭协程
-static void real_main(boost::asio::yield_context yield_context, boost::shared_ptr<RSA> rsa_key, boost::shared_ptr<X509> x509_cert)
+static void real_main(boost::asio::yield_context yield_context, std::string to, boost::shared_ptr<RSA> rsa_key, boost::shared_ptr<X509> x509_cert)
 {
 	boost::asio::ip::tcp::resolver resolver(io_service);
 	boost::shared_ptr<boost::asio::ip::tcp::socket> avserver( new boost::asio::ip::tcp::socket(io_service));
@@ -95,7 +95,7 @@ static void real_main(boost::asio::yield_context yield_context, boost::shared_pt
 
 	avinterface->set_pki(rsa_key, x509_cert);
 
-	boost::asio::spawn(io_service, msg_login_and_send);
+	boost::asio::spawn(io_service, boost::bind(&msg_login_and_send, to, _1));
 }
 
 int main(int argc, char * argv[])
@@ -103,12 +103,15 @@ int main(int argc, char * argv[])
 	OpenSSL_add_all_algorithms();
 	fs::path key, cert;
 
+	std::string to;
+
 	po::variables_map vm;
 	po::options_description desc("qqbot options");
 	desc.add_options()
 	("key", po::value<fs::path>(&key)->default_value("avim.key"), "path to private key")
 	("cert", po::value<fs::path>(&cert)->default_value("avim.cert"), "path to cert")
-	("help,h",  "display this help");
+	("help,h",  "display this help")
+	("to",po::value<std::string>(&to), "send test message to, default to send to your self");
 
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
@@ -148,7 +151,7 @@ int main(int argc, char * argv[])
 	certfile.reset();
 	keyfile.reset();
 
-	boost::asio::spawn(io_service, boost::bind(&real_main, _1, rsa_key, x509_cert));
+	boost::asio::spawn(io_service, boost::bind(&real_main, _1, to, rsa_key, x509_cert));
 
 	// 开协程异步接收消息
 	boost::asio::spawn(io_service, msg_reader);
