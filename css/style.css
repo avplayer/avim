@@ -787,25 +787,27 @@ ul.about-flex-slides {
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
 }
+.pricing-table:hover, .pricing-table.active {
+    background: none repeat scroll 0 0 #f77b6f;
+    color:#fff;
+}
 
 .pricing-table.most-popular {
-    top: -20px;
-    position: relative;
+    /*top: -20px;*/
 }
 
 .most-popular {
-    background: #f77b6f;
-    color: #fff;
+    /*background: #f77b6f;*/
+    /*background: #99ffbf;*/
+    /*color: #fff;*/
 }
 
 .most-popular h1 {
-    font-size: 25px !important;
-    padding-bottom: 10px;
-    padding-top: 17px !important;
+    /*padding-top: 17px !important;*/
 }
 
 .most-popular h2 {
-    background: #d76b61 !important;
+    background: #78cd51 !important;
     margin-top: 20px !important;
 }
 
