@@ -1,7 +1,7 @@
 #include "gavim.h"
-#include <QDateTime>
-#include <QDebug>
-#include <QScrollBar>
+#include <QtCore/QDateTime>
+#include <QtCore/QDebug>
+#include <QtWidgets/QScrollBar>
 
 #include <boost/bind.hpp>
 #include <boost/asio/spawn.hpp>
@@ -71,9 +71,8 @@ void recvThread::run()
 	// 连接到 im.avplayer.org:24950
 	boost::asio::ip::tcp::resolver resolver(io_service_);
 	boost::shared_ptr<boost::asio::ip::tcp::socket> avserver(new boost::asio::ip::tcp::socket(io_service_));
-	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("im.avplayer.org", "24950")));
+	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("avim.avplayer.org", "24950")));
 
-	std::string me_addr = "test@avplayer.org";
 	// 构造 avtcpif
 	// 创建一个 tcp 的 avif 设备，然后添加进去
 	boost::shared_ptr<avjackif> avinterface;
@@ -81,6 +80,7 @@ void recvThread::run()
 	avinterface->set_pki(rsa_key, x509_cert);
 	avinterface->handshake();
 	avcore_.add_interface(avinterface);
+	std::string me_addr = av_address_to_string(*avinterface->if_address());
 	// 添加路由表, metric越大，优先级越低
 	avcore_.add_route(".+@.+", me_addr, avinterface->get_ifname(), 100);
 

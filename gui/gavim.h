@@ -2,6 +2,7 @@
 #define GAVIM_H
 
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QWidget>
 #include <QThread>
 #include "ui_gavim.h"
 

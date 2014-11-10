@@ -24,6 +24,7 @@ endif()
 
 option(RUN_PROTOC "run protoc to generate protobuf protocol parser" ON)
 option(BUILD_C_WRAPPER "build a libavproto that exports C interface" OFF)
+option(BUILD_GUI "build gui" ON)
 
 find_package(Threads REQUIRED)
 find_package(Boost 1.54 REQUIRED COMPONENTS thread system program_options coroutine context regex date_time chrono filesystem )
@@ -62,7 +63,10 @@ link_libraries(avproto++)
 
 
 add_subdirectory(demo)
+
+if(BUILD_GUI)
 add_subdirectory(gui)
+endif()
 
 check_library_exists(rt clock_gettime "" HAVE_CLOCK_GETTIME)
 if(HAVE_CLOCK_GETTIME)
