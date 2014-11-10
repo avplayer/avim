@@ -62,3 +62,9 @@ link_libraries(avproto++)
 
 
 add_subdirectory(demo)
+add_subdirectory(gui)
+
+check_library_exists(rt clock_gettime "" HAVE_CLOCK_GETTIME)
+if(HAVE_CLOCK_GETTIME)
+        link_libraries(-lrt)
+endif(HAVE_CLOCK_GETTIME)

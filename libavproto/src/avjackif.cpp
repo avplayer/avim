@@ -1,6 +1,7 @@
 
 #include <openssl/dh.h>
 #include <openssl/x509.h>
+#include <boost/bind.hpp>
 
 #include "serialization.hpp"
 
@@ -128,6 +129,20 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 	return login_result.get()->result() == proto::login_result_login_result_code_LOGIN_SUCCEED;
 }
 
+#include <boost/thread.hpp>
+
+bool avjackif::handshake()
+{
+	boost::mutex m;
+	boost::condition_variable ready;
+	boost::unique_lock<boost::mutex> l(m);
+ 	boost::asio::spawn(get_io_service(), [&,this](boost::asio::yield_context ctx){
+		this->async_handshake(ctx);
+		ready.notify_all();
+	});
+	ready.wait(l);
+}
+
 void avjackif::async_register_new_user(std::string user_name)
 {
 
@@ -140,7 +155,8 @@ boost::asio::io_service& avjackif::get_io_service() const
 
 std::string avjackif::get_ifname() const
 {
-	return "new_protocol_designed_by_jack";
+	static unsigned t = 0;
+	return boost::str(boost::format("avjack%d") % t++);
 }
 
 const proto::avAddress* avjackif::if_address() const

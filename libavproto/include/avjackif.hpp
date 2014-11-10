@@ -19,6 +19,9 @@ public:
 	// TCP接口，有 master/slave 模式之分 服务器使用 master 模式，客户端则是 slave 模式
 	// 区别只是登录时候的握手不一样，所以就在 handshake 这里直接设定就可以了
 	bool async_handshake(boost::asio::yield_context yield_context);
+	// TCP接口，有 master/slave 模式之分 服务器使用 master 模式，客户端则是 slave 模式
+	// 区别只是登录时候的握手不一样，所以就在 handshake 这里直接设定就可以了
+	bool handshake();
 
 	void async_register_new_user(std::string user_name);
 
