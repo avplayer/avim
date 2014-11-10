@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QWidget>
-#include <QThread>
+#include <QtCore/QThread>
 #include "ui_gavim.h"
 
 #include <boost/asio.hpp>

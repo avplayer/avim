@@ -1,11 +1,14 @@
-#include "gavim.h"
+ï»¿#include "gavim.h"
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
 #include <QtWidgets/QScrollBar>
+#include <QtCore/QStandardPaths>
 
 #include <boost/bind.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/thread.hpp>
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 #include <openssl/x509.h>
 #include <openssl/pem.h>
@@ -68,23 +71,23 @@ void recvThread::run()
 	certfile.reset();
 	keyfile.reset();
 
-	// Á¬½Óµ½ im.avplayer.org:24950
+	// è¿æ¥åˆ° im.avplayer.org:24950
 	boost::asio::ip::tcp::resolver resolver(io_service_);
 	boost::shared_ptr<boost::asio::ip::tcp::socket> avserver(new boost::asio::ip::tcp::socket(io_service_));
 	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query("avim.avplayer.org", "24950")));
 
-	// ¹¹Ôì avtcpif
-	// ´´½¨Ò»¸ö tcp µÄ avif Éè±¸£¬È»ºóÌí¼Ó½øÈ¥
+	// æ„é€  avtcpif
+	// åˆ›å»ºä¸€ä¸ª tcp çš„ avif è®¾å¤‡ï¼Œç„¶åæ·»åŠ è¿›å»
 	boost::shared_ptr<avjackif> avinterface;
 	avinterface.reset(new avjackif(avserver));
 	avinterface->set_pki(rsa_key, x509_cert);
 	avinterface->handshake();
 	avcore_.add_interface(avinterface);
 	std::string me_addr = av_address_to_string(*avinterface->if_address());
-	// Ìí¼ÓÂ·ÓÉ±í, metricÔ½´ó£¬ÓÅÏÈ¼¶Ô½µÍ
+	// æ·»åŠ è·¯ç”±è¡¨, metricè¶Šå¤§ï¼Œä¼˜å…ˆçº§è¶Šä½
 	avcore_.add_route(".+@.+", me_addr, avinterface->get_ifname(), 100);
 
-	// ¿ªĞ­³ÌÒì²½½ÓÊÕÏûÏ¢
+	// å¼€åç¨‹å¼‚æ­¥æ¥æ”¶æ¶ˆæ¯
 	boost::asio::spawn(io_service_, boost::bind(&recvThread::recv_msg, this, _1));
 	io_service_.run();
 }
@@ -106,13 +109,25 @@ gavim::gavim(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	// FIXME Í¨¹ı GUI Ñ¡ÔñÖ¤Êé
+	// éå†å‚æ•°, é€‰æ‰¾ --key å“ˆå“ˆ
+
+	// å¯»
+
+	fs::path avim_key = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
+
+	avim_key /= "user.key";
+
+	fs::path avim_cert = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
+
+	avim_cert /= "user.cert";
+
+	// FIXME é€šè¿‡ GUI é€‰æ‹©è¯ä¹¦
 	// FIXME
-	recvThread *rv_thread_ = new recvThread(io_service_, avcore_, "test.key", "test.cert");
+	recvThread *rv_thread_ = new recvThread(io_service_, avcore_, avim_key.string(), avim_cert.string());
 	connect(rv_thread_, &recvThread::recvReady, this, &gavim::recvHandle);
 	connect(rv_thread_, &recvThread::finished, rv_thread_, &QObject::deleteLater);
 
-	//Æô¶¯½ÓÊÜÏûÏ¢Ïß³Ì
+	//å¯åŠ¨æ¥å—æ¶ˆæ¯çº¿ç¨‹
 	rv_thread_->start();
 }
 
@@ -137,14 +152,14 @@ void gavim::on_sendButton_clicked()
 
 	if (ui.messageTextEdit->toPlainText() == "")
 	{
-		//QMessageBox::warning(0, tr("¾¯¸æ"), tr("·¢ËÍÄÚÈİ²»ÄÜÎª¿Õ"), QMessageBox::Ok);
+		//QMessageBox::warning(0, tr("è­¦å‘Š"), tr("å‘é€å†…å®¹ä¸èƒ½ä¸ºç©º"), QMessageBox::Ok);
 		qDebug() << "cant not send null!";
 		return;
 	}
 	ui.messageBrowser->verticalScrollBar()->setValue(ui.messageBrowser->verticalScrollBar()->maximum());
 	std::string curMsg = getMessage().toStdString();
 	qDebug() << "getMessage()" << QString::fromStdString(curMsg);
-	// ½øÈë IM ¹ı³Ì£¬·¢ËÍÒ»¸ö test  µ½ test2@avplayer.org
+	// è¿›å…¥ IM è¿‡ç¨‹ï¼Œå‘é€ä¸€ä¸ª test  åˆ° test2@avplayer.org
 	boost::async(
 		[this,curMsg](){
 		qDebug() << "send_msg()" << QString::fromStdString(curMsg);
