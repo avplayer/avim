@@ -91,3 +91,14 @@ void avim_client::async_send_im(const proto::av_address& target, const proto::av
 		m_avkernel.async_sendto(av_address_to_string(target), data, handler);
 	});
 }
+
+void avim_client::async_send_im(const proto::av_address& target, const proto::avim_message_packet& pkt, boost::asio::yield_context yield_context)
+{
+	async_wait_online(yield_context);
+
+	std::string data = encode_message(pkt);
+
+	m_avkernel.async_sendto(av_address_to_string(target), data, yield_context);
+}
+
+

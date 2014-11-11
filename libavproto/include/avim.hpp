@@ -32,6 +32,7 @@ public:
 	void async_recv_im(SelectDecryptKeyCallbackType, proto::av_address&, proto::avim_message_packet&, boost::asio::yield_context yield_context);
 
 	void async_send_im(const proto::av_address&, const proto::avim_message_packet& pkt, avim_client::SendHandlerType);
+	void async_send_im(const proto::av_address&, const proto::avim_message_packet& pkt, boost::asio::yield_context yield_context);
 	void async_send_im(const proto::av_address&, const proto::avim_message_packet&, std::string encrypt_key , SendHandlerType);
 	void async_send_im(const proto::av_address&, const proto::avim_message_packet&, int flag, SendHandlerType);
 

@@ -60,9 +60,7 @@ static void msg_login_and_send(std::string to, boost::asio::yield_context yield_
 	msgpkt.mutable_avim()->Add()->mutable_item_text()->set_text(msg);
 
 	// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
-	avim->async_send_im(
-		av_address_from_string(to),
-		msgpkt, [](boost::system::error_code){});
+	avim->async_send_im(av_address_from_string(to), msgpkt, yield_context);
 }
 
 int pass_cb(char *buf, int size, int rwflag, char *u)
