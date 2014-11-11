@@ -113,6 +113,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cert_path</tabstop>
+  <tabstop>browse_cert_button</tabstop>
+  <tabstop>key_path</tabstop>
+  <tabstop>browse_key_button</tabstop>
+  <tabstop>remember_me</tabstop>
+  <tabstop>login_automatically</tabstop>
+  <tabstop>register_button</tabstop>
+  <tabstop>login_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
