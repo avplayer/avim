@@ -29,7 +29,7 @@ void avjackif::set_pki(boost::shared_ptr<RSA> _key, boost::shared_ptr<X509> cert
 	auto strlengh = ASN1_STRING_to_UTF8(&CN, entryData);
 	printf("%s\n",CN);
 	std::string commonname((char*)CN, strlengh);
-	m_local_addr.reset(new proto::avAddress(av_address_from_string(commonname)));
+	m_local_addr.reset(new proto::av_address(av_address_from_string(commonname)));
 	OPENSSL_free(CN);
 }
 
@@ -86,7 +86,7 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 	// 解码
 	boost::scoped_ptr<proto::server_hello> server_hello((proto::server_hello*)av_router::decode(buf));
 
-	m_remote_addr.reset(new proto::avAddress(
+	m_remote_addr.reset(new proto::av_address(
 		av_address_from_string(server_hello->server_av_address())));
 
 	auto server_pubkey = BN_bin2bn((const unsigned char *) server_hello->random_pub_key().data(),
@@ -160,12 +160,12 @@ std::string avjackif::get_ifname() const
 	return boost::str(boost::format("avjack%d") % t++);
 }
 
-const proto::avAddress* avjackif::if_address() const
+const proto::av_address* avjackif::if_address() const
 {
 	return m_local_addr.get();
 }
 
-const proto::avAddress* avjackif::remote_address() const
+const proto::av_address* avjackif::remote_address() const
 {
 	return m_remote_addr.get();
 }
@@ -180,7 +180,7 @@ X509* avjackif::get_cert()
 	return _x509.get();
 }
 
-boost::shared_ptr<proto::avPacket> avjackif::async_read_packet(boost::asio::yield_context yield_context)
+boost::shared_ptr<proto::avpacket> avjackif::async_read_packet(boost::asio::yield_context yield_context)
 {
 	std::string buf;
 	std::uint32_t l;
@@ -192,10 +192,10 @@ boost::shared_ptr<proto::avPacket> avjackif::async_read_packet(boost::asio::yiel
 	boost::asio::async_read(*m_sock, boost::asio::buffer(&buf[4], htonl(l)),
 		boost::asio::transfer_exactly(hostl), yield_context);
 
-	return boost::shared_ptr<proto::avPacket>(dynamic_cast<proto::avPacket*>(av_router::decode(buf)));
+	return boost::shared_ptr<proto::avpacket>(dynamic_cast<proto::avpacket*>(av_router::decode(buf)));
 }
 
-bool avjackif::async_write_packet(proto::avPacket* pkt, boost::asio::yield_context yield_context)
+bool avjackif::async_write_packet(proto::avpacket* pkt, boost::asio::yield_context yield_context)
 {
 	boost::system::error_code ec;
 	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(*pkt)), yield_context[ec]);
