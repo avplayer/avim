@@ -30,14 +30,14 @@ public:
 public: // 下面是实现 avif 接口
 	boost::asio::io_service & get_io_service() const;
 	std::string get_ifname() const;
-	const proto::avAddress * if_address() const;
-	const proto::avAddress * remote_address() const;
+	const proto::av_address * if_address() const;
+	const proto::av_address * remote_address() const;
 	RSA * get_rsa_key();
 	X509 * get_cert();
 
 	void set_root_ca(X509 * ca) { m_root_ca = ca;}
-	boost::shared_ptr<proto::avPacket> async_read_packet(boost::asio::yield_context yield_context);
-    bool async_write_packet(proto::avPacket*, boost::asio::yield_context yield_context);
+	boost::shared_ptr<proto::avpacket> async_read_packet(boost::asio::yield_context yield_context);
+    bool async_write_packet(proto::avpacket*, boost::asio::yield_context yield_context);
 
 protected:
 	bool check_cert(const std::string & cert);
@@ -51,8 +51,8 @@ private:
 	boost::shared_ptr<X509> _x509;
 	X509 *m_root_ca;
 
-	boost::scoped_ptr<proto::avAddress> m_local_addr;
-	boost::scoped_ptr<proto::avAddress> m_remote_addr;
+	boost::scoped_ptr<proto::av_address> m_local_addr;
+	boost::scoped_ptr<proto::av_address> m_remote_addr;
 
 	boost::shared_ptr<boost::asio::ip::tcp::socket> m_sock;
 	boost::asio::streambuf m_recv_buf, m_send_buf;
