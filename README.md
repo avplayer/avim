@@ -34,28 +34,21 @@ avim　是一个完全全新设计的IM协议，同时也是一个同名的C++�
 
 protobuf, boost, Qt(客户端only)
 
-### protobuf
-	protobuf 从这个地方下载
+### protobuf protobuf 从这个地方下载
 
-	https://github.com/google/protobuf/releases
+    https://github.com/google/protobuf/releases
 
 ### boost
 
-	boost 从这个地方下载
+    boost 从这个地方下载
 
-	http://www.boost.org/users/history/version_1_57_0.html
+    http://www.boost.org/users/history/version_1_57_0.html
 	
-### Build
-``` bash
-$ git clone https://github.com/avplayer/avim.git
-$ cd avim && mkdir build && cmake ..
-$ make -j8  # 默认带GUI; 如不需编译GUI的, 可以用 $ cmake .. -DBUILD_GUI=OFF
-```
+### Build ``` bash $ git clone https://github.com/avplayer/avim.git $ cd avim && mkdir build && cmake ..  $ make -j8  # 默认带GUI; 如不需编译GUI的, 可以用 $ cmake .. -DBUILD_GUI=OFF ```
 
 详细的编译说明
-
-[windows 编译说明](https://github.com/avplayer/avim/wiki/Windows-%E7%BC%96%E8%AF%91%E8%AF%B4%E6%98%8E)
-
+[windows版本 编译说明](https://github.com/avplayer/avim/wiki/Windows-%E7%BC%96%E8%AF%91%E8%AF%B4%E6%98%8E)
+[ubuntu版本 编译说明](https://github.com/avplayer/avim/wiki/How-to-build-avim---Ubuntu-platform)
 
 ## 协议
 协议本身将进入　public domain，允许任何人自行实现。
