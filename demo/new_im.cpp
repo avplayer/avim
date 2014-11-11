@@ -1,6 +1,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -14,6 +15,8 @@ namespace fs = boost::filesystem;
 
 #include <avjackif.hpp>
 #include <avproto.hpp>
+#include <message.hpp>
+#include <avim.hpp>
 
 #include <openssl/x509.h>
 #include <openssl/pem.h>
@@ -23,45 +26,43 @@ namespace fs = boost::filesystem;
 
 static boost::asio::io_service io_service;
 
-avkernel avcore(io_service);
-
-// 构造 avtcpif
-// 创建一个 tcp 的 avif 设备，然后添加进去
-boost::shared_ptr<avjackif> avinterface;
+boost::scoped_ptr<avim_client> avim;
 
 static void msg_reader(boost::asio::yield_context yield_context)
 {
 	boost::system::error_code ec;
-	std::string sender, data;
+	proto::av_address sender;
+	proto::avim_message_packet msgpkt;
 
 	for(;;)
 	{
-		avcore.async_recvfrom(sender, data, yield_context);
+		avim->async_recv_im([](proto::av_address){return false;}, sender, msgpkt, yield_context);
 
-		std::cerr << "接收到的数据： "  << sender << "说:" << data << std::endl;
+		std::cerr << "接收到的数据： "  << av_address_to_string(sender) << "说: " ;
+
+		for( proto::avim_message  im_message_item  :  msgpkt.avim())
+		{
+			if( im_message_item.has_item_text() )
+			{
+				std::cerr << im_message_item.item_text().text() << std::endl;
+			}
+		}
+
+		std::cerr << std::endl;
 	}
 }
 
 static void msg_login_and_send(std::string to, boost::asio::yield_context yield_context)
 {
-	std::string me_addr = av_address_to_string(*avinterface->if_address());
+	std::string msg =std::string("test, me are sending a test message to ") + to + " stupid!";
 
-	if( to.empty() )
-		to = me_addr;
-
-	avinterface->async_handshake(yield_context) &&
-	// 添加接口
-	avcore.add_interface(avinterface) &&
-	// 添加路由表, metric越大，优先级越低
-	avcore.add_route(".+@.+", me_addr, avinterface->get_ifname(), 100);
+	proto::avim_message_packet msgpkt;
+	msgpkt.mutable_avim()->Add()->mutable_item_text()->set_text(msg);
 
 	// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
-	boost::async(
-		[to](){
-			avcore.sendto(to, std::string("test, me are sending a test message to ") + to + " stupid!" );
-		}
-	);
-
+	avim->async_send_im(
+		av_address_from_string(to),
+		msgpkt, [](boost::system::error_code){});
 }
 
 int pass_cb(char *buf, int size, int rwflag, char *u)
@@ -82,23 +83,6 @@ int pass_cb(char *buf, int size, int rwflag, char *u)
 	if (len > size) len = size;
 	memcpy(buf, tmp.data(), len);
 	return len;
-}
-
-// 真 main 在这里, 这里是个臭协程
-static void real_main(boost::asio::yield_context yield_context, std::string to, boost::shared_ptr<RSA> rsa_key, boost::shared_ptr<X509> x509_cert)
-{
-	boost::asio::ip::tcp::resolver resolver(io_service);
-	boost::shared_ptr<boost::asio::ip::tcp::socket> avserver( new boost::asio::ip::tcp::socket(io_service));
-
-	auto resolved_host_iterator = resolver.async_resolve(boost::asio::ip::tcp::resolver::query("avim.avplayer.org", "24950"), yield_context);
-
-	boost::asio::async_connect(*avserver, resolved_host_iterator, yield_context);
-
-	avinterface.reset(new avjackif(avserver) );
-
-	avinterface->set_pki(rsa_key, x509_cert);
-
-	boost::asio::spawn(io_service, boost::bind(&msg_login_and_send, to, _1));
 }
 
 int main(int argc, char * argv[])
@@ -125,36 +109,51 @@ int main(int argc, char * argv[])
 		return 1;
 	}
 
-	boost::shared_ptr<BIO> keyfile(BIO_new_file(key.string().c_str(), "r"), BIO_free);
-	if(!keyfile)
+	if(!fs::exists(key))
 	{
 		std::cerr <<  desc <<  std::endl;
 		std::cerr << "can not open " << key << std::endl;
 		exit(1);
 	}
+	if(!fs::exists(cert))
+	{
+		std::cerr <<  desc <<  std::endl;
+		std::cerr << "can not open " << cert << std::endl;
+		exit(1);
+	}
 
+
+	std::string keyfilecontent, keyfilecontent_decrypted, certfilecontent;
+
+	{
+		std::ifstream keyfile(key.string().c_str(), std::ios_base::binary | std::ios_base::in);
+		std::ifstream certfile(cert.string().c_str(), std::ios_base::binary | std::ios_base::in);
+		keyfilecontent.resize(fs::file_size(key));
+		certfilecontent.resize(fs::file_size(cert));
+		keyfile.read(&keyfilecontent[0], fs::file_size(key));
+		certfile.read(&certfilecontent[0], fs::file_size(cert));
+	}
+
+	// 这里通过读取然后写回的方式预先将私钥的密码去除
+
+	boost::shared_ptr<BIO> keyfile(BIO_new_mem_buf(&keyfilecontent[0], keyfilecontent.length()), BIO_free);
 	boost::shared_ptr<RSA> rsa_key(
 		PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, (pem_password_cb*)pass_cb,(void*) key.c_str()),
 		RSA_free
 	);
 
-	boost::shared_ptr<BIO> certfile(BIO_new_file(cert.string().c_str(), "r"), BIO_free);
-	if(!certfile)
-	{
-		std::cerr <<  desc <<  std::endl;
-		std::cerr << "can not open "<< cert << std::endl;
-		exit(1);
-	}
-
-	boost::shared_ptr<X509> x509_cert(
-		PEM_read_bio_X509(certfile.get(), 0, 0, 0),
-		X509_free
-	);
-
-	certfile.reset();
+	keyfile.reset(BIO_new(BIO_s_mem()), BIO_free);
+	char *outbuf = 0;
+	PEM_write_bio_RSAPrivateKey(keyfile.get(),rsa_key.get(), 0, 0, 0, 0, 0 );
+	rsa_key.reset();
+	auto l = BIO_get_mem_data(keyfile.get(), &outbuf);
+	keyfilecontent.assign(outbuf, l);
 	keyfile.reset();
 
-	boost::asio::spawn(io_service, boost::bind(&real_main, _1, to, rsa_key, x509_cert));
+	// 读入 key 和 cert 的内容
+	avim.reset( new avim_client(io_service, keyfilecontent, certfilecontent));
+
+	boost::asio::spawn(io_service, boost::bind(&msg_login_and_send, to, _1));
 
 	// 开协程异步接收消息
 	boost::asio::spawn(io_service, msg_reader);
