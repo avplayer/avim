@@ -49,7 +49,7 @@ private:
 	boost::asio::io_service & io_service;
 	avkernel m_avkernel;
 
-	std::atomic_bool m_online;
+	std::atomic<bool> m_online;
 
 	boost::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 	boost::shared_ptr<avjackif> m_avinterface;
