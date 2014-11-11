@@ -51,8 +51,10 @@ $ git clone https://github.com/avplayer/avim.git
 $ cd avim && mkdir build && cmake ..
 $ make -j8  # 默认带GUI; 如不需编译GUI的, 可以用 $ cmake .. -DBUILD_GUI=OFF
 ```
-For more details, refer to
-https://github.com/avplayer/avim/wiki/How-to-build-avim-for-windows-platform
+
+详细的编译说明
+
+[windows 编译说明](https://github.com/avplayer/avim/wiki/Windows-%E7%BC%96%E8%AF%91%E8%AF%B4%E6%98%8E)
 
 
 ## 协议
