@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>829</width>
+    <width>572</width>
     <height>600</height>
    </rect>
   </property>
@@ -71,9 +71,6 @@ p, li { white-space: pre-wrap; }
       </layout>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QTreeView" name="treeView"/>
    </item>
   </layout>
  </widget>
