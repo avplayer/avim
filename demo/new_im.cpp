@@ -54,13 +54,22 @@ static void msg_reader(boost::asio::yield_context yield_context)
 
 static void msg_login_and_send(std::string to, boost::asio::yield_context yield_context)
 {
+	avim->async_wait_online(yield_context);
+
 	std::string msg =std::string("test, me are sending a test message to ") + to + " stupid!";
 
 	proto::avim_message_packet msgpkt;
 	msgpkt.mutable_avim()->Add()->mutable_item_text()->set_text(msg);
 
-	// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
-	avim->async_send_im(av_address_from_string(to), msgpkt, yield_context);
+	if(to.empty())
+	{
+		avim->async_send_im(avim->self_address(), msgpkt, yield_context);
+	}
+	else
+	{
+		// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
+		avim->async_send_im(av_address_from_string(to), msgpkt, yield_context);
+	}
 }
 
 int pass_cb(char *buf, int size, int rwflag, char *u)

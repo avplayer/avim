@@ -70,6 +70,13 @@ void avim_client::async_wait_online(boost::function<void()> handler)
 	});
 }
 
+proto::av_address avim_client::self_address()
+{
+	proto::av_address ret;
+	ret.CopyFrom(*m_avinterface->if_address());
+	return ret;
+}
+
 void avim_client::async_recv_im(avim_client::SelectDecryptKeyCallbackType, proto::av_address& sender, proto::avim_message_packet& pkt, boost::asio::yield_context yield_context)
 {
 	async_wait_online(yield_context);

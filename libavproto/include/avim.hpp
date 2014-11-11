@@ -40,6 +40,7 @@ public:
 	void async_wait_online(boost::asio::yield_context yield_context);
 	void async_wait_online(boost::function<void()> handler);
 
+	proto::av_address self_address();
 private:
 
 	void coroutine_login(boost::asio::yield_context yield_context);
