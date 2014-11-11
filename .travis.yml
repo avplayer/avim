@@ -10,6 +10,8 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -qq cmake wget
   - sudo apt-get install -qq boost1.55 libprotobuf-dev protobuf-compiler
+  - sudo apt-get install libc++-dev
+  - export CXXFLAGS="-stdlib=libc++"
   - mkdir -pv build
   - git submodule update --init
 
@@ -20,11 +22,11 @@ script:
     - make -j2
 
 notifications:
-  recipients:
+  email:
+    recipients:
     - xosdy.t@gmail.com
     - peter_future@outlook.com
     - 13632323692@139.com
-  email:
     on_success: change
     on_failure: always
 
