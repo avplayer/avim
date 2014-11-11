@@ -11,6 +11,7 @@ before_install:
   - sudo apt-get install -qq cmake wget
   - sudo apt-get install -qq boost1.55 libprotobuf-dev protobuf-compiler
   - sudo apt-get install libc++-dev
+  - export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu"
   - export CXXFLAGS="-stdlib=libc++"
   - mkdir -pv build
   - git submodule update --init
