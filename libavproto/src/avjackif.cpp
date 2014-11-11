@@ -37,6 +37,8 @@ void avjackif::set_pki(boost::shared_ptr<RSA> _key, boost::shared_ptr<X509> cert
 avjackif::avjackif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock)
 	: m_sock(_sock)
 {
+	static unsigned t = 0;
+	m_ifname = boost::str(boost::format("avjack%d") % t++);
 }
 
 avjackif::~avjackif()
@@ -156,8 +158,7 @@ boost::asio::io_service& avjackif::get_io_service() const
 
 std::string avjackif::get_ifname() const
 {
-	static unsigned t = 0;
-	return boost::str(boost::format("avjack%d") % t++);
+	return m_ifname;
 }
 
 const proto::av_address* avjackif::if_address() const

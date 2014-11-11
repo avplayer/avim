@@ -54,7 +54,7 @@ void avim_client::coroutine_login(boost::asio::yield_context yield_context)
 
 void avim_client::async_wait_online(boost::asio::yield_context yield_context)
 {
-	while(!m_online);
+	while(!m_online)
 	{
 		boost::asio::deadline_timer timer(io_service);
 		timer.expires_from_now(boost::posix_time::seconds(2));

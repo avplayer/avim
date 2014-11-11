@@ -46,7 +46,7 @@ private:
 	// 分配一个 if 接口名字
 	static std::string allocate_ifname();
 
-	std::string ifname;
+	std::string m_ifname;
 	boost::shared_ptr<RSA> _rsa;
 	boost::shared_ptr<X509> _x509;
 	X509 *m_root_ca;
