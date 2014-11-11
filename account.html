@@ -23,6 +23,9 @@
       <!-- Custom styles for this template -->
     <link href="css/style.css" rel="stylesheet">
     <link href="css/style-responsive.css" rel="stylesheet" />
+    <!-- Custom styles for this template for admin -->
+    <link href="css/style_admin.css" rel="stylesheet">
+    <link href="css/style-responsive_admin.css" rel="stylesheet" />
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
     <!--[if lt IE 9]>
@@ -71,7 +74,44 @@
     <!--breadcrumbs end-->
 
     <!--container start-->
-    
+      <div class="row">
+          <div class="col-lg-12">
+              <section class="panel">
+                  <header class="panel-heading">
+                    <h4>
+                      <p>请准确填写以下信息，我们将尽快在两个工作日内处理结果发送到您的E-Mail中。</p>
+                      <p>用户名决定您全球唯一的avim地址。</p>
+                      <p>例如用户名是testname，avim地址就是：testname@avplayer.org</p>
+                    </h4>
+                  </header>
+                  <div class="panel-body">
+                      <div class="form">
+                          <form class="cmxform form-horizontal tasi-form" id="commentForm" method="post" onSubmit="return onformsubmit();">
+                              <div id="div_username" class="form-group">
+                                  <label for="username" class="control-label col-lg-2">用户名：</label>
+                                  <div class="col-lg-4">
+                                      <input class="form-control" id="username" name="username" minlength="4" maxlength="20" type="text" required />
+                                      <p id="comment_username" class="help-block"></p>
+                                  </div>
+                              </div>
+                              <div id="div_email" class="form-group">
+                                  <label for="email" class="control-label col-lg-2">E-mail：</label>
+                                  <div class="col-lg-4">
+                                      <input class="form-control" id="email" type="email" name="email" minlength="4" maxlength="24" required />
+                                      <p id="comment_email" class="help-block"></p>
+                                  </div>
+                              </div>
+                              <div class="form-group">
+                                  <div class="col-lg-offset-2 col-lg-10">
+                                      <button class="btn btn-success" type="submit">提交申请</button>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+              </section>
+          </div>
+      </div>
     <!--container end-->
 
   <!-- js placed at the end of the document so the pages load faster -->
@@ -90,7 +130,67 @@
 
 
   <script>
+  function set_input_status(text, classname, comment_text)
+  {
+	  var div_id = "#div_" + text;
+	  var comment_id = "#comment_" + text;
+	  $(div_id).removeClass();
+	  $(div_id).addClass(classname);
+	  $(comment_id).text(comment_text);
+  }
+  function valid_username_input()
+  {
+	  var username_value = $("#username").val();
+	  if(username_value.length < 3)
+	  {
+		 set_input_status("username", "form-group has-error", "请输入正确的用户名");
+		  return false;
+	  }
+	  else
+	  {
+		 set_input_status("username", "form-group has-success", "用户名可用");
+		 return true;
+	  }
+  }
+  function valid_email_input()
+  {
+	  var patten = new RegExp(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]+$/); //email regex
+	  var email_value = $("#email").val();
+	  if(!patten.test(email_value))
+	  {
+         set_input_status("email", "form-group has-error", "请输入正确的E-mail地址");
+		 return false;
+	  }
+	  else
+	  {
+	      set_input_status("email", "form-group has-success", "E-mail可用");
+		  return true;
+	  }
+  }
+  function onformsubmit()
+  {
+	  return valid_username_input() && valid_email_input();
+  }
 
+    
+    $(document).ready(function(){
+	//valid username input
+     $("#username").focus(function(){
+          ;
+        }).blur(function(){
+		valid_username_input();
+      })
+	  
+	  //valid email input
+     $("#email").focus(function(){
+          ;
+        }).blur(function(){
+		valid_email_input();
+      })
+
+	
+      
+	});
   </script>
 
   </body>
