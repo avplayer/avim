@@ -51,6 +51,9 @@ $ git clone https://github.com/avplayer/avim.git
 $ cd avim && mkdir build && cmake ..
 $ make -j8  # 默认带GUI; 如不需编译GUI的, 可以用 $ cmake .. -DBUILD_GUI=OFF
 ```
+For more details, refer to
+https://github.com/avplayer/avim/wiki/How-to-build-avim-for-windows-platform
+
 
 ## 协议
 协议本身将进入　public domain，允许任何人自行实现。
