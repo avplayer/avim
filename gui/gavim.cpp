@@ -133,12 +133,10 @@ gavim::gavim(QWidget *parent)
 gavim::~gavim()
 {
 	qDebug() << "~gavim()";
-	io_service_.stop();
 }
 
 QString gavim::getMessage()
 {
-	//QString msg = ui.messageTextEdit->toHtml();
 	QString msg = ui.messageTextEdit->toPlainText();
 	ui.messageTextEdit->clear();
 	ui.messageTextEdit->setFocus();
@@ -147,12 +145,9 @@ QString gavim::getMessage()
 
 void gavim::on_sendButton_clicked()
 {
-	qDebug() << "on_sendButton_clicked()";
-
 	if (ui.messageTextEdit->toPlainText() == "")
 	{
-		//QMessageBox::warning(0, tr("警告"), tr("发送内容不能为空"), QMessageBox::Ok);
-		qDebug() << "cant not send null!";
+		qDebug() << "Can not send null!";
 		return;
 	}
 	ui.messageBrowser->verticalScrollBar()->setValue(ui.messageBrowser->verticalScrollBar()->maximum());
@@ -161,24 +156,29 @@ void gavim::on_sendButton_clicked()
 	// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
 	boost::async(
 		[this,curMsg](){
-		qDebug() << "send_msg()" << QString::fromStdString(curMsg);
-		//avcore_.sendto("test@avplayer.org", "test, me are testing you stupid avim");
-		avcore_.sendto("test@avplayer.org", curMsg);
+		std::string sender = "test@avplayer.org";
+		qDebug() << "on_sendButton_clicked()" << QString::fromStdString(sender) << " sendMsg: " << QString::fromStdString(curMsg);
+		avcore_.sendto(sender, curMsg);
 	}
 	);
 }
 
 void gavim::on_exitButton_clicked()
 {
-	qDebug() << "on_exitButton_clicked()";
+	this->close();
 }
 
 void gavim::recvHandle(const QString &sender, const QString &data)
 {
-	qDebug() << "handleResults()" << sender << " send: " << data;
+	qDebug() << "recvHandle()" << sender << " sendMsg: " << data;
 	QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 	ui.messageBrowser->setTextColor(Qt::blue);
 	ui.messageBrowser->setCurrentFont(QFont("Times New Roman", 12));
 	ui.messageBrowser->append("[" + sender + "]" + time);
 	ui.messageBrowser->append(data);
+}
+
+void gavim::closeEvent(QCloseEvent *)
+{
+	io_service_.stop();
 }
