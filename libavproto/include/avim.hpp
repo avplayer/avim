@@ -10,7 +10,7 @@
 class avim
 {
 public:
-	boost::function<void(boost::system::error_code, proto::avAddress, proto::avim_packet)> RecvHandlerType;
+	boost::function<void(boost::system::error_code, proto::av_address, proto::avim_packet)> RecvHandlerType;
 	boost::function<void(boost::system::error_code)> SendHandlerType;
 public:
 	// 使用密钥和证书构建 avim 对象
@@ -19,8 +19,8 @@ public:
 
 	// 异步消息接收
 	void async_recv_im(RecvHandlerType);
-	void async_send_im(proto::avAddress, proto::avim_packet, SendHandlerType);
-	void async_send_im(proto::avAddress, proto::avim_packet, int flag, SendHandlerType);
+	void async_send_im(proto::av_address, proto::avim_packet, SendHandlerType);
+	void async_send_im(proto::av_address, proto::avim_packet, int flag, SendHandlerType);
 private:
 	boost::asio::io_service & io_service;
 };
