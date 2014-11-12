@@ -1,7 +1,11 @@
 
+#include <openssl/asn1.h>
 #include <openssl/dh.h>
+#include <openssl/pem.h>
 #include <openssl/x509.h>
+#include <openssl/x509v3.h>
 #include <boost/bind.hpp>
+#include <boost/thread.hpp>
 
 #include "serialization.hpp"
 
@@ -10,6 +14,32 @@
 
 #include "avim_proto/message.pb.h"
 #include "avim_proto/user.pb.h"
+
+static inline std::string i2d_X509(X509 * x509)
+{
+	unsigned char * out = NULL;
+	int l = i2d_X509(x509, & out);
+	std::string ret((char*)out, l);
+	OPENSSL_free(out);
+	return ret;
+}
+
+template<typename AsyncStream>
+static inline google::protobuf::Message*
+async_read_protobuf_message(AsyncStream &_sock, boost::asio::yield_context yield_context)
+{
+	std::uint32_t l;
+	boost::asio::async_read(_sock, boost::asio::buffer(&l, sizeof(l)), boost::asio::transfer_exactly(4), yield_context);
+	auto hostl = htonl(l);
+	std::string  buf;
+
+	buf.resize(hostl + 4);
+	memcpy(&buf[0], &l, 4);
+	hostl = boost::asio::async_read(_sock, boost::asio::buffer(&buf[4], hostl),
+		boost::asio::transfer_exactly(hostl), yield_context);
+
+	return av_router::decode(buf);
+}
 
 /*
  * 这个类呢，是用来实现和 JACK 实现的那个 AVROUTER 对接的。也就是 JACK 版本的 AV NETWORK SERVICE PROVIDER
@@ -45,16 +75,44 @@ avjackif::~avjackif()
 {
 }
 
-static std::string i2d_X509(X509 * x509)
+bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 {
-	unsigned char * out = NULL;
-	int l = i2d_X509(x509, & out);
-	std::string ret((char*)out, l);
-	OPENSSL_free(out);
-	return ret;
+	uint32_t hostl, netl;
+	std::string  buf;
+
+	auto random_pub_key = async_client_hello(yield_context);
+
+	// 接着私钥加密 随机数
+	auto singned = RSA_private_encrypt(_rsa.get(), random_pub_key);
+
+	proto::login login_packet;
+	login_packet.set_user_cert( i2d_X509(_x509.get()) );
+	login_packet.set_encryped_radom_key(singned);
+
+	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(login_packet)),
+		yield_context);
+
+	// 读取回应并解码
+	std::unique_ptr<proto::login_result> login_result(
+		(proto::login_result*)async_read_protobuf_message(*m_sock, yield_context));
+
+	return login_result.get()->result() == proto::login_result::LOGIN_SUCCEED;
 }
 
-bool avjackif::async_handshake(boost::asio::yield_context yield_context)
+bool avjackif::handshake()
+{
+	boost::mutex m;
+	boost::condition_variable ready;
+	boost::unique_lock<boost::mutex> l(m);
+ 	boost::asio::spawn(get_io_service(), [&,this](boost::asio::yield_context ctx){
+		this->async_handshake(ctx);
+		ready.notify_all();
+	});
+	ready.wait(l);
+    return true;
+}
+
+std::string avjackif::async_client_hello(boost::asio::yield_context yield_context)
 {
 	proto::client_hello client_hello;
 	client_hello.set_client("avim");
@@ -75,18 +133,9 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 
 	boost::asio::async_write(*m_sock, boost::asio::buffer(tobesend), yield_context);
 
-	std::uint32_t l;
-	boost::asio::async_read(*m_sock, boost::asio::buffer(&l, sizeof(l)), boost::asio::transfer_exactly(4), yield_context);
-	auto hostl = htonl(l);
-	std::string  buf;
-
-	buf.resize(hostl + 4);
-	memcpy(&buf[0], &l, 4);
-	hostl = boost::asio::async_read(*m_sock, boost::asio::buffer(&buf[4], hostl),
-		boost::asio::transfer_exactly(hostl), yield_context);
-
 	// 解码
-	boost::scoped_ptr<proto::server_hello> server_hello((proto::server_hello*)av_router::decode(buf));
+	std::unique_ptr<proto::server_hello> server_hello(
+		(proto::server_hello*)async_read_protobuf_message(*m_sock, yield_context));
 
 	m_remote_addr.reset(new proto::av_address(
 		av_address_from_string(server_hello->server_av_address())));
@@ -106,49 +155,71 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
     std::printf("\n");
 	DH_free(dh);
 
-	// 接着私钥加密 随机数
-	auto singned = RSA_private_encrypt(_rsa.get(), server_hello->random_pub_key());
-
-	proto::login login_packet;
-	login_packet.set_user_cert( i2d_X509(_x509.get()) );
-	login_packet.set_encryped_radom_key(singned);
-
-	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(login_packet)),
-		yield_context);
-
-	// 读取回应
-	boost::asio::async_read(*m_sock, boost::asio::buffer(&l, sizeof(l)),
-		boost::asio::transfer_exactly(hostl), yield_context);
-
-	hostl = htonl(l);
-	buf.resize(htonl(l) + 4);
-	memcpy(&buf[0], &l, 4);
-	boost::asio::async_read(*m_sock, boost::asio::buffer(&buf[4], htonl(l)),
-		boost::asio::transfer_exactly(hostl), yield_context);
-	// 解码
-	boost::scoped_ptr<proto::login_result> login_result((proto::login_result*)av_router::decode(buf));
-
-	return login_result.get()->result() == proto::login_result_login_result_code_LOGIN_SUCCEED;
+	return server_hello->random_pub_key();
 }
 
-#include <boost/thread.hpp>
-
-bool avjackif::handshake()
+static inline int X509_NAME_add_entry_by_NID(X509_NAME *subj, int nid, std::string value)
 {
-	boost::mutex m;
-	boost::condition_variable ready;
-	boost::unique_lock<boost::mutex> l(m);
- 	boost::asio::spawn(get_io_service(), [&,this](boost::asio::yield_context ctx){
-		this->async_handshake(ctx);
-		ready.notify_all();
-	});
-	ready.wait(l);
-    return true;
+	X509_NAME_add_entry_by_NID(subj, nid, MBSTRING_UTF8, (unsigned char*) value.data(), -1, -1 , 0);
 }
 
-void avjackif::async_register_new_user(std::string user_name)
+bool avjackif::async_register_new_user(std::string user_name, boost::asio::yield_context yield_context)
 {
+	// 先发 client_hello
+	async_client_hello(yield_context);
 
+	auto digest = EVP_sha1();
+
+	// 先生成 RSA 密钥
+	_rsa.reset(RSA_generate_key(2048, 65537, 0, 0), RSA_free);
+
+	// 然后生成 CSR
+	boost::shared_ptr<X509_REQ> csr(X509_REQ_new(), X509_REQ_free);
+
+	boost::shared_ptr<EVP_PKEY> pkey(EVP_PKEY_new(), EVP_PKEY_free);
+	EVP_PKEY_set1_RSA(pkey.get(), _rsa.get());
+
+	// 添加证书申请信息
+
+	auto subj =X509_REQ_get_subject_name(csr.get());
+	X509_NAME_add_entry_by_NID(subj, NID_countryName, "CN");
+	X509_NAME_add_entry_by_NID(subj, NID_stateOrProvinceName, "Shanghai");
+	X509_NAME_add_entry_by_NID(subj, NID_localityName, "Shanghai");
+	X509_NAME_add_entry_by_NID(subj, NID_organizationName, "avplayer");
+	X509_NAME_add_entry_by_NID(subj, NID_organizationalUnitName, "sales");
+	X509_NAME_add_entry_by_NID(subj, NID_commonName, "test-client");
+	X509_NAME_add_entry_by_NID(subj, NID_pkcs9_emailAddress, "test-client");
+
+	X509_REQ_set_pubkey(csr.get(), pkey.get());
+
+	// 签出 CSR
+	X509_REQ_sign(csr.get(), pkey.get(), digest);
+
+	unsigned char * out = NULL;
+	auto csr_out_len = i2d_X509_REQ(csr.get(), &out);
+
+	std::string csrout((char*)out, csr_out_len);
+
+	OPENSSL_free(out);
+	out = NULL;
+	auto rsa_key_out_len = i2d_RSA_PUBKEY(_rsa.get(), &out);
+
+	std::string rsa_key((char*)out, rsa_key_out_len);
+	OPENSSL_free(out);
+
+	// 然后发送 注册信息
+	proto::user_register user_register;
+
+	user_register.set_user_name("test-client");
+	user_register.set_rsa_pubkey(rsa_key);
+	user_register.set_csr(csrout);
+
+	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(user_register)), yield_context);
+
+	// 读取应答
+	std::unique_ptr<proto::user_register_result> user_register_result((proto::user_register_result*)async_read_protobuf_message(*m_sock, yield_context));
+
+	return user_register_result->result() == proto::user_register_result::REGISTER_SUCCEED;
 }
 
 boost::asio::io_service& avjackif::get_io_service() const

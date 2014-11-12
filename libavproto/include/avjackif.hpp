@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #include <boost/noncopyable.hpp>
@@ -23,7 +22,7 @@ public:
 	// 区别只是登录时候的握手不一样，所以就在 handshake 这里直接设定就可以了
 	bool handshake();
 
-	void async_register_new_user(std::string user_name);
+	bool async_register_new_user(std::string user_name, boost::asio::yield_context yield_context);
 
 	std::string remote_addr();
 
@@ -40,6 +39,8 @@ public: // 下面是实现 avif 接口
     bool async_write_packet(proto::avpacket*, boost::asio::yield_context yield_context);
 
 protected:
+	std::string async_client_hello(boost::asio::yield_context yield_context);
+
 	bool check_cert(const std::string & cert);
 
 private:

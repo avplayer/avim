@@ -92,11 +92,29 @@ int pass_cb(char *buf, int size, int rwflag, char *u)
 	return len;
 }
 
+void register_user(boost::asio::yield_context yield_context)
+{
+	boost::asio::ip::tcp::resolver resolver(io_service);
+	boost::shared_ptr<boost::asio::ip::tcp::socket> jackroutersocket;
+	jackroutersocket.reset( new boost::asio::ip::tcp::socket(io_service));
+
+	auto resolved_host_iterator = resolver.async_resolve(
+		boost::asio::ip::tcp::resolver::query("im.avplayer.org", "24950"), yield_context);
+
+	boost::asio::async_connect(*jackroutersocket, resolved_host_iterator, yield_context);
+
+	avjackif avinterface(jackroutersocket);
+
+	avinterface.async_register_new_user(
+		"test",
+		yield_context
+	);
+}
+
 int main(int argc, char * argv[])
 {
 	OpenSSL_add_all_algorithms();
 	fs::path key, cert;
-
 	std::string to;
 
 	po::variables_map vm;
@@ -105,7 +123,8 @@ int main(int argc, char * argv[])
 	("key", po::value<fs::path>(&key)->default_value("avim.key"), "path to private key")
 	("cert", po::value<fs::path>(&cert)->default_value("avim.cert"), "path to cert")
 	("help,h",  "display this help")
-	("to",po::value<std::string>(&to), "send test message to, default to send to your self");
+	("to",po::value<std::string>(&to), "send test message to, default to send to your self")
+	("register", "for test only, request a user_register on test server");
 
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
@@ -114,6 +133,13 @@ int main(int argc, char * argv[])
 	{
 		std::cerr <<  desc <<  std::endl;
 		return 1;
+	}
+
+	if( vm.count("register") )
+	{
+		boost::asio::spawn(io_service, register_user);
+		io_service.run();
+		return 0;
 	}
 
 	if(!fs::exists(key))
