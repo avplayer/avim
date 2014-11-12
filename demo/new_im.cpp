@@ -35,7 +35,7 @@ static void msg_reader(boost::asio::yield_context yield_context)
 
 	for (;;)
 	{
-		avim->async_recv_im([](proto::av_address) {return false;}, sender, msgpkt, yield_context);
+		avim->async_recv_im([](proto::av_address){return false;}, sender, msgpkt, yield_context);
 
 		std::cerr << "接收到的数据： " << av_address_to_string(sender) << "说: ";
 
