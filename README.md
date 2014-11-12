@@ -64,6 +64,6 @@ avplayer.org 本身会运营一个实例，用于社区成员之间的沟通。
 任何人都可以搭建自己的服务器和聊天室。同时允许二次开发，会有更丰富的第三方应用出现。
 
 
+# mail list
 
-
-
+http://mailman.avplayer.org/pipermail/list/
