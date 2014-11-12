@@ -189,7 +189,7 @@ bool avjackif::async_register_new_user(std::string user_name, boost::asio::yield
 	X509_NAME_add_entry_by_NID(subj, NID_localityName, "Shanghai");
 	X509_NAME_add_entry_by_NID(subj, NID_organizationName, "avplayer");
 	X509_NAME_add_entry_by_NID(subj, NID_organizationalUnitName, "sales");
-	X509_NAME_add_entry_by_NID(subj, NID_commonName, "test-client");
+	X509_NAME_add_entry_by_NID(subj, NID_commonName, user_name);
 	X509_NAME_add_entry_by_NID(subj, NID_pkcs9_emailAddress, "test-client");
 
 	X509_REQ_set_pubkey(csr.get(), pkey.get());
@@ -212,7 +212,7 @@ bool avjackif::async_register_new_user(std::string user_name, boost::asio::yield
 	// 然后发送 注册信息
 	proto::user_register user_register;
 
-	user_register.set_user_name("test-client");
+	user_register.set_user_name(user_name);
 	user_register.set_rsa_pubkey(rsa_key);
 	user_register.set_csr(csrout);
 
