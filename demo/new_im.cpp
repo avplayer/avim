@@ -55,7 +55,7 @@ static void msg_login_and_send(std::string to, boost::asio::yield_context yield_
 {
 	avim->async_wait_online(yield_context);
 
-	std::string msg =std::string("test, me are sending a test message to ") + to + " stupid!";
+	std::string msg = std::string("test, me are sending a test message to ") + to + " stupid!";
 
 	proto::avim_message_packet msgpkt;
 	msgpkt.mutable_avim()->Add()->mutable_item_text()->set_text(msg);
@@ -91,7 +91,7 @@ int pass_cb(char *buf, int size, int rwflag, char *u)
 	return len;
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
 	OpenSSL_add_all_algorithms();
 	fs::path key, cert;
@@ -104,7 +104,7 @@ int main(int argc, char * argv[])
 	("key", po::value<fs::path>(&key)->default_value("avim.key"), "path to private key")
 	("cert", po::value<fs::path>(&cert)->default_value("avim.cert"), "path to cert")
 	("help,h", "display this help")
-	("to",po::value<std::string>(&to), "send test message to, default to send to your self");
+	("to", po::value<std::string>(&to), "send test message to, default to send to your self");
 
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
