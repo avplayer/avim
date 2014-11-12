@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 
 	fs::path appdatadir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
 
-	if(!fs::exists(appdatadir))
+	if (!fs::exists(appdatadir))
 		fs::create_directories(appdatadir);
 
 	gavim w;

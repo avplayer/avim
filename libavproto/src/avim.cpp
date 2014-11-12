@@ -1,4 +1,3 @@
-
 #include <boost/asio/spawn.hpp>
 #include <boost/bind.hpp>
 #include <openssl/x509.h>
@@ -41,7 +40,7 @@ void avim_client::coroutine_login(boost::asio::yield_context yield_context)
 
 	m_avinterface->set_pki(m_rsa_key, m_x509_cert);
 
-	if( m_avinterface->async_handshake(yield_context) && m_avkernel.add_interface(m_avinterface) )
+	if (m_avinterface->async_handshake(yield_context) && m_avkernel.add_interface(m_avinterface))
 	{
 		std::string me_addr = av_address_to_string(*m_avinterface->if_address());
 
@@ -54,7 +53,7 @@ void avim_client::coroutine_login(boost::asio::yield_context yield_context)
 
 void avim_client::async_wait_online(boost::asio::yield_context yield_context)
 {
-	while(!m_online)
+	while (!m_online)
 	{
 		boost::asio::deadline_timer timer(io_service);
 		timer.expires_from_now(boost::posix_time::seconds(2));
@@ -92,9 +91,9 @@ void avim_client::async_recv_im(avim_client::SelectDecryptKeyCallbackType, proto
 
 void avim_client::async_send_im(const proto::av_address& target, const proto::avim_message_packet& pkt, avim_client::SendHandlerType handler)
 {
-	async_wait_online([this, target, pkt, handler](){
+	async_wait_online([this, target, pkt, handler]()
+	{
 		std::string data = encode_message(pkt);
-
 		m_avkernel.async_sendto(av_address_to_string(target), data, handler);
 	});
 }
@@ -102,10 +101,6 @@ void avim_client::async_send_im(const proto::av_address& target, const proto::av
 void avim_client::async_send_im(const proto::av_address& target, const proto::avim_message_packet& pkt, boost::asio::yield_context yield_context)
 {
 	async_wait_online(yield_context);
-
 	std::string data = encode_message(pkt);
-
 	m_avkernel.async_sendto(av_address_to_string(target), data, yield_context);
 }
-
-

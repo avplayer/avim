@@ -1,4 +1,3 @@
-
 const char * avim_root_ca_certificate_string =
 "-----BEGIN CERTIFICATE-----\n\
 MIIJ/jCCBeYCCQCe/1kdkGDRZDANBgkqhkiG9w0BAQUFADCBwDELMAkGA1UEBhMC\n\

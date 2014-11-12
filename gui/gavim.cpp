@@ -46,7 +46,7 @@ void recvThread::run()
 
 	OpenSSL_add_all_algorithms();
 	boost::shared_ptr<BIO> keyfile(BIO_new_file(m_keyfile.c_str(), "r"), BIO_free);
-	if(!keyfile)
+	if (!keyfile)
 	{
 		std::cerr << "can not open " << m_keyfile << std::endl;
 		exit(1);
@@ -58,7 +58,7 @@ void recvThread::run()
 	);
 
 	boost::shared_ptr<BIO> certfile(BIO_new_file(m_certfile.c_str(), "r"), BIO_free);
-	if(!certfile)
+	if (!certfile)
 	{
 		std::cerr << "can not open "<< m_certfile << std::endl;
 		exit(1);
@@ -175,8 +175,7 @@ void gavim::on_sendButton_clicked()
 		[this,curMsg](){
 		qDebug() << "on_sendButton_clicked()" << QString::fromStdString(current_chat_target) << " sendMsg: " << QString::fromStdString(curMsg);
 		avcore_.sendto(current_chat_target, curMsg);
-	}
-	);
+	});
 }
 
 void gavim::on_exitButton_clicked()

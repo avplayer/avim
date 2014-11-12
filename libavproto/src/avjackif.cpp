@@ -1,4 +1,3 @@
-
 #include <openssl/dh.h>
 #include <openssl/x509.h>
 #include <boost/bind.hpp>
@@ -22,10 +21,11 @@ void avjackif::set_pki(boost::shared_ptr<RSA> _key, boost::shared_ptr<X509> cert
 	unsigned char * CN = NULL;
 
 	auto cert_name = X509_get_subject_name(cert.get());
-	auto cert_entry = X509_NAME_get_entry(cert_name,
+	auto cert_entry = X509_NAME_get_entry(
+		cert_name,
 		X509_NAME_get_index_by_NID(cert_name, NID_commonName, 0)
 	);
-	ASN1_STRING *entryData = X509_NAME_ENTRY_get_data( cert_entry );
+	ASN1_STRING *entryData = X509_NAME_ENTRY_get_data(cert_entry);
 	auto strlengh = ASN1_STRING_to_UTF8(&CN, entryData);
 	printf("%s\n",CN);
 	std::string commonname((char*)CN, strlengh);
@@ -100,7 +100,8 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 	BN_free(server_pubkey);
 
     std::printf("key = 0x");
-    for (int i=0; i<DH_size(dh); ++i) {
+    for (int i=0; i<DH_size(dh); ++i)
+	{
         std::printf("%x%x", (m_shared_key[i] >> 4) & 0xf, m_shared_key[i] & 0xf);
     }
     std::printf("\n");
@@ -110,7 +111,7 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 	auto singned = RSA_private_encrypt(_rsa.get(), server_hello->random_pub_key());
 
 	proto::login login_packet;
-	login_packet.set_user_cert( i2d_X509(_x509.get()) );
+	login_packet.set_user_cert(i2d_X509(_x509.get()));
 	login_packet.set_encryped_radom_key(singned);
 
 	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(login_packet)),
@@ -148,7 +149,6 @@ bool avjackif::handshake()
 
 void avjackif::async_register_new_user(std::string user_name)
 {
-
 }
 
 boost::asio::io_service& avjackif::get_io_service() const
