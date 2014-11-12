@@ -2,6 +2,7 @@
 #include "login_dialog.h"
 
 #include <QFileDialog>
+#include <QtCore/QDebug>
 
 login_dialog::login_dialog()
 	: ui_(std::make_unique<Ui::login_dialog>())
@@ -24,6 +25,21 @@ login_dialog::login_dialog()
 
 void login_dialog::on_login()
 {
-	// TODO: login verify and open main window if success
+	if ( get_key_path() == "" || get_cert_path() == "" )
+	{
+		qDebug() << "on_login() some thing is null!";
+		return;
+	}
+	this->accept();
+}
+
+std::string login_dialog::get_cert_path()
+{
+	return ui_->cert_path->text().toStdString();
+}
+
+std::string login_dialog::get_key_path()
+{
+	return ui_->key_path->text().toStdString();
 }
 

@@ -1,4 +1,3 @@
-
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -34,15 +33,15 @@ static void msg_reader(boost::asio::yield_context yield_context)
 	proto::av_address sender;
 	proto::avim_message_packet msgpkt;
 
-	for(;;)
+	for (;;)
 	{
 		avim->async_recv_im([](proto::av_address){return false;}, sender, msgpkt, yield_context);
 
-		std::cerr << "接收到的数据： "  << av_address_to_string(sender) << "说: " ;
+		std::cerr << "接收到的数据： " << av_address_to_string(sender) << "说: ";
 
-		for( proto::avim_message  im_message_item  :  msgpkt.avim())
+		for (proto::avim_message im_message_item : msgpkt.avim())
 		{
-			if( im_message_item.has_item_text() )
+			if (im_message_item.has_item_text())
 			{
 				std::cerr << im_message_item.item_text().text() << std::endl;
 			}
@@ -56,12 +55,12 @@ static void msg_login_and_send(std::string to, boost::asio::yield_context yield_
 {
 	avim->async_wait_online(yield_context);
 
-	std::string msg =std::string("test, me are sending a test message to ") + to + " stupid!";
+	std::string msg = std::string("test, me are sending a test message to ") + to + " stupid!";
 
 	proto::avim_message_packet msgpkt;
 	msgpkt.mutable_avim()->Add()->mutable_item_text()->set_text(msg);
 
-	if(to.empty())
+	if (to.empty())
 	{
 		avim->async_send_im(avim->self_address(), msgpkt, yield_context);
 	}
@@ -111,7 +110,7 @@ void register_user(boost::asio::yield_context yield_context)
 	);
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
 	OpenSSL_add_all_algorithms();
 	fs::path key, cert;
@@ -122,39 +121,38 @@ int main(int argc, char * argv[])
 	desc.add_options()
 	("key", po::value<fs::path>(&key)->default_value("avim.key"), "path to private key")
 	("cert", po::value<fs::path>(&cert)->default_value("avim.cert"), "path to cert")
-	("help,h",  "display this help")
-	("to",po::value<std::string>(&to), "send test message to, default to send to your self")
-	("register", "for test only, request a user_register on test server");
+	("register", "for test only, request a user_register on test server")
+	("help,h", "display this help")
+	("to", po::value<std::string>(&to), "send test message to, default to send to your self");
 
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 
 	if (vm.count("help"))
 	{
-		std::cerr <<  desc <<  std::endl;
+		std::cerr << desc << std::endl;
 		return 1;
 	}
 
-	if( vm.count("register") )
+	if (vm.count("register"))
 	{
 		boost::asio::spawn(io_service, register_user);
 		io_service.run();
 		return 0;
 	}
 
-	if(!fs::exists(key))
+	if (!fs::exists(key))
 	{
 		std::cerr <<  desc <<  std::endl;
 		std::cerr << "can not open " << key << std::endl;
 		exit(1);
 	}
-	if(!fs::exists(cert))
+	if (!fs::exists(cert))
 	{
 		std::cerr <<  desc <<  std::endl;
 		std::cerr << "can not open " << cert << std::endl;
 		exit(1);
 	}
-
 
 	std::string keyfilecontent, keyfilecontent_decrypted, certfilecontent;
 
@@ -177,14 +175,14 @@ int main(int argc, char * argv[])
 
 	keyfile.reset(BIO_new(BIO_s_mem()), BIO_free);
 	char *outbuf = 0;
-	PEM_write_bio_RSAPrivateKey(keyfile.get(),rsa_key.get(), 0, 0, 0, 0, 0 );
+	PEM_write_bio_RSAPrivateKey(keyfile.get(),rsa_key.get(), 0, 0, 0, 0, 0);
 	rsa_key.reset();
 	auto l = BIO_get_mem_data(keyfile.get(), &outbuf);
 	keyfilecontent.assign(outbuf, l);
 	keyfile.reset();
 
 	// 读入 key 和 cert 的内容
-	avim.reset( new avim_client(io_service, keyfilecontent, certfilecontent));
+	avim.reset(new avim_client(io_service, keyfilecontent, certfilecontent));
 
 	boost::asio::spawn(io_service, boost::bind(&msg_login_and_send, to, _1));
 

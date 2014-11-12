@@ -46,7 +46,7 @@ void recvThread::run()
 
 	OpenSSL_add_all_algorithms();
 	boost::shared_ptr<BIO> keyfile(BIO_new_file(m_keyfile.c_str(), "r"), BIO_free);
-	if(!keyfile)
+	if (!keyfile)
 	{
 		std::cerr << "can not open " << m_keyfile << std::endl;
 		exit(1);
@@ -58,7 +58,7 @@ void recvThread::run()
 	);
 
 	boost::shared_ptr<BIO> certfile(BIO_new_file(m_certfile.c_str(), "r"), BIO_free);
-	if(!certfile)
+	if (!certfile)
 	{
 		std::cerr << "can not open "<< m_certfile << std::endl;
 		exit(1);
@@ -109,33 +109,47 @@ gavim::gavim(QWidget *parent)
 	: avcore_(io_service_)/*, rv_thread_(io_service_, avcore_)*/, QWidget(parent)
 {
 	ui.setupUi(this);
-	current_chat_target = "test@avplayer.org";
-	ui.currentChat->setText(QString::fromStdString(current_chat_target));
-	// 遍历参数, 选找 --key 哈哈
-
-	// 寻
-
-	fs::path avim_key = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
-
-	avim_key /= "user.key";
-
-	fs::path avim_cert = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
-
-	avim_cert /= "user.cert";
-
-	// FIXME 通过 GUI 选择证书
-	// FIXME
-	recvThread *rv_thread_ = new recvThread(io_service_, avcore_, avim_key.string(), avim_cert.string());
-	connect(rv_thread_, &recvThread::recvReady, this, &gavim::recvHandle);
-	connect(rv_thread_, &recvThread::finished, rv_thread_, &QObject::deleteLater);
-
-	//启动接受消息线程
-	//rv_thread_->start();
 }
 
 gavim::~gavim()
 {
 	qDebug() << "~gavim()";
+}
+
+void gavim::init(const std::string& cur_key, const std::string& cur_cert)
+{ 
+	set_avim_key(cur_key);
+	set_avim_cert(cur_cert);
+	current_chat_target = "test@avplayer.org";
+	ui.currentChat->setText(QString::fromStdString(current_chat_target));
+	// 遍历参数, 选找 --key 哈哈
+
+	// 寻
+	if (cur_avim_key == "")
+	{
+		fs::path avim_key = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
+
+		avim_key /= "user.key";
+		cur_avim_key = avim_key.string();
+	}
+	if (cur_avim_cert == "")
+	{
+		fs::path avim_cert = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
+
+		avim_cert /= "user.cert"; 
+		cur_avim_cert = avim_cert.string();
+	}
+
+	qDebug() << "cert:" << QString::fromStdString(cur_avim_cert);
+	qDebug() << "key:" << QString::fromStdString(cur_avim_key);
+	// FIXME 通过 GUI 选择证书
+	// FIXME
+	recvThread *rv_thread_ = new recvThread(io_service_, avcore_, cur_avim_key, cur_avim_cert);
+	connect(rv_thread_, &recvThread::recvReady, this, &gavim::recvHandle);
+	connect(rv_thread_, &recvThread::finished, rv_thread_, &QObject::deleteLater);
+
+	//启动接受消息线程
+	rv_thread_->start();
 }
 
 QString gavim::getMessage()
@@ -161,8 +175,7 @@ void gavim::on_sendButton_clicked()
 		[this,curMsg](){
 		qDebug() << "on_sendButton_clicked()" << QString::fromStdString(current_chat_target) << " sendMsg: " << QString::fromStdString(curMsg);
 		avcore_.sendto(current_chat_target, curMsg);
-	}
-	);
+	});
 }
 
 void gavim::on_exitButton_clicked()

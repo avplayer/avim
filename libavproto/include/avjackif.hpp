@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <boost/noncopyable.hpp>
@@ -58,4 +57,3 @@ private:
 	boost::shared_ptr<boost::asio::ip::tcp::socket> m_sock;
 	boost::asio::streambuf m_recv_buf, m_send_buf;
 };
-

@@ -44,13 +44,20 @@ protobuf, boost, Qt(客户端only)
 
     http://www.boost.org/users/history/version_1_57_0.html
 	
-### Build ``` bash $ git clone https://github.com/avplayer/avim.git $ cd avim && mkdir build && cmake ..  $ make -j8  # 默认带GUI; 如不需编译GUI的, 可以用 $ cmake .. -DBUILD_GUI=OFF ```
+### Build
+``` bash
+$ git clone https://github.com/avplayer/avim.git
+$ cd avim && mkdir build && cmake ..
+$ make -j8  # 默认带GUI; 如不需编译GUI的, 可以用 $ cmake .. -DBUILD_GUI=OFF
+```
 
 详细的编译说明
 
 [windows版本 编译说明](https://github.com/avplayer/avim/wiki/Windows-%E7%BC%96%E8%AF%91%E8%AF%B4%E6%98%8E)
 
 [ubuntu版本 编译说明](https://github.com/avplayer/avim/wiki/How-to-build-avim---Ubuntu-platform)
+
+[MacOS版本 编译说明](https://github.com/avplayer/avim/wiki/How-to-build-avim-on-MacOS)
 
 ## 协议
 协议本身将进入　public domain，允许任何人自行实现。
