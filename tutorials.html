@@ -72,11 +72,10 @@
 
     <!--container start-->
     <div class="container">
-        <div class="row">
-            <div class="col-lg-5">
+        <!--<div class="row">
+        <div class="col-lg-5">
                 <div class="span5 about-carousel">
                     <div id="myCarousel" class="carousel slide">
-                        <!-- Carousel items -->
                         <div class="carousel-inner">
                             <div class="active item">
                                 <img src="img/about_1.jpg" alt="">
@@ -87,11 +86,10 @@
                             <div class="item">
                                 <img src="img/about_2.jpg" alt="">
                                 <div class="carousel-caption">
-                                    <p>这样1来，任何消息监控体系都无法工作</p>
+                                    <p>AVIM编译指南</p>
                                 </div>
                             </div>
                         </div>
-                        <!-- Carousel nav -->
                         <a class="carousel-control left" href="#myCarousel" data-slide="prev">
                             <i class="icon-angle-left"></i>
                         </a>
@@ -100,72 +98,94 @@
                         </a>
                     </div>
                 </div>
-            </div>
+            </div>-->
             <div class="col-lg-7 about">
-                <h3>AVIM编译教程</h3>
-                <p>
-                    Dr想给Jack发个消息，可是QQ能监控所有的聊天交给gcd。dr和jack发的任何消息gcd都能看到。
-于是 Jack 创建了一个密钥对，包含一个公钥和一个私钥。
-Jack 把公钥发给了 Dr . 现在， gcd 也有这份公钥。
-dr 把消息用这个公钥加密后发给了 jack
-现在 gcd 也拿到了加密后的消息
-但是只有 jack 拿出了私钥，然后吧密文解开了，看到了要说的骂 gcd 的话 ....
-gcd 也有密文，也有公钥，可是却什么也做不了，因为 gcd 木有 jack 的私钥。
+                <h3>avim 总架构</h3>
+                <p>     <pre>avim-client(qt based, ncurser based, etc)
+           |
++----------+---------+     +----------+---------+
+|     avim-router ---+-----+----- avim-router   |
++--------------------+     +--------------------+
+                                      |
+                                      |
+                            +---------+----------+
+                            |      avim-bot      |
+                            |      |      |      |
+                            |  avim-db  avim-log |
+                            +--------------------+</pre>
                 </p>
                 <p>
-                    AVIM 就建立在牛逼哄哄的非对称加密基础之上。
-这样一来，任何消息监控体系都无法工作。
+    <li>avim-router 为核心协议实现， libavproto.so / libavproto.dll 提供多种语言的 wrapper 接口</li>
+    <li>avim-bot 为聊天机器人，用来实现群聊。</li>
+    <li>avim-db 为用户信息数据库，为独立进程。可以不必跑在相同服务器上。</li>
+    <li>avim-log 为聊天日志记录数据库，为独立进程。可以不必跑在相同服务器上。</li>
+    <li>avim-client 为客户端，avplayer.org 计划提供基于Qt的跨平台客户端，以及 pidgin 插件。</li>
                 </p>
             </div>
             
-            <div class="col-lg-7 about">
-                <h3>AVIM编译教程</h3>
+            <div class="col-lg-10 about">
+                <h3><a href="https://github.com/avplayer/avim/wiki/Windows-%E7%BC%96%E8%AF%91%E8%AF%B4%E6%98%8E" target="_blank">AVIM编译教程 - Windows</a></h3>
                 <p>
-                    Dr想给Jack发个消息，可是QQ能监控所有的聊天交给gcd。dr和jack发的任何消息gcd都能看到。
-于是 Jack 创建了一个密钥对，包含一个公钥和一个私钥。
-Jack 把公钥发给了 Dr . 现在， gcd 也有这份公钥。
-dr 把消息用这个公钥加密后发给了 jack
-现在 gcd 也拿到了加密后的消息
-但是只有 jack 拿出了私钥，然后吧密文解开了，看到了要说的骂 gcd 的话 ....
-gcd 也有密文，也有公钥，可是却什么也做不了，因为 gcd 木有 jack 的私钥。
-                </p>
-                <p>
-                    AVIM 就建立在牛逼哄哄的非对称加密基础之上。
-这样一来，任何消息监控体系都无法工作。
-                </p>
-            </div>
-            <div class="col-lg-10">
-                <h3>AVIM编译教程</h3>
-                <p>
-                    Dr想给Jack发个消息，可是QQ能监控所有的聊天交给gcd。dr和jack发的任何消息gcd都能看到。
-于是 Jack 创建了一个密钥对，包含一个公钥和一个私钥。
-Jack 把公钥发给了 Dr . 现在， gcd 也有这份公钥。
-dr 把消息用这个公钥加密后发给了 jack
-现在 gcd 也拿到了加密后的消息
-但是只有 jack 拿出了私钥，然后吧密文解开了，看到了要说的骂 gcd 的话 ....
-gcd 也有密文，也有公钥，可是却什么也做不了，因为 gcd 木有 jack 的私钥。
-                </p>
-                <p>
-                    AVIM 就建立在牛逼哄哄的非对称加密基础之上。
-这样一来，任何消息监控体系都无法工作。
+                    <h4>0. 先决条件</h4>
+                    安装 CMake, Boost, OpenSSL, Protocol Buffers 的最新版本, 如需要 GUI 可选择安装最新的 Qt.
+                    <h4>1. 环境设置</h4>
+                    添加 Qt 对应的 CMake 模块路径到 CMAKE_PREFIX_PATH 环境变量下, 如在 Qt 5.3.2 for Windows 64-bit (VS 2013, OpenGL) 下设置为 C:\Qt\Qt5.3.2\5.3\msvc2013_64_opengl\lib\cmake.<br/>
+设置 PROTOBUF_SRC_ROOT_FOLDER 变量的值为 protobuf 根目录, 并对其进行编译.<br/>
+其他包若安装于默认路径, CMake 会自动进行查找, 否则设置相应的环境变量或在配置 CMake 时设置路径.<br/>
+                    <h4>2. 构建</h4>
+                    <h5>a.使用 Visual Studio</h5>
+                    运行 CMake, 设置工程目录和构建目录(建议放在工程下的build目录里), 点击 Configure 后选择 Visual Studio 12 2013 Win64 后按 Finish. 点击 Generate 生成 Visual Studio 解决方案.<br/>
+打开 build/avim.sln, 执行 BUILD -> Build Solution (F7), 泡杯咖啡后即可完成构建.<br/>
+                    <h5>b.使用 MinGW</h5>
+                    省略
                 </p>
             </div>
             <div class="col-lg-10">
-                <h3>AVIM编译教程</h3>
+                <h3><a href="https://github.com/avplayer/avim/wiki/How-to-build-avim---Ubuntu-platform" target="_blank">AVIM编译教程 - Linux(Ubuntu)</a></h3>
                 <p>
-                    Dr想给Jack发个消息，可是QQ能监控所有的聊天交给gcd。dr和jack发的任何消息gcd都能看到。
-于是 Jack 创建了一个密钥对，包含一个公钥和一个私钥。
-Jack 把公钥发给了 Dr . 现在， gcd 也有这份公钥。
-dr 把消息用这个公钥加密后发给了 jack
-现在 gcd 也拿到了加密后的消息
-但是只有 jack 拿出了私钥，然后吧密文解开了，看到了要说的骂 gcd 的话 ....
-gcd 也有密文，也有公钥，可是却什么也做不了，因为 gcd 木有 jack 的私钥。
+                    <h4>1. 依赖</h4>
+                    <pre>
+libssl-dev
+gcc-4.9
+g++-4.9
+cmake
+make
+lib64bz2-dev
+python-dev
+libprotobuf-dev
+protobuf-compiler
+git
+libqt5gui5
+qt5-default
+boost-1.57.0
+
+sudo apt-get install libssl-dev gcc-4.9 g++-4.9 cmake make lib64bz2-dev python-dev \
+    libprotobuf-dev protobuf-compiler git libqt5gui5 qt5-default
+                   </pre>
+                   <h4>2. 编译Boost</h4>
+                   请参考 <a href="https://github.com/avplayer/avim/wiki/How-to-build-boost-1_57_0---Ubuntu-platform" target="_blank">How-to-build-boost-1_57_0---Ubuntu-platform</a>
                 </p>
                 <p>
-                    AVIM 就建立在牛逼哄哄的非对称加密基础之上。
-这样一来，任何消息监控体系都无法工作。Peter你就将教程写在这个里面哈~
+                  <h4>3. 获取源码</h4>
+                  <pre>
+sudo git clone https://github.com/avplayer/avim.git /opt/avim
+sudo cd /opt/avim
+sudo git submodule update --init</pre>
                 </p>
+                <h4>4. 编译脚本</h4>
+                <pre>
+AVIM_HOME=/opt/avim
+cd $AVIM_HOME/
+git pull -f
+git submodule update
+rm -rf build/
+mkdir $AVIM_HOME/build/
+cd $AVIM_HOME/build/
+cmake $AVIM_HOME/
+make -j8
+                </pre>
             </div>
+            
         </div>
     </div>
     <!--container end-->
