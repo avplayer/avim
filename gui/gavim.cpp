@@ -3,6 +3,7 @@
 #include <QtCore/QDebug>
 #include <QScrollBar>
 #include <QStandardPaths>
+#include <QInputDialog>
 
 #include <boost/bind.hpp>
 #include <boost/asio/spawn.hpp>
@@ -108,6 +109,8 @@ gavim::gavim(QWidget *parent)
 	: avcore_(io_service_)/*, rv_thread_(io_service_, avcore_)*/, QWidget(parent)
 {
 	ui.setupUi(this);
+	current_chat_target = "test@avplayer.org";
+	ui.currentChat->setText(QString::fromStdString(current_chat_target));
 	// 遍历参数, 选找 --key 哈哈
 
 	// 寻
@@ -127,7 +130,7 @@ gavim::gavim(QWidget *parent)
 	connect(rv_thread_, &recvThread::finished, rv_thread_, &QObject::deleteLater);
 
 	//启动接受消息线程
-	rv_thread_->start();
+	//rv_thread_->start();
 }
 
 gavim::~gavim()
@@ -156,9 +159,8 @@ void gavim::on_sendButton_clicked()
 	// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
 	boost::async(
 		[this,curMsg](){
-		std::string sender = "test@avplayer.org";
-		qDebug() << "on_sendButton_clicked()" << QString::fromStdString(sender) << " sendMsg: " << QString::fromStdString(curMsg);
-		avcore_.sendto(sender, curMsg);
+		qDebug() << "on_sendButton_clicked()" << QString::fromStdString(current_chat_target) << " sendMsg: " << QString::fromStdString(curMsg);
+		avcore_.sendto(current_chat_target, curMsg);
 	}
 	);
 }
@@ -166,6 +168,17 @@ void gavim::on_sendButton_clicked()
 void gavim::on_exitButton_clicked()
 {
 	this->close();
+}
+
+void gavim::on_chatTarget_clicked()
+{
+	bool ok;
+	QString targetName = QInputDialog::getText(this, tr("Chat With Name"), tr("Input name:"), QLineEdit::Normal, ui.currentChat->text(), &ok);
+	if (ok && !targetName.isEmpty())
+	{
+		ui.currentChat->setText(targetName);
+		current_chat_target = targetName.toStdString();
+	}
 }
 
 void gavim::recvHandle(const QString &sender, const QString &data)

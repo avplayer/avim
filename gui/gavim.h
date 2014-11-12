@@ -46,10 +46,12 @@ private:
 	boost::asio::io_service io_service_;
 	avkernel avcore_;
 	//recvThread rv_thread_;
+	std::string current_chat_target;
 
 private slots:
 	void on_sendButton_clicked();
 	void on_exitButton_clicked();
+	void on_chatTarget_clicked();
 	void recvHandle(const QString &, const QString &);
 };
 
