@@ -19,6 +19,7 @@ endif()
 
 if(MSVC)
 	add_definitions(-DNOMINMAX)
+    add_definitions("/wd4819")
 	set(Boost_USE_MULTITHREADED TRUE)
 	set(Boost_USE_STATIC_LIBS TRUE)
 
