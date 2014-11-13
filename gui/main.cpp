@@ -15,14 +15,16 @@ int main(int argc, char *argv[])
 
 	fs::path appdatadir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
 
-	if(!fs::exists(appdatadir))
+	if (!fs::exists(appdatadir))
 		fs::create_directories(appdatadir);
 
 	gavim w;
 	login_dialog login;
 	if (login.exec() == QDialog::Accepted)
 	{
-		w.init(login.get_key_path(), login.get_cert_path());
+		if (!w.init(login.get_key_path(), login.get_cert_path())){
+			return 1;
+		}
 		w.show();
 		return app.exec();
 	}

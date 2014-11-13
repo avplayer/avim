@@ -19,11 +19,11 @@ proto::av_address av_address_from_string(std::string av_address)
     proto::av_address addr;
     boost::regex re("([^@]*)@([^/]*)(/(.*))?");
     boost::smatch m;
-    if(boost::regex_search(av_address, m, re))
+    if (boost::regex_search(av_address, m, re))
     {
         addr.set_username(m[1]);
         addr.set_domain(m[2]);
-        if(m[3].matched)
+        if (m[3].matched)
         {
             addr.set_resource(m[4]);
         }
@@ -36,11 +36,11 @@ proto::av_address av_address_from_string(std::string av_address)
 
 std::string av_address_to_string(const proto::av_address & addr)
 {
-	if(addr.has_resource())
+	if (addr.has_resource())
 	{
 		return boost::str( boost::format("%s@%s/%s") % addr.username() % addr.domain() % addr.resource());
 	}
-	return boost::str( boost::format("%s@%s") % addr.username() % addr.domain() );
+	return boost::str(boost::format("%s@%s") % addr.username() % addr.domain());
 }
 
 void avif::construct()
