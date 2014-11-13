@@ -15,3 +15,5 @@
 build/
 *.kdev4
 
+# For Qt
+*.pro.user
