@@ -3,7 +3,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
-#include <io.h>
+#include <fstream>
 
 namespace avim {
 
@@ -38,7 +38,7 @@ namespace avim {
 	void ini::put(const std::string& path, const value_type& value)
 	{
 		if (m_err_code) {
-			ofstream of(m_ini_file);
+			std::ofstream of(m_ini_file);
 			if (!of) {
 				return;
 			}
