@@ -162,7 +162,7 @@ std::string avjackif::async_client_hello(boost::asio::yield_context yield_contex
 
 static inline int X509_NAME_add_entry_by_NID(X509_NAME *subj, int nid, std::string value)
 {
-	X509_NAME_add_entry_by_NID(subj, nid, MBSTRING_UTF8, (unsigned char*) value.data(), -1, -1 , 0);
+	return X509_NAME_add_entry_by_NID(subj, nid, MBSTRING_UTF8, (unsigned char*) value.data(), -1, -1 , 0);
 }
 
 bool avjackif::async_register_user_check_name(std::string user_name, boost::asio::yield_context yield_context)
