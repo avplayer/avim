@@ -40,7 +40,7 @@ public:
 	~gavim();
 
 	QString getMessage();
-	void init(const std::string&, const std::string&);
+	bool init(const std::string&, const std::string&);
 	void set_avim_key(const std::string& v_){ cur_avim_key = v_; }
 	void set_avim_cert(const std::string& v_){ cur_avim_cert = v_; }
 protected:

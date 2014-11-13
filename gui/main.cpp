@@ -22,7 +22,9 @@ int main(int argc, char *argv[])
 	login_dialog login;
 	if (login.exec() == QDialog::Accepted)
 	{
-		w.init(login.get_key_path(), login.get_cert_path());
+		if (!w.init(login.get_key_path(), login.get_cert_path())){
+			return 1;
+		}
 		w.show();
 		return app.exec();
 	}

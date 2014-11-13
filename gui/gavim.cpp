@@ -49,7 +49,7 @@ void recvThread::run()
 	if (!keyfile)
 	{
 		std::cerr << "can not open " << m_keyfile << std::endl;
-		exit(1);
+		::exit(1);
 	}
 
 	boost::shared_ptr<RSA> rsa_key(
@@ -61,7 +61,7 @@ void recvThread::run()
 	if (!certfile)
 	{
 		std::cerr << "can not open "<< m_certfile << std::endl;
-		exit(1);
+		::exit(1);
 	}
 
 	boost::shared_ptr<X509> x509_cert(
@@ -116,7 +116,7 @@ gavim::~gavim()
 	qDebug() << "~gavim()";
 }
 
-void gavim::init(const std::string& cur_key, const std::string& cur_cert)
+bool gavim::init(const std::string& cur_key, const std::string& cur_cert)
 { 
 	set_avim_key(cur_key);
 	set_avim_cert(cur_cert);
@@ -139,7 +139,9 @@ void gavim::init(const std::string& cur_key, const std::string& cur_cert)
 		avim_cert /= "user.cert"; 
 		cur_avim_cert = avim_cert.string();
 	}
-
+	if (!fs::exists(fs::path(cur_avim_key)) || !fs::exists(fs::path(cur_avim_cert))) {
+		return false;
+	}
 	qDebug() << "cert:" << QString::fromStdString(cur_avim_cert);
 	qDebug() << "key:" << QString::fromStdString(cur_avim_key);
 	// FIXME 通过 GUI 选择证书
@@ -150,6 +152,7 @@ void gavim::init(const std::string& cur_key, const std::string& cur_cert)
 
 	//启动接受消息线程
 	rv_thread_->start();
+	return true;
 }
 
 QString gavim::getMessage()
