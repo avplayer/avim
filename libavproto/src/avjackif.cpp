@@ -165,10 +165,26 @@ static inline int X509_NAME_add_entry_by_NID(X509_NAME *subj, int nid, std::stri
 	X509_NAME_add_entry_by_NID(subj, nid, MBSTRING_UTF8, (unsigned char*) value.data(), -1, -1 , 0);
 }
 
+bool avjackif::async_register_user_check_name(std::string user_name, boost::asio::yield_context yield_context)
+{
+	if (m_shared_key.empty())
+		async_client_hello(yield_context);
+
+	proto::username_availability_check username_availability_check;
+	username_availability_check.set_user_name(user_name);
+
+	boost::asio::async_write(*m_sock, boost::asio::buffer(av_router::encode(username_availability_check)), yield_context);
+
+	std::unique_ptr<proto::username_availability_result> username_availability_result((proto::username_availability_result*)async_read_protobuf_message(*m_sock, yield_context));
+
+	return username_availability_result->result() == proto::username_availability_result::NAME_AVAILABLE;
+}
+
 bool avjackif::async_register_new_user(std::string user_name, boost::asio::yield_context yield_context)
 {
 	// 先发 client_hello
-	async_client_hello(yield_context);
+	if( m_shared_key.empty())
+		async_client_hello(yield_context);
 
 	auto digest = EVP_sha1();
 
