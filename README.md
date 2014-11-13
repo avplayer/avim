@@ -44,7 +44,7 @@ protobuf, boost, Qt(客户端only)
 
     http://www.boost.org/users/history/version_1_57_0.html
 	
-### Build ``` bash $ git clone https://github.com/avplayer/avim.git $ cd avim && mkdir build && cmake ..  $ make -j8  # 默认带GUI; 如不需编译GUI的, 可以用 $ cmake .. -DBUILD_GUI=OFF ```
+### Build ``` bash $ git clone https://github.com/avplayer/avim.git $ cd avim && mkdir build && cd build && cmake ..  $ make -j8  # 默认带GUI; 如不需编译GUI的, 可以用 $ cmake .. -DBUILD_GUI=OFF ```
 
 详细的编译说明
 
