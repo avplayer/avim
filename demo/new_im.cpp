@@ -104,6 +104,11 @@ void register_user(boost::asio::yield_context yield_context)
 
 	avjackif avinterface(jackroutersocket);
 
+	avinterface.async_register_user_check_name(
+		"test",
+		yield_context
+	);
+
 	avinterface.async_register_new_user(
 		"test",
 		yield_context

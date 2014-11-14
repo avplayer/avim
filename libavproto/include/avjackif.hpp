@@ -22,6 +22,7 @@ public:
 	bool handshake();
 
 	bool async_register_new_user(std::string user_name, boost::asio::yield_context yield_context);
+	bool async_register_user_check_name(std::string user_name, boost::asio::yield_context yield_context);
 
 	std::string remote_addr();
 
