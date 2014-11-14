@@ -17,3 +17,4 @@ build/
 .kdev_include_paths
 # For Qt
 *.pro.user
+Win32/

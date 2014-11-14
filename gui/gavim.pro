@@ -14,7 +14,8 @@ INCLUDEPATH += ./GeneratedFiles \
     $(SolutionDir)3rd_party/openssl_vs2013_32/inc32 \
     $(SolutionDir)protocol \
     $(SolutionDir)3rd_party/libavproto/include \
-    $(SolutionDir)3rd_party/protobuf-2.6.1/src
+    $(SolutionDir)3rd_party/protobuf-2.6.1/src \
+    /usr/local/include
 LIBS += -L"$(SolutionDir)3rd_party" \
     -L"$(SolutionDir)3rd_party/openssl_vs2013_32/out32" \
     -llibeay32 \
