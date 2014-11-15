@@ -105,7 +105,7 @@
                               <div class="form-group">
                                   <div class="col-lg-offset-2 col-lg-10">
                                       <!--<button class="btn btn-success" type="submit">提交申请</button>-->
-                                      <a class="btn btn-success" data-toggle="modal" href="#regester">提交申请</a>
+                                      <button id="button_submit" class="btn btn-success" type="button" data-toggle="modal">提交申请</button>
                                   </div>
                               </div>
                           </form>
@@ -124,26 +124,26 @@
                                           <form class="form-horizontal" role="form">
                                               <div class="form-group">
                                                   <label class="col-lg-5 control-label">用户名：</label>
-                                                  <div class="col-lg-14 control-label">
+                                                  <div id="confirm_username" class="col-lg-14 control-label">
                                                       username
                                                   </div>
                                               </div>
                                               <div class="form-group">
                                                   <label class="col-lg-5 control-label">avim专享地址：</label>
-                                                  <div class="col-lg-14 control-label">
+                                                  <div id="confirm_avimaddress" class="col-lg-14 control-label">
                                                       username@avplayer.org
                                                   </div>
                                               </div>
                                               <div class="form-group">
                                                   <label class="col-lg-5 control-label">E-mail：</label>
-                                                  <div class="col-lg-14 control-label">
+                                                  <div id="confirm_email" class="col-lg-14 control-label">
                                                       username@outlook.com
                                                   </div>
                                               </div>
 
                                               <div class="form-group">
                                                   <div class="col-lg-offset-5 col-lg-14">
-                                                      <button type="submit" class="btn btn-send">确认申请</button>
+                                                      <button type="button" class="btn btn-send">确认申请</button>
                                                   </div>
                                               </div>
                                           </form>
@@ -173,7 +173,7 @@
     <script src="js/common-scripts.js"></script>
 
 
-  <script>
+  <script type="text/javascript">
   function set_input_status(text, classname, comment_text)
   {
 	  var div_id = "#div_" + text;
@@ -231,7 +231,18 @@
         }).blur(function(){
 		valid_email_input();
       })
-
+	  
+	  $("#button_submit").click(function(){
+          if(onformsubmit())
+		  {
+			$("#confirm_username").text($("#username").val());
+			$("#confirm_avimaddress").text($("#username").val()+"@avplayer.org");
+			$("#confirm_email").text($("#email").val());
+		    $("#button_submit").attr("href", "#regester");
+		  }
+		  else
+		    $("#button_submit").attr("href", "#");
+        })
 	
       
 	});
