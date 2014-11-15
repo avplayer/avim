@@ -1,4 +1,4 @@
-﻿#include "gavim.h"
+﻿#include "avim.h"
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
 #include <QScrollBar>
@@ -105,18 +105,19 @@ void recvThread::recv_msg(boost::asio::yield_context yield_context)
 	}
 }
 
-gavim::gavim(QWidget *parent)
-	: avcore_(io_service_)/*, rv_thread_(io_service_, avcore_)*/, QWidget(parent)
+avim::avim(QWidget *parent)
+	: QWidget(parent)
+	, avcore_(io_service_)
 {
 	ui.setupUi(this);
 }
 
-gavim::~gavim()
+avim::~avim()
 {
-	qDebug() << "~gavim()";
+	qDebug() << "~avim()";
 }
 
-bool gavim::init(const std::string& cur_key, const std::string& cur_cert)
+bool avim::init(const std::string& cur_key, const std::string& cur_cert)
 { 
 	set_avim_key(cur_key);
 	set_avim_cert(cur_cert);
@@ -147,7 +148,7 @@ bool gavim::init(const std::string& cur_key, const std::string& cur_cert)
 	// FIXME 通过 GUI 选择证书
 	// FIXME
 	recvThread *rv_thread_ = new recvThread(io_service_, avcore_, cur_avim_key, cur_avim_cert);
-	connect(rv_thread_, &recvThread::recvReady, this, &gavim::recvHandle);
+	connect(rv_thread_, &recvThread::recvReady, this, &avim::recvHandle);
 	connect(rv_thread_, &recvThread::finished, rv_thread_, &QObject::deleteLater);
 
 	//启动接受消息线程
@@ -155,7 +156,7 @@ bool gavim::init(const std::string& cur_key, const std::string& cur_cert)
 	return true;
 }
 
-QString gavim::getMessage()
+QString avim::getMessage()
 {
 	QString msg = ui.messageTextEdit->toPlainText();
 	ui.messageTextEdit->clear();
@@ -163,7 +164,7 @@ QString gavim::getMessage()
 	return msg;
 }
 
-void gavim::on_sendButton_clicked()
+void avim::on_sendButton_clicked()
 {
 	if (ui.messageTextEdit->toPlainText() == "")
 	{
@@ -181,12 +182,12 @@ void gavim::on_sendButton_clicked()
 	});
 }
 
-void gavim::on_exitButton_clicked()
+void avim::on_exitButton_clicked()
 {
 	this->close();
 }
 
-void gavim::on_chatTarget_clicked()
+void avim::on_chatTarget_clicked()
 {
 	bool ok;
 	QString targetName = QInputDialog::getText(this, tr("Chat With Name"), tr("Input name:"), QLineEdit::Normal, ui.currentChat->text(), &ok);
@@ -197,7 +198,7 @@ void gavim::on_chatTarget_clicked()
 	}
 }
 
-void gavim::recvHandle(const QString &sender, const QString &data)
+void avim::recvHandle(const QString &sender, const QString &data)
 {
 	qDebug() << "recvHandle()" << sender << " sendMsg: " << data;
 	QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
@@ -207,7 +208,7 @@ void gavim::recvHandle(const QString &sender, const QString &data)
 	ui.messageBrowser->append(data);
 }
 
-void gavim::closeEvent(QCloseEvent *)
+void avim::closeEvent(QCloseEvent *)
 {
 	io_service_.stop();
 }

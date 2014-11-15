@@ -1,9 +1,8 @@
-#ifndef GAVIM_H
-#define GAVIM_H
+#pragma once
 
 #include <QWidget>
 #include <QThread>
-#include "ui_gavim.h"
+#include "ui_avim.h"
 #include "login_dialog.h"
 
 #include <boost/asio.hpp>
@@ -31,13 +30,13 @@ signals:
 	void recvReady(const QString &, const QString &);
 };
 
-class gavim : public QWidget
+class avim : public QWidget
 {
 	Q_OBJECT
 
 public:
-	gavim(QWidget *parent = 0);
-	~gavim();
+	avim(QWidget *parent = 0);
+	~avim();
 
 	QString getMessage();
 	bool init(const std::string&, const std::string&);
@@ -47,7 +46,7 @@ protected:
 	void closeEvent(QCloseEvent *);
 
 private:
-	Ui::gavimClass ui;
+	Ui::avimClass ui;
 	boost::asio::io_service io_service_;
 	avkernel avcore_;
 	//recvThread rv_thread_;
@@ -61,5 +60,3 @@ private slots:
 	void on_chatTarget_clicked();
 	void recvHandle(const QString &, const QString &);
 };
-
-#endif // GAVIM_H

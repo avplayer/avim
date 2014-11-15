@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>gavimClass</class>
- <widget class="QWidget" name="gavimClass">
+ <class>avimClass</class>
+ <widget class="QWidget" name="avimClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>gavim</string>
+   <string>avim</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="4,0">
    <item>

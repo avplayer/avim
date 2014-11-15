@@ -5,7 +5,7 @@ namespace fs = boost::filesystem;
 
 #include <QStandardPaths>
 #include <QApplication>
-#include "gavim.h"
+#include "avim.h"
 #include "login_dialog.h"
 
 int main(int argc, char *argv[])
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	if (!fs::exists(appdatadir))
 		fs::create_directories(appdatadir);
 
-	gavim w;
+	avim w;
 	login_dialog login;
 	if (login.exec() == QDialog::Accepted)
 	{
