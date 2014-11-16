@@ -97,8 +97,10 @@ void register_user(boost::asio::yield_context yield_context)
 	boost::shared_ptr<boost::asio::ip::tcp::socket> jackroutersocket;
 	jackroutersocket.reset( new boost::asio::ip::tcp::socket(io_service));
 
+	auto env_host = std::getenv("AVIMROUTERHOST");
+
 	auto resolved_host_iterator = resolver.async_resolve(
-		boost::asio::ip::tcp::resolver::query("im.avplayer.org", "24950"), yield_context);
+		boost::asio::ip::tcp::resolver::query(env_host? env_host:"avim.avplayer.org", "24950"), yield_context);
 
 	boost::asio::async_connect(*jackroutersocket, resolved_host_iterator, yield_context);
 
@@ -113,6 +115,8 @@ void register_user(boost::asio::yield_context yield_context)
 		"test",
 		yield_context
 	);
+	// 注册成功, 保存 RSA 私钥 ! 很重要!
+	// TODO save avinterface.get_rsa_key();
 }
 
 int main(int argc, char* argv[])
