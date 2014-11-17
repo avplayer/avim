@@ -199,6 +199,7 @@
 			if (json.code == "0")
 			{
 				set_input_status("username", "form-group has-error", "非常抱歉，该用户名已被占用");
+				$("#button_submit").attr("href", "#");
 			}
 			else
 			{
