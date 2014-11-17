@@ -192,8 +192,22 @@
 	  }
 	  else
 	  {
-		 set_input_status("username", "form-group has-success", "用户名可用");
-		 return true;
+	     $.post(
+			"/avrouter/username_availability_check.jsp"
+			, { username: username_value }
+			, function (json) {
+			if (json.code == "0")
+			{
+				set_input_status("username", "form-group has-error", "非常抱歉，该用户名已被占用");
+			}
+			else
+			{
+				set_input_status("username", "form-group has-success", "用户名可用");
+				$("#button_submit").attr("href", "#regester");
+			}
+		});
+		set_input_status("username", "form-group has-success", "...");
+		return true;
 	  }
   }
   function valid_email_input()
@@ -238,7 +252,6 @@
 			$("#confirm_username").text($("#username").val());
 			$("#confirm_avimaddress").text($("#username").val()+"@avplayer.org");
 			$("#confirm_email").text($("#email").val());
-		    $("#button_submit").attr("href", "#regester");
 		  }
 		  else
 		    $("#button_submit").attr("href", "#");
