@@ -220,7 +220,7 @@ bool avjackif::async_register_new_user(std::string user_name, boost::asio::yield
 
 	OPENSSL_free(out);
 	out = NULL;
-	auto rsa_key_out_len = i2d_RSAPublicKey(_rsa.get(), &out);
+	auto rsa_key_out_len = i2d_RSA_PUBKEY(_rsa.get(), &out);
 
 	std::string rsa_key((char*)out, rsa_key_out_len);
 	OPENSSL_free(out);
