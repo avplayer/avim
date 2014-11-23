@@ -22,6 +22,7 @@ namespace fs = boost::filesystem;
 #include "avim.h"
 #include "login_dialog.h"
 
+void post_on_gui_thread(std::function<void()>);
 
 class MainWindow : public QMainWindow
 {

@@ -4,6 +4,14 @@
 #include <QDebug>
 
 #include "app.hpp"
+#include "syncobj.hpp"
+
+static SyncObjec syncobj;
+
+void post_on_gui_thread(std::function<void()> func)
+{
+	syncobj.do_post(func);
+}
 
 void avimApp::on_post(std::function<void()> qfunc_ptr)
 {
@@ -32,9 +40,9 @@ avimApp::avimApp(int argc, char* argv[])
 	// 发送一个测试 信号, 看能不能顺利的在2个线程里同步
 	qDebug() << "test GUI thread and IO thread interactivity" ;
 	m_io_service.post(
-		[this](){
+		[](){
 			std::cerr << "this code run in asio thread : " << std::this_thread::get_id() << std::endl;
-			emit post([]()
+			post_on_gui_thread([]()
 			{
 				std::cerr << "this code run in GUI thread : " << std::this_thread::get_id() << std::endl;
 			});
