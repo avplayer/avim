@@ -12,19 +12,31 @@ void avimApp::on_post(std::function<void()> qfunc_ptr)
 
 avimApp::avimApp(int argc, char* argv[])
     : QApplication(argc, argv)
+	, m_io_work(m_io_service)
 {
     qRegisterMetaType<std::function<void()>>("std::function<void()>");
     connect(this, SIGNAL(post(std::function<void()>)),
             this, SLOT(on_post(std::function<void()>)), Qt::QueuedConnection);
     // 开启 boost 线程跑 io_service
-    m_io_thread = std::thread(boost::bind(&boost::asio::io_service::run, &m_io_service));
+	m_io_thread = std::thread([this](){
+		try{
+			m_io_service.run();
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "main exception: " << e.what() << std::endl;
+			return -1;
+		}
+	});
 
 	// 发送一个测试 信号, 看能不能顺利的在2个线程里同步
-
+	qDebug() << "test GUI thread and IO thread interactivity" ;
 	m_io_service.post(
 		[this](){
-			emit post([](){
-				qDebug() << "test GUI thread and IO thread interactivity" ;
+			std::cerr << "this code run in asio thread : " << std::this_thread::get_id() << std::endl;
+			emit post([]()
+			{
+				std::cerr << "this code run in GUI thread : " << std::this_thread::get_id() << std::endl;
 			});
 		}
 	);
@@ -59,7 +71,7 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
     qDebug() << "key:" << QString::fromStdString(cur_key);
 
     // 登录进去
-    m_avim_client.reset(new avim_client(m_io_service, cur_key, cur_key));
+   // m_avim_client.reset(new avim_client(m_io_service, cur_key, cur_key));
     return true;
 }
 

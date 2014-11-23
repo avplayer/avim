@@ -29,8 +29,9 @@ public:
 	MainWindow()
 	{
 		setCentralWidget(new QWidget);
-
+		auto vlayout = new QVBoxLayout(centralWidget());
 		m_list = new QListWidget(centralWidget());
+		vlayout->addWidget(m_list);
 	}
 
 private:
@@ -49,6 +50,7 @@ private:
 
 	boost::asio::io_service m_io_service;
 	std::thread m_io_thread;
+	boost::asio::io_service::work m_io_work;
 
 	std::unique_ptr<avim::ini> m_cfg;
 
