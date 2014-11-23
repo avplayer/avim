@@ -4,14 +4,6 @@
 #include <QDebug>
 
 #include "app.hpp"
-#include "syncobj.hpp"
-
-static SyncObjec syncobj;
-
-void post_on_gui_thread(std::function<void()> func)
-{
-	syncobj.do_post(func);
-}
 
 void avimApp::on_post(std::function<void()> qfunc_ptr)
 {
@@ -78,8 +70,10 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
     qDebug() << "cert:" << QString::fromStdString(cur_cert);
     qDebug() << "key:" << QString::fromStdString(cur_key);
 
+	// TODO 这里就提示输入key的密码解锁掉
+
     // 登录进去
-   // m_avim_client.reset(new avim_client(m_io_service, cur_key, cur_key));
+	// m_avim_client.reset(new avim_client(m_io_service, cur_key, cur_key));
     return true;
 }
 
