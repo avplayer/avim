@@ -62,3 +62,70 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
     m_avim_client.reset(new avim_client(m_io_service, cur_key, cur_key));
     return true;
 }
+
+int avimApp::exec()
+{
+    load_cfg();
+
+    std::string auto_login = m_cfg->get<std::string>("global.auto_login");
+
+    if (auto_login == "true")
+    {
+        if (load_key_and_cert(m_cfg->get<std::string>("global.key"), m_cfg->get<std::string>("global.cert")))
+        {
+            return QApplication::exec();
+        }
+        else
+        {
+            m_login_dialog.reset(new login_dialog(m_cfg.get()));
+            if (m_login_dialog->exec() == QDialog::Accepted)
+            {
+                if (!load_key_and_cert(m_login_dialog->get_key_path(), m_login_dialog->get_cert_path()))
+                {
+                    return 1;
+                }
+                m_login_dialog.reset();
+                return start_main();
+            }
+            else
+            {
+                return 0;
+            }
+        }
+    }
+    else
+    {
+        m_login_dialog.reset(new login_dialog(m_cfg.get()));
+        if (m_login_dialog->exec() == QDialog::Accepted)
+        {
+            if (!load_key_and_cert(m_login_dialog->get_key_path(), m_login_dialog->get_cert_path()))
+            {
+                return 1;
+            }
+            m_login_dialog.reset();
+            return start_main();
+        }
+        else
+        {
+            return 0;
+        }
+    }
+}
+
+void avimApp::load_cfg()
+{
+    fs::path appdatadir = get_app_dir();
+
+    if (!fs::exists(appdatadir))
+        fs::create_directories(appdatadir);
+
+    m_cfg.reset(new avim::ini(appdatadir / "config.ini"));
+}
+
+int avimApp::start_main()
+{
+    // 创建主窗口, 开始真正的 GUI 之旅
+    m_mainwindow.reset(new MainWindow);
+    m_mainwindow->show();
+    return QApplication::exec();
+}

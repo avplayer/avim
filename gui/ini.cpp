@@ -23,6 +23,11 @@ ini::ini(const boost::filesystem::path& ini_file)
 
 ini::~ini()
 {
+	write_to_file();
+}
+
+void ini::write_to_file()
+{
     if (m_modified)
 	{
         boost::property_tree::ini_parser::write_ini(m_ini_file.string(), m_pt);

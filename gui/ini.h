@@ -7,7 +7,7 @@
 
 namespace avim {
 
-class ini
+class ini : boost::noncopyable
 {
     bool m_modified;
     short m_err_code;
@@ -23,6 +23,8 @@ public:
 
     template<typename value_type>
     void put(const std::string& path, const value_type& value);
+
+	void write_to_file();
 };
 
 template<typename value_type>

@@ -1,14 +1,14 @@
 
 #include "login_dialog.h"
-#include "ini.h"
 #include "avim.h"
 
 #include <memory>
 #include <QFileDialog>
 #include <QtCore/QDebug>
 
-login_dialog::login_dialog()
+login_dialog::login_dialog(avim::ini* _cfg)
     : ui_(std::make_unique<Ui::login_dialog>())
+	, cfg(_cfg)
 {
     ui_->setupUi(this);
     this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -25,9 +25,8 @@ login_dialog::login_dialog()
     });
     connect(ui_->login_button, &QPushButton::clicked, this, &login_dialog::on_login);
 
-    avim::ini cfg("config.ini");
-    ui_->cert_path->setText(QString::fromStdString(cfg.get<std::string>("global.cert")));
-    ui_->key_path->setText(QString::fromStdString(cfg.get<std::string>("global.key")));
+    ui_->cert_path->setText(QString::fromStdString(cfg->get<std::string>("global.cert")));
+    ui_->key_path->setText(QString::fromStdString(cfg->get<std::string>("global.key")));
 }
 
 void login_dialog::on_login()
@@ -41,14 +40,13 @@ void login_dialog::on_login()
     bool auto_lgoin = Qt::Checked == ui_->login_automatically->checkState();
     if (Qt::Checked == ui_->remember_me->checkState() || auto_lgoin)
     {
-        // TODO: 把配置文件名定义成跨平台变量,而不依赖于执行目录当前路径
-        avim::ini cfg("config.ini");
-        cfg.put("global.cert", ui_->cert_path->text().toStdString());
-        cfg.put("global.key", ui_->key_path->text().toStdString());
+        cfg->put("global.cert", ui_->cert_path->text().toStdString());
+        cfg->put("global.key", ui_->key_path->text().toStdString());
         if (auto_lgoin)
 		{
-            cfg.put("auto_login", "true");
+            cfg->put("auto_login", "true");
         }
+		cfg->write_to_file();
     }
 
     this->accept();
