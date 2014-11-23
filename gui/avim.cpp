@@ -38,6 +38,7 @@ int pass_cb(char *buf, int size, int rwflag, char *u)
 
 namespace avui {
 
+#if 0
 recvThread::~recvThread()
 {
     qDebug() << "~recvThread()";
@@ -108,6 +109,7 @@ void recvThread::recv_msg(boost::asio::yield_context yield_context)
         qDebug() << "recv_msg()" << QString::fromStdString(data) << " from " << QString::fromStdString(sender);
     }
 }
+#endif
 
 avim::avim(QWidget *parent)
     : QWidget(parent), avcore_(io_service_)
@@ -122,49 +124,7 @@ avim::~avim()
 
 bool avim::init(const std::string &cur_key, const std::string &cur_cert)
 {
-    set_avim_key(cur_key);
-    set_avim_cert(cur_cert);
-    current_chat_target = "test@avplayer.org";
-    ui.currentChat->setText(QString::fromStdString(current_chat_target));
-    // 遍历参数, 选找 --key 哈哈
 
-    // 寻
-    if (cur_avim_key == "")
-	{
-        fs::path avim_key = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
-
-        avim_key /= "user.key";
-        cur_avim_key = avim_key.string();
-    }
-
-    if (cur_avim_cert == "")
-	{
-        fs::path avim_cert = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
-
-        avim_cert /= "user.cert";
-        cur_avim_cert = avim_cert.string();
-    }
-
-    if (!fs::exists(fs::path(cur_avim_key)) || !fs::exists(fs::path(cur_avim_cert)))
-	{
-        std::cout << cur_avim_key << '\n';
-        std::cout << cur_avim_cert << '\n';
-        std::cout << "omg";
-        return false;
-    }
-    qDebug() << "cert:" << QString::fromStdString(cur_avim_cert);
-    qDebug() << "key:" << QString::fromStdString(cur_avim_key);
-    // FIXME 通过 GUI 选择证书
-    // FIXME
-    recvThread *rv_thread_ = new recvThread(io_service_, avcore_, cur_avim_key, cur_avim_cert);
-    connect(rv_thread_, &recvThread::recvReady, this, &avim::recvHandle);
-    connect(rv_thread_, &recvThread::finished, rv_thread_, &QObject::deleteLater);
-
-
-
-    //启动接受消息线程
-    rv_thread_->start();
-    return true;
 }
 
 QString avim::getMessage() {
