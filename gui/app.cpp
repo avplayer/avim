@@ -73,7 +73,7 @@ int avimApp::exec()
     {
         if (load_key_and_cert(m_cfg->get<std::string>("global.key"), m_cfg->get<std::string>("global.cert")))
         {
-            return QApplication::exec();
+			return start_main();
         }
         else
         {
