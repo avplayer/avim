@@ -31,7 +31,13 @@ namespace avim {
 		if (m_err_code) {
 			return value_type();
 		}
-		return m_pt.get<value_type>(path);
+    // path不存在时，异常处理
+    try {
+      return m_pt.get<value_type>(path);
+    } catch (boost::property_tree::ptree_error error) {
+      // FIXME: 这里异常返回啥比较好？
+      return error.what();
+    }
 	}
 
 	template<typename value_type>
@@ -48,4 +54,4 @@ namespace avim {
 		m_modified = true;
 		m_pt.put(path, value);
 	}
-}
+} // namespace avim

@@ -1,6 +1,7 @@
 
 #include "login_dialog.h"
 #include "ini.h"
+#include "avim.h"
 
 #include <memory>
 #include <QFileDialog>
@@ -36,12 +37,16 @@ void login_dialog::on_login()
 		qDebug() << "on_login() some thing is null!";
 		return;
 	}
-
-	if (Qt::Checked == ui_->remember_me->checkState() || Qt::Checked == ui_->login_automatically->checkState())  
+  bool auto_lgoin = Qt::Checked == ui_->login_automatically->checkState();
+	if (Qt::Checked == ui_->remember_me->checkState() || auto_lgoin)
 	{
-		avim::ini cfg("config.ini");	
+    // TODO: 把配置文件名定义成跨平台变量,而不依赖于执行目录当前路径
+		avim::ini cfg("config.ini");
 		cfg.put("global.cert", ui_->cert_path->text().toStdString());
 		cfg.put("global.key", ui_->key_path->text().toStdString());
+    if (auto_lgoin) {
+      cfg.put("auto_login", "true");
+    }
 	}
 
 	this->accept();
