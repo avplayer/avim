@@ -11,11 +11,11 @@ class ini
 {
     bool m_modified;
     short m_err_code;
-    std::string m_ini_file;
+    boost::filesystem::path m_ini_file;
     boost::property_tree::ptree m_pt;
 
 public:
-    ini(const std::string& ini_file);
+    ini(const boost::filesystem::path& ini_file);
     ~ini();
 
     template<typename value_type>
@@ -49,7 +49,7 @@ void ini::put(const std::string& path, const value_type& value)
 {
     if (m_err_code)
 	{
-        std::ofstream of(m_ini_file);
+        std::ofstream of(m_ini_file.string().c_str());
         if (!of)
 		{
             return;

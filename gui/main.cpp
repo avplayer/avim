@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
         fs::create_directories(appdatadir);
 
     avui::avim w;
-    avim::ini cfg("config.ini");
+    avim::ini cfg(appdatadir / "config.ini");
     std::string auto_login = cfg.get<std::string>("global.auto_login");
 
     if (auto_login == "true")

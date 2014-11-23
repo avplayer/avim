@@ -5,15 +5,15 @@ namespace avim {
 
 namespace fs = boost::filesystem;
 
-ini::ini(const std::string& ini_file)
+ini::ini(const boost::filesystem::path& ini_file)
     : m_modified(false)
     , m_ini_file(ini_file)
 {
     fs::path p(ini_file);
-    if (fs::exists(p))
+    if (fs::exists(ini_file))
 	{
         m_err_code = 0;
-        boost::property_tree::ini_parser::read_ini(m_ini_file, m_pt);
+        boost::property_tree::ini_parser::read_ini(m_ini_file.string(), m_pt);
     }
     else
 	{
@@ -25,7 +25,7 @@ ini::~ini()
 {
     if (m_modified)
 	{
-        boost::property_tree::ini_parser::write_ini(m_ini_file, m_pt);
+        boost::property_tree::ini_parser::write_ini(m_ini_file.string(), m_pt);
         m_modified = false;
     }
 }
