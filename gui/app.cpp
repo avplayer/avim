@@ -163,7 +163,7 @@ MainWindow::MainWindow(avimApp* _avimapp)
     m_list->addItem("microcai@avplayer.org");
 
     connect(m_list, &QListWidget::itemDoubleClicked, [this](QListWidgetItem* item){
-		emit chat_opened(item->text().toStdString());
+		Q_EMIT chat_opened(item->text().toStdString());
 	});
 }
 

@@ -12,10 +12,10 @@ class SyncObjec : QObject
 
 	void do_post(std::function<void()> func);
 
-private slots:
+private Q_SLOTS:
 	void on_post(std::function<void()> qfunc_ptr){(qfunc_ptr)();}
 
-signals:
+Q_SIGNALS:
 	void post(std::function<void()>);
 
 public:

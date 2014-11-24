@@ -48,7 +48,7 @@ private:
     std::string cur_avim_key;
     std::string cur_avim_cert;
 
-private slots:
+private Q_SLOTS:
 
     void on_sendButton_clicked();
 

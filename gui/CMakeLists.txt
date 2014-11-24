@@ -1,5 +1,8 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
+
+add_definitions(-DQT_NO_KEYWORDS)
+
 find_package(Qt5Widgets REQUIRED)
 
 file(GLOB HDRS include/*.h*)
