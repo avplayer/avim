@@ -5,14 +5,10 @@
 
 #include "app.hpp"
 
-void avimApp::on_post(std::function<void()> qfunc_ptr)
-{
-    (qfunc_ptr)();
-}
-
 avimApp::avimApp(int argc, char* argv[])
     : QApplication(argc, argv)
 	, m_io_work(m_io_service)
+	, m_avkernel(m_io_service)
 {
     qRegisterMetaType<std::function<void()>>("std::function<void()>");
     connect(this, SIGNAL(post(std::function<void()>)),
@@ -40,6 +36,12 @@ avimApp::avimApp(int argc, char* argv[])
 			});
 		}
 	);
+}
+
+avimApp::~avimApp()
+{
+    m_io_service.stop();
+    m_io_thread.join();
 }
 
 bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
@@ -139,7 +141,39 @@ void avimApp::load_cfg()
 int avimApp::start_main()
 {
     // 创建主窗口, 开始真正的 GUI 之旅
-    m_mainwindow.reset(new MainWindow);
+    m_mainwindow.reset(new MainWindow(this));
     m_mainwindow->show();
     return QApplication::exec();
+}
+
+void avimApp::start_chat_with(std::string)
+{
+}
+
+MainWindow::MainWindow(avimApp* _avimapp)
+    :m_avimapp(_avimapp)
+{
+    setCentralWidget(new QWidget);
+    auto vlayout = new QVBoxLayout(centralWidget());
+    m_list = new QListWidget(centralWidget());
+    vlayout->addWidget(m_list);
+
+    m_list->addItem("test@avplayer.org");
+    m_list->addItem("test-client@avplayer.org");
+    m_list->addItem("microcai@avplayer.org");
+
+    connect(m_list, &QListWidget::itemDoubleClicked, [this](QListWidgetItem* item){
+		emit chat_opened(item->text().toStdString());
+	});
+}
+
+void MainWindow::on_login_success()
+{
+	// TODO 更新 GUI 向用户显示
+
+}
+
+void MainWindow::on_lost_connection(int reason)
+{
+	// TODO 更新 GUI 报告用户
 }
