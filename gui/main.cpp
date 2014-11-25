@@ -30,7 +30,7 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int
 	// 初始化该初始化的东西
     OpenSSL_add_all_algorithms();
 	// 创建 QApp 对象
-    avimApp app(__argc, _targv);
+    avimApp app(__argc, __argv);
 	// 开跑
 	return app.exec();
 }
