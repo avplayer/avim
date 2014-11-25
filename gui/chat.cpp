@@ -13,7 +13,7 @@ namespace fs = boost::filesystem;
 #include <QStandardPaths>
 #include <QInputDialog>
 
-#include "chat.h"
+#include "chat.hpp"
 
 namespace avui
 {
