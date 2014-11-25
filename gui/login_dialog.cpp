@@ -40,8 +40,8 @@ void login_dialog::on_login()
     bool auto_lgoin = Qt::Checked == ui_->login_automatically->checkState();
     if (Qt::Checked == ui_->remember_me->checkState() || auto_lgoin)
     {
-        cfg->put("global.cert", ui_->cert_path->text().toStdString());
-        cfg->put("global.key", ui_->key_path->text().toStdString());
+        cfg->put("global.cert", get_cert_path());
+        cfg->put("global.key", get_key_path());
         if (auto_lgoin)
 		{
             cfg->put("auto_login", "true");
