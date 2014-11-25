@@ -202,7 +202,7 @@ void avimApp::start_chat_with(std::string)
 	box.setText("别激动, 木实现");
 	box.exec();
 
-
+	// TODO 打开 chat 窗口
 }
 
 MainWindow::MainWindow(avimApp* _avimapp)
