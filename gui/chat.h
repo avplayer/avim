@@ -6,32 +6,33 @@
 #include "ini.h"
 #include "login_dialog.h"
 
-namespace avui {
-
-class avim : public QWidget
+namespace avui
 {
-    Q_OBJECT
 
-public:
-    avim(QWidget *parent = 0);
+	class avim : public QWidget
+	{
+		Q_OBJECT
 
-    ~avim();
+	public:
+		avim(QWidget* parent = 0);
 
-    QString getMessage();
+		~avim();
 
-private:
-    Ui::chatClass ui;
+		QString getMessage();
 
-	//recvThread rv_thread_;
-    std::string current_chat_target;
+	private:
+		Ui::chatClass ui;
 
-private Q_SLOTS:
+		//recvThread rv_thread_;
+		std::string current_chat_target;
 
-    void on_sendButton_clicked();
+	private Q_SLOTS:
 
-    void on_chatTarget_clicked();
+		void on_sendButton_clicked();
 
-    void recvHandle(const QString &, const QString &);
-};
+		void on_chatTarget_clicked();
+
+		void recvHandle(const QString&, const QString&);
+	};
 
 } // namespace avim

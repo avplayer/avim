@@ -18,7 +18,8 @@ class AVConnection :  public QObject,  boost::noncopyable
 {
 	Q_OBJECT
 public:
-	enum ConState{
+	enum ConState
+	{
 		DISCONNECTED,
 		CONNECTED,
 		AUTHORIZED,
@@ -26,7 +27,7 @@ public:
 	};
 
 public:
-    AVConnection(boost::asio::io_service&);
+	AVConnection(boost::asio::io_service&);
 Q_SIGNALS:
 	void connection_state_change(ConState);
 	void invalid_cert();
@@ -51,7 +52,7 @@ public Q_SLOTS:
 
 	void handover_to_avkernel(avkernel&);
 
-	boost::asio::io_service& get_io_service(){return m_io_service;}
+	boost::asio::io_service& get_io_service() {return m_io_service;}
 
 private: // coroutines
 	void connect_coroutine(boost::asio::yield_context);
