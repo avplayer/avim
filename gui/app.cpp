@@ -186,6 +186,7 @@ int avimApp::start_main()
 	connect(m_avconnection.get(), SIGNAL(server_connected()), m_avconnection.get(), SLOT(start_login()), Qt::QueuedConnection);
 	// 要登录成功的消息!
 	connect(m_avconnection.get(), SIGNAL(login_success()), this, SIGNAL(login_success()), Qt::QueuedConnection);
+	connect(m_avconnection.get(), &AVConnection::login_success, std::bind(&AVConnection::handover_to_avkernel, m_avconnection.get(), std::ref(m_avkernel)));
 
 	m_mainwindow->show();
 	m_avconnection->start_connect();

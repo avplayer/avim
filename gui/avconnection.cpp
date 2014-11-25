@@ -6,6 +6,7 @@
 #include <QtGlobal>
 #include <QDebug>
 
+#include "avproto.hpp"
 #include "avjackif.hpp"
 
 #include "avconnection.hpp"
@@ -53,6 +54,19 @@ void AVConnection::start_login()
 	boost::asio::spawn(m_io_service, std::bind(&AVConnection::login_coroutine, this, std::placeholders::_1));
 }
 
+void AVConnection::handover_to_avkernel(avkernel& kernel)
+{
+	if (kernel.add_interface(m_avif))
+	{
+		std::string me_addr = av_address_to_string(*m_avif->if_address());
+
+		// 添加路由表, metric越大，优先级越低
+		kernel.add_route(".+@.+", me_addr, m_avif->get_ifname(), 100);
+
+		Q_EMIT kernel_accepted();
+	}
+}
+
 void AVConnection::connect_coroutine(boost::asio::yield_context yield_context)
 {
 	boost::system::error_code ec;
@@ -84,7 +98,14 @@ void AVConnection::connect_coroutine(boost::asio::yield_context yield_context)
 	set_state(CONNECTED);
 }
 
-void AVConnection::login_coroutine(boost::asio::yield_context)
+void AVConnection::login_coroutine(boost::asio::yield_context yield_context)
 {
 	m_avif.reset(new avjackif(m_socket));
+
+	if (m_avif->async_handshake(yield_context))
+	{
+		// 成功
+		Q_EMIT login_success();
+		set_state(AUTHORIZED);
+	}
 }

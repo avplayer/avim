@@ -12,6 +12,8 @@
 #include <QObject>
 
 class avjackif;
+class avkernel;
+
 class AVConnection :  public QObject,  boost::noncopyable
 {
 	Q_OBJECT
@@ -38,11 +40,16 @@ Q_SIGNALS:
 
 	void login_success();
 
+	// 内核接受了该连接, 此连接已经可以正式使用了
+	void kernel_accepted();
+
 public Q_SLOTS:
 	void set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X509> cert);
 
 	void start_connect();
 	void start_login();
+
+	void handover_to_avkernel(avkernel&);
 
 	boost::asio::io_service& get_io_service(){return m_io_service;}
 
