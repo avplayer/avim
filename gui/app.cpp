@@ -208,6 +208,7 @@ void avimApp::start_chat_with(std::string budy)
 	box.exec();
 
 	// TODO 打开 chat 窗口
+	// 别激动, 这里故意内存泄漏的
 	auto chat_widet = new avui::chat_widget(budy);
 	chat_widet->show();
 }

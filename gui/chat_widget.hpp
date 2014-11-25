@@ -1,10 +1,7 @@
 #pragma once
 
 #include <QWidget>
-#include <QThread>
 #include "ui_chat_widget.h"
-#include "ini.h"
-#include "login_dialog.h"
 
 namespace avui
 {
@@ -18,6 +15,14 @@ namespace avui
 
 		~chat_widget();
 
+	public:
+	Q_SIGNALS:
+		// 编辑完成, 点击发送
+		void send_message();
+		// 正编辑
+		void editing_message();
+
+	public:
 		QString getMessage();
 
 	private:
