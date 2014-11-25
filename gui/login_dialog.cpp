@@ -1,6 +1,6 @@
 
 #include "login_dialog.h"
-#include "avim.h"
+#include "chat.h"
 
 #include <memory>
 #include <QFileDialog>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>avimClass</class>
- <widget class="QWidget" name="avimClass">
+ <class>chatClass</class>
+ <widget class="QWidget" name="chatClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>avim</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="4,0">
+  <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="4">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,6,0,2,0">
      <item>
@@ -21,7 +21,7 @@
        <item>
         <widget class="QPushButton" name="chatTarget">
          <property name="text">
-          <string>chat with</string>
+          <string>func stub</string>
          </property>
         </widget>
        </item>
@@ -113,25 +113,6 @@ p, li { white-space: pre-wrap; }
       </layout>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QListWidget" name="friendList">
-     <item>
-      <property name="text">
-       <string>friend001</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>friend002</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>friend003</string>
-      </property>
-     </item>
-    </widget>
    </item>
   </layout>
  </widget>

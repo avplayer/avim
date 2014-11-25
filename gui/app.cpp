@@ -199,6 +199,8 @@ void avimApp::start_chat_with(std::string)
 	QMessageBox box;
 	box.setText("别激动, 木实现");
 	box.exec();
+
+	
 }
 
 MainWindow::MainWindow(avimApp* _avimapp)
