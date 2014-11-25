@@ -15,26 +15,6 @@ namespace fs = boost::filesystem;
 
 #include "chat.h"
 
-int pass_cb(char *buf, int size, int rwflag, char *u)
-{
-    int len;
-    std::string tmp;
-    /* We'd probably do something else if 'rwflag' is 1 */
-    std::cout << "Enter pass phrase for " << u << " :";
-    std::flush(std::cout);
-
-    std::cin >> tmp;
-
-    /* get pass phrase, length 'len' into 'tmp' */
-    len = tmp.length();
-
-    if (len <= 0) return 0;
-    /* if too long, truncate */
-    if (len > size) len = size;
-    memcpy(buf, tmp.data(), len);
-    return len;
-}
-
 namespace avui {
 
 #if 0
@@ -96,11 +76,6 @@ void avim::on_sendButton_clicked()
         //avcore_.sendto(current_chat_target, stdMsg);
     });
 }
-
-/*
-void avim::on_exitButton_clicked() {
-  this->close();
-}*/
 
 void avim::on_chatTarget_clicked()
 {
