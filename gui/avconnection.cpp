@@ -102,6 +102,8 @@ void AVConnection::login_coroutine(boost::asio::yield_context yield_context)
 {
 	m_avif.reset(new avjackif(m_socket));
 
+	m_avif->set_pki(m_key, m_cert);
+
 	if (m_avif->async_handshake(yield_context))
 	{
 		// 成功
