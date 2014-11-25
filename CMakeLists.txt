@@ -75,9 +75,6 @@ add_subdirectory(libavproto)
 
 link_libraries(avproto++)
 
-
-add_subdirectory(demo)
-
 if(BUILD_GUI)
 add_subdirectory(gui)
 endif()

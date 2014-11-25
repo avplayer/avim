@@ -12,3 +12,13 @@ void AVConnection::set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X5
 {
 
 }
+
+void AVConnection::start()
+{
+
+}
+
+void AVConnection::stop()
+{
+
+}

@@ -28,8 +28,10 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X509> cert);
 
-private:
+	void start();
+	void stop();
 
+private:
 	std::shared_ptr<RSA> m_key;
 	std::shared_ptr<X509> m_cert;
 	std::shared_ptr<avjackif> m_avif;
