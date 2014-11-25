@@ -13,7 +13,7 @@ namespace fs = boost::filesystem;
 #include <QStandardPaths>
 #include <QInputDialog>
 
-#include "chat.hpp"
+#include "chat_widget.hpp"
 
 namespace avui
 {
@@ -32,18 +32,18 @@ namespace avui
 	}
 #endif
 
-	avim::avim(QWidget* parent)
+	chat_widget::chat_widget(QWidget* parent)
 		: QWidget(parent)
 	{
 		ui.setupUi(this);
 	}
 
-	avim::~avim()
+	chat_widget::~chat_widget()
 	{
 		qDebug() << "~avim()";
 	}
 
-	QString avim::getMessage()
+	QString chat_widget::getMessage()
 	{
 		QString msg = ui.messageTextEdit->toPlainText();
 		ui.messageTextEdit->clear();
@@ -51,7 +51,7 @@ namespace avui
 		return msg;
 	}
 
-	void avim::on_sendButton_clicked()
+	void chat_widget::on_sendButton_clicked()
 	{
 		if (ui.messageTextEdit->toPlainText() == "")
 		{
@@ -63,7 +63,7 @@ namespace avui
 		std::string stdMsg = msg.toStdString();
 		QString htmlMsg = QString("<div>%1</div>").arg(msg);
 
-		// TODO: new public method avim::loadLocalUserCssPreference
+		// TODO: new public method chat_widget::loadLocalUserCssPreference
 		// FIXME: memory leaking
 		QTextDocument* doc = new QTextDocument(this);
 		doc->setDefaultStyleSheet("div { color: red; text-align: right;}");
@@ -79,7 +79,7 @@ namespace avui
 		});
 	}
 
-	void avim::on_chatTarget_clicked()
+	void chat_widget::on_chatTarget_clicked()
 	{
 		bool ok;
 		QString targetName = QInputDialog::getText(this, tr("Chat With Name"), tr("Input name:"), QLineEdit::Normal, ui.currentChat->text(), &ok);
@@ -90,7 +90,7 @@ namespace avui
 		}
 	}
 
-	void avim::recvHandle(const QString& sender, const QString& data)
+	void chat_widget::recvHandle(const QString& sender, const QString& data)
 	{
 		qDebug() << "recvHandle()" << sender << " sendMsg: " << data;
 		QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");

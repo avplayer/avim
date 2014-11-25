@@ -19,7 +19,7 @@ namespace fs = boost::filesystem;
 
 #include <avim.hpp>
 
-#include "chat.hpp"
+#include "chat_widget.hpp"
 #include "login_dialog.h"
 #include "avconnection.hpp"
 

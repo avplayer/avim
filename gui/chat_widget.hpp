@@ -2,21 +2,21 @@
 
 #include <QWidget>
 #include <QThread>
-#include "ui_chat.h"
+#include "ui_chat_widget.h"
 #include "ini.h"
 #include "login_dialog.h"
 
 namespace avui
 {
 
-	class avim : public QWidget
+	class chat_widget : public QWidget
 	{
 		Q_OBJECT
 
 	public:
-		avim(QWidget* parent = 0);
+		chat_widget(QWidget* parent = 0);
 
-		~avim();
+		~chat_widget();
 
 		QString getMessage();
 
