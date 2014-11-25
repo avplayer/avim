@@ -213,6 +213,8 @@ MainWindow::MainWindow(avimApp* _avimapp)
     m_list->addItem("test-client@avplayer.org");
     m_list->addItem("microcai@avplayer.org");
 
+	m_list->setEnabled(false);
+
     connect(m_list, &QListWidget::itemDoubleClicked, [this](QListWidgetItem* item){
 		Q_EMIT chat_opened(item->text().toStdString());
 	});
@@ -221,7 +223,7 @@ MainWindow::MainWindow(avimApp* _avimapp)
 void MainWindow::on_login_success()
 {
 	// TODO 更新 GUI 向用户显示
-
+	m_list->setEnabled(true);
 }
 
 void MainWindow::on_lost_connection(int reason)
