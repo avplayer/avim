@@ -179,17 +179,15 @@ int avimApp::start_main()
 {
     // 创建主窗口, 开始真正的 GUI 之旅
 	m_mainwindow.reset(new MainWindow(this));
+	connect(this, SIGNAL(login_success()), m_mainwindow.get(), SLOT(on_login_success()), Qt::QueuedConnection);
 
 	// 连接成功后马上登录
 	connect(m_avconnection.get(), SIGNAL(server_connected()), m_avconnection.get(), SLOT(start_connect()), Qt::QueuedConnection);
-
 	// 要登录成功的消息!
 	connect(m_avconnection.get(), SIGNAL(login_success()), this, SIGNAL(login_success()), Qt::QueuedConnection);
-	connect(this, SIGNAL(login_success()), m_mainwindow.get(), SLOT(on_login_success()), Qt::QueuedConnection);
-
-	m_avconnection->start_connect();
 
 	m_mainwindow->show();
+	m_avconnection->start_connect();
     return QApplication::exec();
 }
 
