@@ -1,9 +1,25 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
+cmake_policy(SET CMP0020 NEW)
 add_definitions(-DQT_NO_KEYWORDS)
 
 find_package(Qt5Widgets REQUIRED)
+
+if(WIN32 AND MSVC )
+	# For static Windows builds, we also need to pull in the Qt5 Platform
+	# support library, which is not exposed to CMake properly, unfortunately
+	GET_TARGET_PROPERTY(QT_LIB_DIR "${Qt5Widgets_LIBRARIES}" LOCATION)
+	GET_FILENAME_COMPONENT(QT_LIB_DIR "${QT_LIB_DIR}" PATH)
+	FIND_LIBRARY(Qt5Platform_LIBRARIES Qt5PlatformSupport
+	HINTS "${QT_LIB_DIR}"
+	)
+	FIND_LIBRARY(Qt5QWindows_LIBRARIES qwindows
+	HINTS "${QT_LIB_DIR}/../plugins/platforms"
+	)
+	ADD_DEFINITIONS(-DSTATIC_QT5)
+	link_libraries(${Qt5Platform_LIBRARIES} ${Qt5QWindows_LIBRARIES})
+endif()
 
 file(GLOB HDRS include/*.h*)
 file(GLOB SRCS *.cpp *.h*)
