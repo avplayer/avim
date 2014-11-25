@@ -17,7 +17,7 @@ namespace fs = boost::filesystem;
 #include <QListWidget>
 #include <QDialog>
 
-#include <avim.hpp>
+#include "avproto.hpp"
 
 #include "chat_widget.hpp"
 #include "login_dialog.h"

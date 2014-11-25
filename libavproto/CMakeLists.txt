@@ -9,7 +9,6 @@ set(SRCS
 	src/avif.cpp
 	src/avjackif.cpp
 	src/message.cpp
-	src/avim.cpp
 )
 
 file(GLOB HDRS include/*.h*)

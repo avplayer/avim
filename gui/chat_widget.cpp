@@ -32,11 +32,12 @@ namespace avui
 	}
 #endif
 
-	chat_widget::chat_widget(std::string title, QWidget* parent)
+	chat_widget::chat_widget(std::string chat_target, QWidget* parent)
 		: QWidget(parent)
 	{
 		ui.setupUi(this);
-		setWindowTitle(title.c_str());
+		setWindowTitle(chat_target.c_str());
+		m_chat_target = chat_target;
 	}
 
 	chat_widget::~chat_widget()
@@ -75,30 +76,30 @@ namespace avui
 		// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
 		boost::async([this, stdMsg]()
 		{
-			qDebug() << "on_sendButton_clicked()" << QString::fromStdString(current_chat_target) << " sendMsg: " << QString::fromStdString(stdMsg);
+			qDebug() << "on_sendButton_clicked()" << QString::fromStdString(m_chat_target) << " sendMsg: " << QString::fromStdString(stdMsg);
 			//avcore_.sendto(current_chat_target, stdMsg);
 		});
 	}
 
-	void chat_widget::on_chatTarget_clicked()
-	{
-		bool ok;
-		QString targetName = QInputDialog::getText(this, tr("Chat With Name"), tr("Input name:"), QLineEdit::Normal, ui.currentChat->text(), &ok);
-		if (ok && !targetName.isEmpty())
-		{
-			ui.currentChat->setText(targetName);
-			current_chat_target = targetName.toStdString();
-		}
-	}
-
-	void chat_widget::recvHandle(const QString& sender, const QString& data)
-	{
-		qDebug() << "recvHandle()" << sender << " sendMsg: " << data;
-		QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-		ui.messageBrowser->setTextColor(Qt::blue);
-		ui.messageBrowser->setCurrentFont(QFont("Times New Roman", 12));
-		ui.messageBrowser->append("[" + sender + "]" + time);
-		ui.messageBrowser->append(data);
-	}
+// 	void chat_widget::on_chatTarget_clicked()
+// 	{
+// 		bool ok;
+// 		QString targetName = QInputDialog::getText(this, tr("Chat With Name"), tr("Input name:"), QLineEdit::Normal, ui.currentChat->text(), &ok);
+// 		if (ok && !targetName.isEmpty())
+// 		{
+// 			ui.currentChat->setText(targetName);
+// 			current_chat_target = targetName.toStdString();
+// 		}
+// 	}
+//
+// 	void chat_widget::recvHandle(const QString& sender, const QString& data)
+// 	{
+// 		qDebug() << "recvHandle()" << sender << " sendMsg: " << data;
+// 		QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+// 		ui.messageBrowser->setTextColor(Qt::blue);
+// 		ui.messageBrowser->setCurrentFont(QFont("Times New Roman", 12));
+// 		ui.messageBrowser->append("[" + sender + "]" + time);
+// 		ui.messageBrowser->append(data);
+// 	}
 
 } // namespace avui
