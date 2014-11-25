@@ -1,5 +1,4 @@
 #include <openssl/evp.h>
-
 #include "app.hpp"
 
 #ifndef _WIN32
@@ -15,6 +14,16 @@ int main(int argc, char *argv[])
 #else
 
 #include <windows.h>
+
+#ifdef QT_PLUGIN_STATIC_LINK
+
+#include<QtPlugin>
+
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+
+Q_IMPORT_PLUGIN(QICOPlugin);
+
+#endif
 
 int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
