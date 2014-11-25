@@ -1,4 +1,8 @@
+#include <list>
+#include <vector>
+#include <memory>
 #include <openssl/evp.h>
+#include <QMetaType>
 #include "app.hpp"
 
 #ifdef _WIN32
@@ -13,6 +17,8 @@ Q_IMPORT_PLUGIN(QICOPlugin);
 
 #endif
 #endif
+
+Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr);
 
 int main(int argc, char *argv[])
 {

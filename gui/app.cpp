@@ -10,10 +10,7 @@ avimApp::avimApp(int argc, char* argv[])
 	, m_io_work(m_io_service)
 	, m_avkernel(m_io_service)
 {
-    qRegisterMetaType<std::function<void()>>("std::function<void()>");
-    connect(this, SIGNAL(post(std::function<void()>)),
-            this, SLOT(on_post(std::function<void()>)), Qt::QueuedConnection);
-    // 开启 boost 线程跑 io_service
+	// 开启 boost 线程跑 io_service
 	m_io_thread = std::thread([this](){
 		try{
 			m_io_service.run();

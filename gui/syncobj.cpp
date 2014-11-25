@@ -1,5 +1,6 @@
 
 #include <functional>
+#include <QMetaType>
 #include "syncobj.hpp"
 
 static SyncObjec syncobj;
