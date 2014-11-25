@@ -1,7 +1,11 @@
 
+#include <cstdlib>
 #include <boost/bind.hpp>
+#include <openssl/pem.h>
 
 #include <QDebug>
+#include <QInputDialog>
+#include <QMessageBox>
 
 #include "app.hpp"
 
@@ -69,10 +73,46 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
     qDebug() << "cert:" << QString::fromStdString(cur_cert);
     qDebug() << "key:" << QString::fromStdString(cur_key);
 
-	// TODO 这里就提示输入key的密码解锁掉
+	std::shared_ptr<BIO> bio_key {BIO_new_file(cur_key.c_str(), "r") , BIO_free};
+	std::shared_ptr<BIO> bio_cert {BIO_new_file(cur_cert.c_str(), "r") , BIO_free};
 
-    // 登录进去
-	// m_avim_client.reset(new avim_client(m_io_service, cur_key, cur_key));
+	auto _c_rsa_key = PEM_read_bio_RSAPrivateKey(bio_key.get(), nullptr, [](char *buf, int size, int rwflag, void * parent)->int
+    {
+        // 打开窗口, 提升用户输入密码
+		bool ok;
+		QString text = QInputDialog::getText(nullptr, tr("unlock key"),
+		tr("the private key is password protected, please input the password:"), QLineEdit::Password,
+		"", &ok);
+
+		if (ok && !text.isEmpty())
+		{
+			strncpy(buf, text.toUtf8().constData(), size);
+			return text.toUtf8().length();
+		}
+		return -1;
+    }, (void*)this);
+
+	std::shared_ptr<RSA> user_key(_c_rsa_key, RSA_free);
+
+	if (!user_key)
+	{
+		// TODO 提示错误, 重新输入
+		// 现在暂时暴力退出
+
+		QMessageBox box;
+		box.setText("unable to read the private key!");
+		box.exec();
+		std::exit(1);
+	}
+
+	std::shared_ptr<X509> user_cert{
+		PEM_read_bio_X509(bio_cert.get(), NULL, NULL, NULL),
+		X509_free
+	};
+
+	// 设置下 cert 和密码
+	m_avconnection.reset(new AVConnection(m_io_service));
+	m_avconnection->set_cert_and_key(user_key, user_cert);
     return true;
 }
 
@@ -138,8 +178,18 @@ void avimApp::load_cfg()
 int avimApp::start_main()
 {
     // 创建主窗口, 开始真正的 GUI 之旅
-    m_mainwindow.reset(new MainWindow(this));
-    m_mainwindow->show();
+	m_mainwindow.reset(new MainWindow(this));
+
+	// 连接成功后马上登录
+	connect(m_avconnection.get(), SIGNAL(server_connected()), m_avconnection.get(), SLOT(start_connect()), Qt::QueuedConnection);
+
+	// 要登录成功的消息!
+	connect(m_avconnection.get(), SIGNAL(login_success()), this, SIGNAL(login_success()), Qt::QueuedConnection);
+	connect(this, SIGNAL(login_success()), m_mainwindow.get(), SLOT(on_login_success()), Qt::QueuedConnection);
+
+	m_avconnection->start_connect();
+
+	m_mainwindow->show();
     return QApplication::exec();
 }
 

@@ -1,7 +1,10 @@
 
+#include <boost/asio.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/bind.hpp>
 #include <QMetaType>
+#include <QtGlobal>
+
 #include "avconnection.hpp"
 
 Q_DECLARE_METATYPE(std::shared_ptr<RSA>);
@@ -13,12 +16,21 @@ AVConnection::AVConnection(boost::asio::io_service& _io)
 {
 }
 
+void AVConnection::set_state(AVConnection::ConState _s)
+{
+	if (m_state != _s)
+	{
+		m_state = _s;
+		Q_EMIT connection_state_change(m_state);
+	}
+}
+
 void AVConnection::set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X509> cert)
 {
 
 }
 
-void AVConnection::start()
+void AVConnection::start_connect()
 {
 	// 检查 cert 和 key 是否已经设置, 没有设置的话就错误
 	if (!m_key || !m_cert)
@@ -27,15 +39,47 @@ void AVConnection::start()
 	}
 
 	// 创建协程干活
-	boost::asio::spawn(m_io_service, std::bind(&AVConnection::coroutine, this, std::placeholders::_1));
+	boost::asio::spawn(m_io_service, std::bind(&AVConnection::connect_coroutine, this, std::placeholders::_1));
 }
 
-void AVConnection::stop()
+void AVConnection::start_login()
 {
-
+	Q_ASSERT(m_state == CONNECTED);
+	// 创建协程干活
+	boost::asio::spawn(m_io_service, std::bind(&AVConnection::login_coroutine, this, std::placeholders::_1));
 }
 
-void AVConnection::coroutine(boost::asio::yield_context yield_context)
+void AVConnection::connect_coroutine(boost::asio::yield_context yield_context)
+{
+	boost::system::error_code ec;
+	// 传教到 avim.avplayer.org 的连接
+	using namespace boost::asio::ip;
+
+	tcp::resolver resolver(get_io_service());
+
+	tcp::resolver::query query("avim.avplayer.org", "24950");
+
+	auto endpoint_iterator = resolver.async_resolve(query, yield_context[ec]);
+
+	if (ec || endpoint_iterator == tcp::resolver::iterator())
+	{
+		return Q_EMIT server_not_found();
+	}
+
+	m_socket.reset(new tcp::socket(get_io_service()));
+
+	boost::asio::async_connect(*m_socket, endpoint_iterator, yield_context[ec]);
+
+	if (ec)
+	{
+		return Q_EMIT connection_refused();
+	}
+
+	Q_EMIT server_connected();
+	set_state(CONNECTED);
+}
+
+void AVConnection::login_coroutine(boost::asio::yield_context)
 {
 
 }
