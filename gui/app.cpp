@@ -8,6 +8,7 @@
 #include <QMessageBox>
 
 #include "app.hpp"
+#include "chat_widget.hpp"
 
 avimApp::avimApp(int argc, char* argv[])
 	: QApplication(argc, argv)
@@ -207,6 +208,8 @@ void avimApp::start_chat_with(std::string)
 	box.exec();
 
 	// TODO 打开 chat 窗口
+	auto chat_widet = new avui::chat_widget();
+	chat_widet->show();
 }
 
 MainWindow::MainWindow(avimApp* _avimapp)
