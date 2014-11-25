@@ -7,6 +7,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
+#include "message.hpp"
 #include "app.hpp"
 #include "chat_widget.hpp"
 
@@ -226,11 +227,14 @@ void avimApp::start_chat_with(std::string budy)
 	});
 }
 
-void avimApp::send_message(std::string target, proto::avim_message_packet)
+void avimApp::send_message(std::string target, proto::avim_message_packet pkt)
 {
-
+	m_avkernel.async_sendto(target, encode_message(pkt), [](boost::system::error_code ec){
+		post_on_gui_thread([ec](){
+			// TODO 处理消息发送成功 OR 失败的结果
+		});
+	});
 }
-
 
 MainWindow::MainWindow(avimApp* _avimapp)
 	: m_avimapp(_avimapp)

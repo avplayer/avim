@@ -10,7 +10,7 @@
 #include <string>
 #include <google/protobuf/message.h>
 
-namespace av_router {
+namespace av_proto {
 	// 序列化消息.
 	std::string encode(const google::protobuf::Message& message);
 	// 反序列化消息.

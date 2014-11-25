@@ -21,7 +21,7 @@
 
 #include "logging.hpp"
 
-namespace av_router {
+namespace av_proto {
 
 	// 创建type_name指定的名字的Message对象.
 	static inline google::protobuf::Message* create_message(const std::string& type_name)
