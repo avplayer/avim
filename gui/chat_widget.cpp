@@ -32,10 +32,11 @@ namespace avui
 	}
 #endif
 
-	chat_widget::chat_widget(QWidget* parent)
+	chat_widget::chat_widget(std::string title, QWidget* parent)
 		: QWidget(parent)
 	{
 		ui.setupUi(this);
+		setWindowTitle(title.c_str());
 	}
 
 	chat_widget::~chat_widget()

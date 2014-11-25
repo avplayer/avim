@@ -14,7 +14,7 @@ namespace avui
 		Q_OBJECT
 
 	public:
-		chat_widget(QWidget* parent = 0);
+		chat_widget(std::string title, QWidget* parent = 0);
 
 		~chat_widget();
 

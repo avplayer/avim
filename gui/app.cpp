@@ -201,14 +201,14 @@ int avimApp::start_main()
 	return QApplication::exec();
 }
 
-void avimApp::start_chat_with(std::string)
+void avimApp::start_chat_with(std::string budy)
 {
 	QMessageBox box;
 	box.setText("别激动, 木实现");
 	box.exec();
 
 	// TODO 打开 chat 窗口
-	auto chat_widet = new avui::chat_widget();
+	auto chat_widet = new avui::chat_widget(budy);
 	chat_widet->show();
 }
 
