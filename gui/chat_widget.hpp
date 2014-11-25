@@ -24,9 +24,14 @@ namespace avui
 		void send_message(proto::avim_message_packet);
 		// 正编辑
 		void editing_message();
+	public Q_SLOTS:
+		void append_message(proto::avim_message_packet);
 
 	protected:
-		QString getMessage();
+		std::string getMessage();
+
+		// 从控件里构建 avim_message_packet
+		proto::avim_message_packet get_message();
 
 	private:
 		Ui::chatClass ui;

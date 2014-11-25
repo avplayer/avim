@@ -45,12 +45,12 @@ namespace avui
 		qDebug() << "~avim()";
 	}
 
-	QString chat_widget::getMessage()
+	std::string chat_widget::getMessage()
 	{
 		QString msg = ui.messageTextEdit->toPlainText();
 		ui.messageTextEdit->clear();
 		ui.messageTextEdit->setFocus();
-		return msg;
+		return msg.toStdString();
 	}
 
 	void chat_widget::on_sendButton_clicked()
@@ -61,9 +61,9 @@ namespace avui
 			return;
 		}
 		ui.messageBrowser->verticalScrollBar()->setValue(ui.messageBrowser->verticalScrollBar()->maximum());
-		QString msg = getMessage();
-		std::string stdMsg = msg.toStdString();
-		QString htmlMsg = QString("<div>%1</div>").arg(msg);
+
+		std::string msg = getMessage();
+		QString htmlMsg = QString("<div>%1</div>").arg(msg.c_str());
 
 		// TODO: new public method chat_widget::loadLocalUserCssPreference
 		// FIXME: memory leaking
@@ -72,34 +72,39 @@ namespace avui
 		// ui.messageBrowser->setDocument(doc);
 
 		ui.messageBrowser->insertHtml(htmlMsg);
-		qDebug() << "getMessage()" << msg;
+		qDebug() << "getMessage()" << QString::fromStdString(msg);
 		// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
-		boost::async([this, stdMsg]()
-		{
-			qDebug() << "on_sendButton_clicked()" << QString::fromStdString(m_chat_target) << " sendMsg: " << QString::fromStdString(stdMsg);
-			//avcore_.sendto(current_chat_target, stdMsg);
-		});
+
+		// TODO 从 GUI 控件里构造 protobuf 的聊天消息
+
+		qDebug() << "on_sendButton_clicked()" << QString::fromStdString(m_chat_target) << " sendMsg: " << QString::fromStdString(msg);
+		Q_EMIT send_message(get_message());
 	}
 
-// 	void chat_widget::on_chatTarget_clicked()
-// 	{
-// 		bool ok;
-// 		QString targetName = QInputDialog::getText(this, tr("Chat With Name"), tr("Input name:"), QLineEdit::Normal, ui.currentChat->text(), &ok);
-// 		if (ok && !targetName.isEmpty())
-// 		{
-// 			ui.currentChat->setText(targetName);
-// 			current_chat_target = targetName.toStdString();
-// 		}
-// 	}
-//
-// 	void chat_widget::recvHandle(const QString& sender, const QString& data)
-// 	{
+	void chat_widget::append_message(proto::avim_message_packet)
+	{
+		// TODO 从 protobuf 消息里解码出文字消息,图片消息 etc, 插入到 GUI 控件里
 // 		qDebug() << "recvHandle()" << sender << " sendMsg: " << data;
 // 		QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 // 		ui.messageBrowser->setTextColor(Qt::blue);
 // 		ui.messageBrowser->setCurrentFont(QFont("Times New Roman", 12));
 // 		ui.messageBrowser->append("[" + sender + "]" + time);
 // 		ui.messageBrowser->append(data);
-// 	}
+	}
+
+	proto::avim_message_packet chat_widget::get_message()
+	{
+		// TODO
+		proto::avim_message_packet ret;
+
+		auto txtmsg = getMessage();
+
+		proto::text_message txt_msg;
+		txt_msg.set_text(txtmsg);
+
+		ret.mutable_avim()->Add()->mutable_item_text()->CopyFrom(txt_msg);
+
+		return ret;
+	}
 
 } // namespace avui

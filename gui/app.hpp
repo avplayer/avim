@@ -18,6 +18,7 @@ namespace fs = boost::filesystem;
 #include <QDialog>
 
 #include "avproto.hpp"
+#include "avim_proto/im.pb.h"
 
 #include "chat_widget.hpp"
 #include "login_dialog.h"
@@ -85,6 +86,8 @@ public Q_SLOTS:
 
     bool load_key_and_cert(std::string cur_key, std::string cur_cert);
 
+	void send_message(std::string target, proto::avim_message_packet);
+
 protected:
 	int start_main();
 
@@ -94,7 +97,7 @@ private:
 	std::unique_ptr<AVConnection> m_avconnection;
 	std::unique_ptr<login_dialog> m_login_dialog;
 	std::unique_ptr<MainWindow> m_mainwindow;
-	std::list<QWidget*> m_chats;
+	std::map<std::string, QWidget*> m_chats;
 
 	std::thread m_io_thread;
 	boost::asio::io_service::work m_io_work;

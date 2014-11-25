@@ -203,15 +203,34 @@ int avimApp::start_main()
 
 void avimApp::start_chat_with(std::string budy)
 {
-	QMessageBox box;
-	box.setText("别激动, 木实现");
-	box.exec();
+	// 先找下是否已经有窗口打开了, 直接激活
 
-	// TODO 打开 chat 窗口
-	// 别激动, 这里故意内存泄漏的
-	auto chat_widet = new avui::chat_widget(budy);
-	chat_widet->show();
+	auto chat_widget_it = m_chats.find(budy);
+	if (chat_widget_it != m_chats.end())
+	{
+		QWidget * w = chat_widget_it->second;
+		w->activateWindow();
+		return;
+	}
+
+	// 打开 chat 窗口
+	auto chat_widget = new avui::chat_widget(budy);
+	chat_widget->show();
+
+	connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_message, this, budy, std::placeholders::_1));
+
+	m_chats.insert(std::pair<std::string, QWidget*>(budy, (QWidget*)chat_widget));
+
+	connect(chat_widget, &avui::chat_widget::destroyed, [this, budy](QObject*){
+		m_chats.erase(budy);
+	});
 }
+
+void avimApp::send_message(std::string target, proto::avim_message_packet)
+{
+
+}
+
 
 MainWindow::MainWindow(avimApp* _avimapp)
 	: m_avimapp(_avimapp)
