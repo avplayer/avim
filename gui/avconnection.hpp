@@ -17,7 +17,7 @@ public:
 		DISCONNECTED,
 		CONNECTED,
 		AUTHORIZED,
-
+		CONNECTIONRESET
 	};
 
 public:
