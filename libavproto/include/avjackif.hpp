@@ -9,10 +9,10 @@ struct avjackif : boost::noncopyable
 {
 	std::vector<unsigned char> m_shared_key;
 public:
-	avjackif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock);
+	avjackif(std::shared_ptr<boost::asio::ip::tcp::socket> _sock);
 	~avjackif();
 
-	void set_pki(boost::shared_ptr<RSA> _key, boost::shared_ptr<X509>);
+	void set_pki(std::shared_ptr< RSA > _key, std::shared_ptr< X509 > cert);
 
 	// TCP接口，有 master/slave 模式之分 服务器使用 master 模式，客户端则是 slave 模式
 	// 区别只是登录时候的握手不一样，所以就在 handshake 这里直接设定就可以了
@@ -48,13 +48,13 @@ private:
 	static std::string allocate_ifname();
 
 	std::string m_ifname;
-	boost::shared_ptr<RSA> _rsa;
-	boost::shared_ptr<X509> _x509;
+	std::shared_ptr<RSA> _rsa;
+	std::shared_ptr<X509> _x509;
 	X509 *m_root_ca;
 
 	boost::scoped_ptr<proto::av_address> m_local_addr;
 	boost::scoped_ptr<proto::av_address> m_remote_addr;
 
-	boost::shared_ptr<boost::asio::ip::tcp::socket> m_sock;
+	std::shared_ptr<boost::asio::ip::tcp::socket> m_sock;
 	boost::asio::streambuf m_recv_buf, m_send_buf;
 };

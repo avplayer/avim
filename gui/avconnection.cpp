@@ -4,6 +4,9 @@
 #include <boost/bind.hpp>
 #include <QMetaType>
 #include <QtGlobal>
+#include <QDebug>
+
+#include "avjackif.hpp"
 
 #include "avconnection.hpp"
 
@@ -27,7 +30,8 @@ void AVConnection::set_state(AVConnection::ConState _s)
 
 void AVConnection::set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X509> cert)
 {
-
+	m_key = key;
+	m_cert = cert;
 }
 
 void AVConnection::start_connect()
@@ -72,6 +76,7 @@ void AVConnection::connect_coroutine(boost::asio::yield_context yield_context)
 
 	if (ec)
 	{
+		qDebug() << QString(ec.message().c_str());
 		return Q_EMIT connection_refused();
 	}
 
@@ -81,5 +86,5 @@ void AVConnection::connect_coroutine(boost::asio::yield_context yield_context)
 
 void AVConnection::login_coroutine(boost::asio::yield_context)
 {
-
+	m_avif.reset(new avjackif(m_socket));
 }

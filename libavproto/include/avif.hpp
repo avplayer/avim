@@ -91,13 +91,13 @@ namespace detail {
 			return _impl->async_write_packet(pkt, yield_context);
 		}
 
-		avif_implement_wrapper(boost::shared_ptr<RealImpl> other)
+		avif_implement_wrapper(std::shared_ptr<RealImpl> other)
 		{
 			_impl = other;
 		}
 
 	private:
-		boost::shared_ptr<RealImpl> _impl;
+		std::shared_ptr<RealImpl> _impl;
 	};
 
 }
@@ -142,7 +142,7 @@ struct avif
 	bool async_write_packet(proto::avpacket* pkt, boost::asio::yield_context yield_context);
 
 	template<class AV_IF_IMPL>
-	avif(boost::shared_ptr<AV_IF_IMPL> impl)
+	avif(std::shared_ptr<AV_IF_IMPL> impl)
 	{
 		_impl.reset( new detail::avif_implement_wrapper<AV_IF_IMPL>(impl) );
 		construct();
@@ -179,7 +179,7 @@ private:
 
 	void construct();
 
-	boost::shared_ptr<detail::avif_implement_interface> _impl;
+	std::shared_ptr<detail::avif_implement_interface> _impl;
 };
 
 proto::av_address av_address_from_string(std::string av_address);

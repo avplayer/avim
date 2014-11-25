@@ -51,10 +51,10 @@ private:
 
 	std::atomic<bool> m_online;
 
-	boost::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
-	boost::shared_ptr<avjackif> m_avinterface;
+	std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
+	std::shared_ptr<avjackif> m_avinterface;
 
-	boost::shared_ptr<RSA> m_rsa_key;
-	boost::shared_ptr<X509> m_x509_cert;
+	std::shared_ptr<RSA> m_rsa_key;
+	std::shared_ptr<X509> m_x509_cert;
 };
 

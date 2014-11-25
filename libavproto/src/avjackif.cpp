@@ -44,7 +44,7 @@ async_read_protobuf_message(AsyncStream &_sock, boost::asio::yield_context yield
 /*
  * 这个类呢，是用来实现和 JACK 实现的那个 AVROUTER 对接的。也就是 JACK 版本的 AV NETWORK SERVICE PROVIDER
  */
-void avjackif::set_pki(boost::shared_ptr<RSA> _key, boost::shared_ptr<X509> cert)
+void avjackif::set_pki(std::shared_ptr<RSA> _key, std::shared_ptr<X509> cert)
 {
     _rsa = _key;
 	_x509 = cert;
@@ -65,7 +65,7 @@ void avjackif::set_pki(boost::shared_ptr<RSA> _key, boost::shared_ptr<X509> cert
 }
 
 // av地址可以从证书里获取，所以外面无需传递进来
-avjackif::avjackif(boost::shared_ptr<boost::asio::ip::tcp::socket> _sock)
+avjackif::avjackif(std::shared_ptr<boost::asio::ip::tcp::socket> _sock)
 	: m_sock(_sock)
 {
 	static unsigned t = 0;

@@ -40,6 +40,7 @@ private Q_SLOTS:
 	// 槽, 丢失链接的时候调用, GUI 自己会做相应更新
 	void on_lost_connection(int reason);
 
+public:
 Q_SIGNALS:
 	// 信号, 用户开始和某用户开始交谈的时候发射
 	void chat_opened(std::string);
