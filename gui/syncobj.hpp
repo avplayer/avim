@@ -6,7 +6,7 @@
 
 void post_on_gui_thread(std::function<void()>);
 
-class SyncObjec : QObject
+class SyncObjec : public QObject
 {
 	Q_OBJECT
 
@@ -19,12 +19,7 @@ Q_SIGNALS:
 	void post(std::function<void()>);
 
 public:
-	SyncObjec()
-	{
-		qRegisterMetaType<std::function<void()>>("std::function<void()>");
-		connect(this, SIGNAL(post(std::function<void()>)),
-				this, SLOT(on_post(std::function<void()>)), Qt::QueuedConnection);
-	}
+	SyncObjec();
 
 	friend void post_on_gui_thread(std::function<void()>);
 
