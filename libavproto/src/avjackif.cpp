@@ -102,16 +102,15 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 
 std::string avjackif::async_client_hello(boost::asio::yield_context yield_context)
 {
+	unsigned char to[512] = { 0 };
+
+	DH* dh = DH_new();
+	DH_generate_parameters_ex(dh, 64, DH_GENERATOR_5, NULL);
+	DH_generate_key(dh);
+
 	proto::client_hello client_hello;
 	client_hello.set_client("avim");
 	client_hello.set_version(0001);
-
-	unsigned char to[512];
-
-	auto dh = DH_new();
-	DH_generate_parameters_ex(dh,64,DH_GENERATOR_5,NULL);
-	DH_generate_key(dh);
-
 	// 把 g,p, pubkey 传过去
 	client_hello.set_random_g((const void*)to, BN_bn2bin(dh->g, to));
 	client_hello.set_random_p((const void*)to, BN_bn2bin(dh->p, to));

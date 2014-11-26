@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <boost/concept_check.hpp>
+#include <functional>
 
 void post_on_gui_thread(std::function<void()>);
 

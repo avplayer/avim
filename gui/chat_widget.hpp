@@ -8,7 +8,6 @@
 
 namespace avui
 {
-
 	class chat_widget : public QWidget
 	{
 		Q_OBJECT
