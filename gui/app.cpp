@@ -201,8 +201,13 @@ int avimApp::start_main()
 	m_avconnection->start_connect();
 
 	// 开启消息接收协程
-
 	boost::asio::spawn(m_io_service, std::bind(&avimApp::recive_coroutine, this, std::placeholders::_1));
+
+	// 显示 tray icon
+
+	m_tray_icon.reset(new avim_system_tray);
+	m_tray_icon->show();
+
 	return QApplication::exec();
 }
 

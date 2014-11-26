@@ -24,6 +24,7 @@ namespace fs = boost::filesystem;
 #include "login_dialog.h"
 #include "avconnection.hpp"
 #include "main_window.hpp"
+#include "system_tray.hpp"
 
 void post_on_gui_thread(std::function<void()>);
 
@@ -77,6 +78,7 @@ private:
 	std::unique_ptr<AVConnection> m_avconnection;
 	std::unique_ptr<login_dialog> m_login_dialog;
 	std::unique_ptr<main_window> m_mainwindow;
+	std::unique_ptr<avim_system_tray> m_tray_icon;
 	std::map<std::string, QWidget*> m_chats;
 
 	std::thread m_io_thread;
