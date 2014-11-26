@@ -10,6 +10,7 @@
 #include "message.hpp"
 #include "app.hpp"
 #include "chat_widget.hpp"
+#include "system_tray.hpp"
 
 avimApp::avimApp(int argc, char* argv[])
 	: QApplication(argc, argv)
