@@ -6,31 +6,69 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>485</width>
-    <height>616</height>
+    <width>639</width>
+    <height>733</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QListWidget" name="m_list"/>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLineEdit" name="lineEdit"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>Add Buddy</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="tab_buddy">
+       <attribute name="title">
+        <string>Buddy</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QListWidget" name="buddylistWidget"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="buddy_lineEdit"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="add_buddyButton">
+            <property name="text">
+             <string>Add Buddy</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_group">
+       <attribute name="title">
+        <string>Group</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QListWidget" name="grouplistWidget"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLineEdit" name="group_lineEdit"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="add_groupButton">
+            <property name="text">
+             <string>Add Group</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -39,7 +77,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>485</width>
+     <width>639</width>
      <height>30</height>
     </rect>
    </property>

@@ -17,9 +17,8 @@ namespace fs = boost::filesystem;
 #include <QListWidget>
 #include <QDialog>
 
-#include "ui_main_window.h"
-
 class avimApp;
+class Ui_main_window;
 class main_window : public QMainWindow
 {
 	Q_OBJECT
@@ -40,7 +39,7 @@ Q_SIGNALS:
 
 private:
 
-	Ui::main_window m_ui;
+	std::shared_ptr<Ui_main_window> m_ui;
 
 	QListWidget* m_list;
 };

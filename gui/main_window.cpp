@@ -14,29 +14,43 @@
 #include <QPushButton>
 
 #include "main_window.hpp"
+#include "ui_main_window.h"
 
 main_window::main_window()
 {
-	m_ui.setupUi(this);
+	m_ui.reset(new Ui_main_window);
+	m_ui->setupUi(this);
 
-	m_list = m_ui.m_list;
+	m_list = m_ui->buddylistWidget;
 
 	m_list->addItem("test-client@avplayer.org");
 	m_list->addItem("microcai@avplayer.org");
-	m_list->addItem("group@avplayer.org");
 	m_list->addItem("michael.fan@avplayer.org");
 
+	m_ui->grouplistWidget->addItem("group@avplayer.org");
+
 	m_list->setEnabled(false);
+	m_ui->grouplistWidget->setEnabled(false);
 
 	connect(m_list, &QListWidget::itemDoubleClicked, [this] (QListWidgetItem * item)
 	{
 		Q_EMIT chat_opened(item->text().toStdString());
 	});
 
-	QObject::connect(m_ui.pushButton, &QAbstractButton::clicked, [this](bool checked)
+	connect(m_ui->grouplistWidget, &QListWidget::itemDoubleClicked, [this] (QListWidgetItem * item)
 	{
-		m_list->addItem(m_ui.lineEdit->text());
-		m_ui.lineEdit->clear();
+		Q_EMIT chat_opened(item->text().toStdString());
+	});
+
+	QObject::connect(m_ui->add_buddyButton, &QAbstractButton::clicked, [this](bool checked)
+	{
+		m_list->addItem(m_ui->buddy_lineEdit->text());
+		m_ui->buddy_lineEdit->clear();
+	});
+	QObject::connect(m_ui->add_groupButton, &QAbstractButton::clicked, [this](bool checked)
+	{
+		m_list->addItem(m_ui->group_lineEdit->text());
+		m_ui->group_lineEdit->clear();
 	});
 }
 
