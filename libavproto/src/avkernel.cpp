@@ -174,20 +174,27 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 			RSA_free(rsa);
 			return ;
 		}
+
 		// 有  payload ， 那就一定要解密，呵呵
 		if (avPacket->has_payload())
 		{
-			// 第一阶段解密，先使用发送者的公钥解密
-			std::string stage1decypted = RSA_public_decrypt(rsa.get(), avPacket->payload());
-			// 第二阶段解密，用自己的私钥解密
-			payload = RSA_private_decrypt(avinterface.get_rsa_key(), stage1decypted);
+			if (avPacket->upperlayerpotocol() == "agmp")
+			{
+				payload = avPacket->payload();
+			}
+			else
+			{
+				// 第一阶段解密，先使用发送者的公钥解密
+				std::string stage1decypted = RSA_public_decrypt(rsa.get(), avPacket->payload());
+				// 第二阶段解密，用自己的私钥解密
+				payload = RSA_private_decrypt(avinterface.get_rsa_key(), stage1decypted);
+			}
 		}
 
 		// 挂入本地接收列队，等待上层读取
 		if (avPacket->upperlayerpotocol() == "avim")
 			m_recv_buffer.push(std::make_pair(add, payload));
 	}
-
 
 	void process_recived_packet(boost::shared_ptr<proto::avpacket> avPacket, avif avinterface, boost::asio::yield_context yield_context)
 	{
@@ -443,9 +450,32 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 				deadline += boost::posix_time::seconds(8);
 
-				async_wait_processed_packet(deadline, [this, target](const proto::avpacket & pkt)->bool{
-					return av_address_to_string(pkt.src()) == target && find_RSA_pubkey(target);
+				volatile bool no_route_to_host = false;
+
+				async_wait_processed_packet(deadline, [this, target, &no_route_to_host](const proto::avpacket & pkt)->bool
+				{
+					if (av_address_to_string(pkt.src()) == target && find_RSA_pubkey(target))
+						return true;
+
+					if (pkt.upperlayerpotocol() == "agmp")
+					{
+						proto::agmp agmp;
+						agmp.ParseFromString(pkt.payload());
+						// 看是不是告诉自己的
+						if (agmp.has_noroutetohost())
+						{
+							return no_route_to_host = (av_address_to_string(agmp.noroutetohost().host()) == target);
+						}
+					}
+
+					return false;
 				}, yield_context[ec]);
+
+				if (no_route_to_host)
+				{
+					return handler(boost::asio::error::network_unreachable);
+				}
+
 				target_pubkey = find_RSA_pubkey(target);
 			}
 
