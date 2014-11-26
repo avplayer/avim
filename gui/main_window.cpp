@@ -10,9 +10,9 @@
 #include <QDialog>
 #include <QVBoxLayout>
 
-#include "mainwindow.hpp"
+#include "main_window.hpp"
 
-MainWindow::MainWindow(avimApp* _avimapp)
+main_window::main_window(avimApp* _avimapp)
 	: m_avimapp(_avimapp)
 {
 	setCentralWidget(new QWidget);
@@ -32,13 +32,13 @@ MainWindow::MainWindow(avimApp* _avimapp)
 	});
 }
 
-void MainWindow::on_login_success()
+void main_window::on_login_success()
 {
 	// TODO 更新 GUI 向用户显示
 	m_list->setEnabled(true);
 }
 
-void MainWindow::on_lost_connection(int reason)
+void main_window::on_lost_connection(int reason)
 {
 	// TODO 更新 GUI 报告用户
 }

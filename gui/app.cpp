@@ -186,7 +186,7 @@ void avimApp::load_cfg()
 int avimApp::start_main()
 {
 	// 创建主窗口, 开始真正的 GUI 之旅
-	m_mainwindow.reset(new MainWindow(this));
+	m_mainwindow.reset(new main_window(this));
 	connect(this, SIGNAL(login_success()), m_mainwindow.get(), SLOT(on_login_success()), Qt::QueuedConnection);
 	connect(m_mainwindow.get(), SIGNAL(chat_opened(std::string)), this, SLOT(start_chat_with(std::string)), Qt::QueuedConnection);
 

@@ -18,11 +18,11 @@ namespace fs = boost::filesystem;
 #include <QDialog>
 
 class avimApp;
-class MainWindow : public QMainWindow
+class main_window : public QMainWindow
 {
 	Q_OBJECT
 public:
-	MainWindow(avimApp* _avimapp);
+	main_window(avimApp* _avimapp);
 
 private Q_SLOTS:
 

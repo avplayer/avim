@@ -23,7 +23,7 @@ namespace fs = boost::filesystem;
 #include "chat_widget.hpp"
 #include "login_dialog.h"
 #include "avconnection.hpp"
-#include "mainwindow.hpp"
+#include "main_window.hpp"
 
 void post_on_gui_thread(std::function<void()>);
 
@@ -76,7 +76,7 @@ private:
 	avkernel m_avkernel;
 	std::unique_ptr<AVConnection> m_avconnection;
 	std::unique_ptr<login_dialog> m_login_dialog;
-	std::unique_ptr<MainWindow> m_mainwindow;
+	std::unique_ptr<main_window> m_mainwindow;
 	std::map<std::string, QWidget*> m_chats;
 
 	std::thread m_io_thread;
@@ -84,6 +84,6 @@ private:
 
 	std::unique_ptr<avim::ini> m_cfg;
 
-	friend class MainWindow;
+	friend class main_window;
 };
 
