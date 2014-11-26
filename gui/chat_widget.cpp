@@ -16,25 +16,8 @@ namespace fs = boost::filesystem;
 
 #include "chat_widget.hpp"
 
-Q_DECLARE_METATYPE(proto::avim_message_packet);
-
 namespace avui
 {
-
-#if 0
-	void recvThread::recv_msg(boost::asio::yield_context yield_context)
-	{
-		boost::system::error_code ec;
-		std::string sender, data;
-		for (; ;)
-		{
-			avcore_.async_recvfrom(sender, data, yield_context);
-			emit recvReady(QString::fromStdString(sender), QString::fromStdString(data));
-			qDebug() << "recv_msg()" << QString::fromStdString(data) << " from " << QString::fromStdString(sender);
-		}
-	}
-#endif
-
 	chat_widget::chat_widget(std::string chat_target, QWidget* parent)
 		: QWidget(parent)
 	{
