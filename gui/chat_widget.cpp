@@ -47,7 +47,7 @@ namespace avui
 		ui.messageBrowser->verticalScrollBar()->setValue(ui.messageBrowser->verticalScrollBar()->maximum());
 
 		std::string msg = getMessage();
-		QString htmlMsg = QString("<div><h>我 说:</h><p>%1</p><br /></div>").arg(msg.c_str());
+		QString htmlMsg = QStringLiteral("<div><h>我 说:</h><p>%1</p><br /></div>").arg(msg.c_str());
 
 		// TODO: new public method chat_widget::loadLocalUserCssPreference
 		// FIXME: memory leaking
@@ -74,7 +74,7 @@ namespace avui
 
 		QString htmlMsg;
 
-		htmlMsg += QString("<div><h>%1 说:</h>").arg(m_chat_target.c_str());
+		htmlMsg += QStringLiteral("<div><h>%1 说:</h>").arg(m_chat_target.c_str());
 
 		for (proto::avim_message im_message_item : msgpkt.avim())
 		{
@@ -83,12 +83,12 @@ namespace avui
 				proto::text_message text_message = im_message_item.item_text();
 				std::string text = text_message.text();
 				// TODO 更好的格式化
-				htmlMsg.append(QString(" <p> %1</p>").arg(QString::fromStdString(text)));
+				htmlMsg.append(QStringLiteral(" <p> %1</p>").arg(QString::fromStdString(text)));
 			}
 			// TODO 添加图片功能!
 		}
 
-		htmlMsg.append(QString("<br /></div>"));
+		htmlMsg.append(QStringLiteral("<br /></div>"));
 
 		ui.messageBrowser->insertHtml(htmlMsg);
 
