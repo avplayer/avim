@@ -15,13 +15,11 @@
 
 #include "main_window.hpp"
 
-main_window::main_window(avimApp* _avimapp)
-	: m_avimapp(_avimapp)
+main_window::main_window()
 {
-	setCentralWidget(new QWidget);
-	auto vlayout = new QVBoxLayout(centralWidget());
-	m_list = new QListWidget(centralWidget());
-	vlayout->addWidget(m_list);
+	m_ui.setupUi(this);
+
+	m_list = m_ui.m_list;
 
 	m_list->addItem("test-client@avplayer.org");
 	m_list->addItem("microcai@avplayer.org");
@@ -35,20 +33,10 @@ main_window::main_window(avimApp* _avimapp)
 		Q_EMIT chat_opened(item->text().toStdString());
 	});
 
-	auto editor = new QLineEdit(centralWidget());
-	auto bt = new QPushButton(centralWidget());
-
-	auto hlayout = new QHBoxLayout();
-	hlayout->addWidget(editor);
-	hlayout->addWidget(bt);
-	vlayout->addLayout(hlayout);
-
-	bt->setText("add buddy");
-
-	QObject::connect(bt, &QAbstractButton::clicked, [this, editor](bool checked)
+	QObject::connect(m_ui.pushButton, &QAbstractButton::clicked, [this](bool checked)
 	{
-		m_list->addItem(editor->text());
-		editor->clear();
+		m_list->addItem(m_ui.lineEdit->text());
+		m_ui.lineEdit->clear();
 	});
 }
 

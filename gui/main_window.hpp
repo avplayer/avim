@@ -17,12 +17,14 @@ namespace fs = boost::filesystem;
 #include <QListWidget>
 #include <QDialog>
 
+#include "ui_main_window.h"
+
 class avimApp;
 class main_window : public QMainWindow
 {
 	Q_OBJECT
 public:
-	main_window(avimApp* _avimapp);
+	main_window();
 
 private Q_SLOTS:
 
@@ -38,9 +40,8 @@ Q_SIGNALS:
 	void chat_opened(std::string);
 
 private:
+
+	Ui::main_window m_ui;
+
 	QListWidget* m_list;
-
-	avimApp* m_avimapp;
-
-	friend class avimApp;
 };

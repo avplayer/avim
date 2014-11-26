@@ -189,7 +189,7 @@ void avimApp::load_cfg()
 int avimApp::start_main()
 {
 	// 创建主窗口, 开始真正的 GUI 之旅
-	m_mainwindow.reset(new main_window(this));
+	m_mainwindow.reset(new main_window());
 	connect(this, SIGNAL(login_success()), m_mainwindow.get(), SLOT(on_login_success()), Qt::QueuedConnection);
 	connect(m_mainwindow.get(), SIGNAL(chat_opened(std::string)), this, SLOT(start_chat_with(std::string)), Qt::QueuedConnection);
 
@@ -206,7 +206,6 @@ int avimApp::start_main()
 	boost::asio::spawn(m_io_service, std::bind(&avimApp::recive_coroutine, this, std::placeholders::_1));
 
 	// 显示 tray icon
-
 	m_tray_icon.reset(new avim_system_tray);
 	m_tray_icon->show();
 
