@@ -116,4 +116,11 @@ namespace avui
 		return ret;
 	}
 
+	void chat_widget::closeEvent(QCloseEvent* e)
+	{
+		Q_EMIT windowclosed();
+		QWidget::closeEvent(e);
+	}
+
+
 } // namespace avui

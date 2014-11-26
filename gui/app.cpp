@@ -260,7 +260,7 @@ void avimApp::start_chat_with(std::string budy)
 
 	m_chats.insert(std::pair<std::string, QWidget*>(budy, (QWidget*)chat_widget));
 
-	connect(chat_widget, &avui::chat_widget::destroyed, [this, budy, slot_connect](QObject*)
+	connect(chat_widget, &avui::chat_widget::windowclosed, this, [this, budy, slot_connect]()
 	{
 		m_chats.erase(budy);
 		QObject::disconnect(slot_connect);

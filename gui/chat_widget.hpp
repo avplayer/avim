@@ -19,6 +19,7 @@ namespace avui
 
 	public:
 	Q_SIGNALS:
+		void windowclosed();
 		// 编辑完成, 点击发送
 		void send_message(proto::avim_message_packet);
 		// 正编辑
@@ -31,6 +32,8 @@ namespace avui
 
 		// 从控件里构建 avim_message_packet
 		proto::avim_message_packet get_message();
+
+		virtual void closeEvent(QCloseEvent*);
 
 	private:
 		Ui::chatClass ui;
