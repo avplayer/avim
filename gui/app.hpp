@@ -33,7 +33,7 @@ class avimApp : public QApplication
 Q_OBJECT
 
 private Q_SLOTS:
-	void start_chat_with(std::string);
+	avui::chat_widget* start_chat_with(std::string);
 public:
 	avimApp(int argc, char *argv[]);
 
@@ -68,6 +68,7 @@ public Q_SLOTS:
     bool load_key_and_cert(std::string cur_key, std::string cur_cert);
 
 	void send_message(std::string target, proto::avim_message_packet);
+	void on_message_recieve(std::string target, proto::avim_message_packet);
 
 protected:
 	int start_main();

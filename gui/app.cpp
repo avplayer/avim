@@ -41,6 +41,8 @@ avimApp::avimApp(int argc, char* argv[])
 			std::cerr << "this code run in GUI thread : " << std::this_thread::get_id() << std::endl;
 		});
 	});
+
+	connect(this, &avimApp::message_recieved, this, &avimApp::on_message_recieve, Qt::QueuedConnection);
 }
 
 avimApp::~avimApp()
@@ -234,7 +236,7 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 	}
 }
 
-void avimApp::start_chat_with(std::string budy)
+avui::chat_widget* avimApp::start_chat_with(std::string budy)
 {
 	// 先找下是否已经有窗口打开了, 直接激活
 
@@ -243,7 +245,7 @@ void avimApp::start_chat_with(std::string budy)
 	{
 		QWidget * w = chat_widget_it->second;
 		w->activateWindow();
-		return;
+		return (avui::chat_widget*) w;
 	}
 
 	// 打开 chat 窗口
@@ -265,6 +267,16 @@ void avimApp::start_chat_with(std::string budy)
 		m_chats.erase(budy);
 		QObject::disconnect(slot_connect);
 	});
+
+	return chat_widget;
+}
+
+void avimApp::on_message_recieve(std::string target, proto::avim_message_packet pkt)
+{
+	if (m_chats.find(target) == m_chats.end())
+	{
+		start_chat_with(target)->append_message(pkt);
+	}
 }
 
 void avimApp::send_message(std::string target, proto::avim_message_packet pkt)
