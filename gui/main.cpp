@@ -5,6 +5,7 @@
 #include <QMetaType>
 #include <QTextBlock>
 #include "app.hpp"
+#include "syncobj.hpp"
 
 #ifdef _WIN32
 
