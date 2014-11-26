@@ -431,7 +431,11 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 			{
 				// 进入 askpk 模式
 				// TODO 如果如果已经有一个了，则不用发送，直接等待
-				async_send_agmp_pkask(interface, target);
+				interface = select_route(target);
+				if (interface)
+					async_send_agmp_pkask(interface, target);
+				else
+					return handler(boost::asio::error::network_unreachable);
 
 				// TODO 发送 askpk 消息获取共钥
 				// TODO 如果配置了公钥服务器，尝试去公钥服务器获取
@@ -447,7 +451,7 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 
 			if (!target_pubkey)
 			{
-				return handler(	boost::asio::error::network_unreachable );
+				return handler(boost::asio::error::network_unreachable);
 			}
 		}
 

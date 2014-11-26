@@ -100,19 +100,6 @@ bool avjackif::async_handshake(boost::asio::yield_context yield_context)
 	return login_result.get()->result() == proto::login_result::LOGIN_SUCCEED;
 }
 
-bool avjackif::handshake()
-{
-	boost::mutex m;
-	boost::condition_variable ready;
-	boost::unique_lock<boost::mutex> l(m);
- 	boost::asio::spawn(get_io_service(), [&,this](boost::asio::yield_context ctx){
-		this->async_handshake(ctx);
-		ready.notify_all();
-	});
-	ready.wait(l);
-    return true;
-}
-
 std::string avjackif::async_client_hello(boost::asio::yield_context yield_context)
 {
 	proto::client_hello client_hello;

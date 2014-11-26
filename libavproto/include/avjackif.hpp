@@ -14,12 +14,8 @@ public:
 
 	void set_pki(std::shared_ptr< RSA > _key, std::shared_ptr< X509 > cert);
 
-	// TCP接口，有 master/slave 模式之分 服务器使用 master 模式，客户端则是 slave 模式
-	// 区别只是登录时候的握手不一样，所以就在 handshake 这里直接设定就可以了
+	// 登录握手
 	bool async_handshake(boost::asio::yield_context yield_context);
-	// TCP接口，有 master/slave 模式之分 服务器使用 master 模式，客户端则是 slave 模式
-	// 区别只是登录时候的握手不一样，所以就在 handshake 这里直接设定就可以了
-	bool handshake();
 
 	bool async_register_new_user(std::string user_name, boost::asio::yield_context yield_context);
 	bool async_register_user_check_name(std::string user_name, boost::asio::yield_context yield_context);
