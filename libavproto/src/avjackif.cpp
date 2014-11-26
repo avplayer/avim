@@ -259,17 +259,26 @@ X509* avjackif::get_cert()
 	return _x509.get();
 }
 
+void avjackif::notify_remove()
+{
+	signal_notify_remove();
+}
+
 boost::shared_ptr<proto::avpacket> avjackif::async_read_packet(boost::asio::yield_context yield_context)
 {
+	boost::system::error_code ec;
 	std::string buf;
 	std::uint32_t l;
-	boost::asio::async_read(*m_sock, boost::asio::buffer(&l, sizeof(l)), yield_context);
+	if( boost::asio::async_read(*m_sock, boost::asio::buffer(&l, sizeof(l)), yield_context[ec]) != 4)
+		return boost::shared_ptr<proto::avpacket>();
 
 	auto hostl = htonl(l);
 	buf.resize(htonl(l) + 4);
 	memcpy(&buf[0], &l, 4);
 	boost::asio::async_read(*m_sock, boost::asio::buffer(&buf[4], htonl(l)),
-		boost::asio::transfer_exactly(hostl), yield_context);
+		boost::asio::transfer_exactly(hostl), yield_context[ec]);
+	if(ec)
+		return boost::shared_ptr<proto::avpacket>();
 
 	return boost::shared_ptr<proto::avpacket>(dynamic_cast<proto::avpacket*>(av_proto::decode(buf)));
 }

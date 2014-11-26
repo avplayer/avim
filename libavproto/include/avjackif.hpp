@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/noncopyable.hpp>
+#include <boost/signals2.hpp>
 
 #include "avif.hpp"
 
@@ -22,6 +23,8 @@ public:
 
 	std::string remote_addr();
 
+	boost::signals2::signal<void()> signal_notify_remove;
+
 public: // 下面是实现 avif 接口
 	boost::asio::io_service & get_io_service() const;
 	std::string get_ifname() const;
@@ -29,6 +32,7 @@ public: // 下面是实现 avif 接口
 	const proto::av_address * remote_address() const;
 	RSA * get_rsa_key();
 	X509 * get_cert();
+	void notify_remove();
 
 	void set_root_ca(X509 * ca) { m_root_ca = ca;}
 	boost::shared_ptr<proto::avpacket> async_read_packet(boost::asio::yield_context yield_context);

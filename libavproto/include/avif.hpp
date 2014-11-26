@@ -39,6 +39,7 @@ namespace detail {
 
 		virtual RSA * get_rsa_key() = 0;
 		virtual X509 * get_cert() = 0;
+		virtual void notify_remove() = 0;
 
 		// 读取 av数据包
 		virtual boost::shared_ptr<proto::avpacket> async_read_packet(boost::asio::yield_context yield_context) = 0;
@@ -74,11 +75,16 @@ namespace detail {
 			return _impl->get_rsa_key();
 		}
 
-
 		X509 * get_cert()
 		{
 			return _impl->get_cert();
 		}
+
+		void notify_remove()
+		{
+			return _impl->notify_remove();
+		}
+
 		// 读取 av数据包
 		boost::shared_ptr<proto::avpacket> async_read_packet(boost::asio::yield_context yield_context)
 		{
@@ -133,6 +139,11 @@ struct avif
 	X509 * get_cert()
 	{
 		return _impl->get_cert();
+	}
+
+	void notify_remove()
+	{
+		return _impl->notify_remove();
 	}
 
 	// 读取 av数据包
