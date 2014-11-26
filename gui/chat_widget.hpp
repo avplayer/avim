@@ -5,7 +5,6 @@
 
 #include "avim_proto/im.pb.h"
 
-Q_DECLARE_METATYPE(proto::avim_message_packet);
 
 namespace avui
 {

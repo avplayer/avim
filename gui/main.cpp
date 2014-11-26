@@ -3,6 +3,7 @@
 #include <memory>
 #include <openssl/evp.h>
 #include <QMetaType>
+#include <QTextBlock>
 #include "app.hpp"
 
 #ifdef _WIN32
