@@ -35,19 +35,17 @@ main_window::main_window(avimApp* _avimapp)
 		Q_EMIT chat_opened(item->text().toStdString());
 	});
 
-	auto adder_p = new QWidget(centralWidget());
-	auto editor = new QLineEdit(adder_p);
-	auto bt = new QPushButton(adder_p);
+	auto editor = new QLineEdit(centralWidget());
+	auto bt = new QPushButton(centralWidget());
 
-	auto hlayout = new QHBoxLayout(adder_p);
+	auto hlayout = new QHBoxLayout();
 	hlayout->addWidget(editor);
 	hlayout->addWidget(bt);
-
-	vlayout->addWidget(adder_p);
+	vlayout->addLayout(hlayout);
 
 	bt->setText("add buddy");
 
-	QObject::connect(bt, &QAbstractButton::clicked, [this, editor](bool checked)\
+	QObject::connect(bt, &QAbstractButton::clicked, [this, editor](bool checked)
 	{
 		m_list->addItem(editor->text());
 		editor->clear();
