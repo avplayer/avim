@@ -70,6 +70,10 @@ else()
 	message( FATAL_ERROR "please run 'git submodule update --init' to get avim_proto")
 endif()
 
+check_library_exists(rt clock_gettime "" HAVE_CLOCK_GETTIME)
+if(HAVE_CLOCK_GETTIME)
+        link_libraries(-lrt)
+endif(HAVE_CLOCK_GETTIME)
 
 add_subdirectory(libavproto)
 
@@ -79,7 +83,4 @@ if(BUILD_GUI)
 add_subdirectory(gui)
 endif()
 
-check_library_exists(rt clock_gettime "" HAVE_CLOCK_GETTIME)
-if(HAVE_CLOCK_GETTIME)
-        link_libraries(-lrt)
-endif(HAVE_CLOCK_GETTIME)
+add_subdirectory(wrapper)

@@ -44,7 +44,7 @@ void av_stop()
 	delete avkernelthread;
 }
 
-static void jackif_login(boost::shared_ptr<avjackif> avinterface, boost::asio::yield_context yield_context, boost::condition_variable & ready)
+static void jackif_login(std::shared_ptr<avjackif> avinterface, boost::asio::yield_context yield_context, boost::condition_variable & ready)
 {
 	std::string me_addr = av_address_to_string(*avinterface->if_address());
 
@@ -62,7 +62,7 @@ static void jackif_login(boost::shared_ptr<avjackif> avinterface, boost::asio::y
 // FIXME 添加错误处理
 int connect_to_avrouter(const char * keyfilename, const char * certfilename, const char * self_addr, const char * host, const char * port)
 {
-	boost::shared_ptr<BIO> keyfile(BIO_new_file(keyfilename, "r"), BIO_free);
+	std::shared_ptr<BIO> keyfile(BIO_new_file(keyfilename, "r"), BIO_free);
 	if(!keyfile)
 	{
 		std::cerr << "can not open avim.key" << std::endl;
@@ -70,7 +70,7 @@ int connect_to_avrouter(const char * keyfilename, const char * certfilename, con
 	}
 	RSA * rsa_key = PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, 0, 0);
 
-	boost::shared_ptr<BIO> certfile(BIO_new_file(certfilename, "r"), BIO_free);
+	std::shared_ptr<BIO> certfile(BIO_new_file(certfilename, "r"), BIO_free);
 	if(!certfile)
 	{
 		std::cerr << "can not open avim.crt" << std::endl;
@@ -83,14 +83,14 @@ int connect_to_avrouter(const char * keyfilename, const char * certfilename, con
 
 	boost::asio::ip::tcp::resolver resolver(*av_service);
 
-	boost::shared_ptr<boost::asio::ip::tcp::socket> avserver( new boost::asio::ip::tcp::socket(*av_service));
+	std::shared_ptr<boost::asio::ip::tcp::socket> avserver( new boost::asio::ip::tcp::socket(*av_service));
 
 	// 连接
 	boost::asio::connect(*avserver, resolver.resolve(boost::asio::ip::tcp::resolver::query(host, port ? port : "24950")));
 
 	// 构造 avtcpif
 	// 创建一个 tcp 的 avif 设备，然后添加进去
-	boost::shared_ptr<avjackif> avinterface(new avjackif(avserver));
+	std::shared_ptr<avjackif> avinterface(new avjackif(avserver));
 
 	boost::mutex m;
 	boost::condition_variable ready;
