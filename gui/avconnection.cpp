@@ -58,6 +58,11 @@ void AVConnection::handover_to_avkernel(avkernel& kernel)
 {
 	if (kernel.add_interface(m_avif))
 	{
+		m_avif->signal_notify_remove.connect([this](){
+			set_state(DISCONNECTED);
+			Q_EMIT interface_removed();
+		});
+
 		std::string me_addr = av_address_to_string(*m_avif->if_address());
 
 		// 添加路由表, metric越大，优先级越低

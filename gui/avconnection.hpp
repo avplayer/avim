@@ -44,6 +44,9 @@ Q_SIGNALS:
 	// 内核接受了该连接, 此连接已经可以正式使用了
 	void kernel_accepted();
 
+	// 内核删除了本连接. 本连接可能出错了, 解决问题后重新添加
+	void interface_removed();
+
 public Q_SLOTS:
 	void set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X509> cert);
 
