@@ -23,6 +23,7 @@ main_window::main_window(avimApp* _avimapp)
 	m_list->addItem("test@avplayer.org");
 	m_list->addItem("test-client@avplayer.org");
 	m_list->addItem("microcai@avplayer.org");
+	m_list->addItem("group@avplayer.org");
 
 	m_list->setEnabled(false);
 
