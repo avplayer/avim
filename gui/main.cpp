@@ -21,8 +21,15 @@ Q_IMPORT_PLUGIN(QICOPlugin);
 
 Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr);
 
+
+static SyncObjec * _syncobj;
+
 int main(int argc, char *argv[])
 {
+	SyncObjec syncobj;
+
+	_syncobj = &syncobj;
+
 	qRegisterMetaType<std::string>("std::string");
 	// 初始化该初始化的东西
 	OpenSSL_add_all_algorithms();
@@ -30,4 +37,10 @@ int main(int argc, char *argv[])
 	avimApp app(argc, argv);
 	// 开跑
 	return app.exec();
+}
+
+
+void post_on_gui_thread(std::function<void()> func)
+{
+	_syncobj->do_post(func);
 }
