@@ -58,6 +58,7 @@ void main_window::on_login_success()
 {
 	// TODO 更新 GUI 向用户显示
 	m_list->setEnabled(true);
+	m_ui->grouplistWidget->setEnabled(true);
 }
 
 void main_window::on_lost_connection(int reason)
