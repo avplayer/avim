@@ -26,8 +26,7 @@ class main_window : public QMainWindow
 public:
 	main_window();
 
-private Q_SLOTS:
-
+public:
 	// 槽, 登录成功调用, GUI 自己会做相应更新
 	void on_login_success();
 
