@@ -80,7 +80,8 @@ void AVConnection::connect_coroutine(boost::asio::yield_context yield_context)
 
 	tcp::resolver resolver(get_io_service());
 
-	tcp::resolver::query query("avim.avplayer.org", "24950");
+	auto _debug_host = getenv("AVIM_HOST");
+	tcp::resolver::query query(_debug_host?_debug_host:"avim.avplayer.org", "24950");
 
 	auto endpoint_iterator = resolver.async_resolve(query, yield_context[ec]);
 
