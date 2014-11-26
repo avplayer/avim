@@ -1,4 +1,4 @@
-
+#pragma once
 /*
  * 这个文件决定了 avpakcet->payload 里面的数据的解释格式
  */

@@ -199,7 +199,23 @@ int avimApp::start_main()
 	m_mainwindow->show();
 	m_avconnection->start_connect();
 
+	// 开启消息接收协程
+
+	boost::asio::spawn(m_io_service, std::bind(&avimApp::recive_coroutine, this, std::placeholders::_1));
 	return QApplication::exec();
+}
+
+void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
+{
+	std::string target,data;
+	m_avkernel.async_recvfrom(target, data, yield_context);
+
+	try
+	{
+		Q_EMIT message_recieved(target, decode_message(data));
+	}catch (std::exception&)
+	{
+	}
 }
 
 void avimApp::start_chat_with(std::string budy)
@@ -220,10 +236,18 @@ void avimApp::start_chat_with(std::string budy)
 
 	connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_message, this, budy, std::placeholders::_1));
 
+	QMetaObject::Connection slot_connect = connect(this, &avimApp::message_recieved, [this, budy, chat_widget](std::string target, proto::avim_message_packet pkt)
+	{
+		if (target == budy)
+			chat_widget->append_message(pkt);
+	});
+
 	m_chats.insert(std::pair<std::string, QWidget*>(budy, (QWidget*)chat_widget));
 
-	connect(chat_widget, &avui::chat_widget::destroyed, [this, budy](QObject*){
+	connect(chat_widget, &avui::chat_widget::destroyed, [this, budy, slot_connect](QObject*)
+	{
 		m_chats.erase(budy);
+		QObject::disconnect(slot_connect);
 	});
 }
 

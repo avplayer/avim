@@ -72,6 +72,13 @@ public:
 
 	// 信号, 丢失链接的时候发射
 	void connection_lost(int reason);
+private:
+
+	void recive_coroutine(boost::asio::yield_context);
+
+	Q_SIGNALS:
+	// 收到消息的时候发射!
+	void message_recieved(std::string target, proto::avim_message_packet);
 
 public:
 	fs::path get_app_dir()
