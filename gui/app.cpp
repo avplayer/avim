@@ -208,6 +208,8 @@ int avimApp::start_main()
 	m_tray_icon.reset(new avim_system_tray);
 	m_tray_icon->show();
 
+	connect(m_tray_icon.get(), SIGNAL(menu_request_quit()), this, SLOT(quit()));
+
 	return QApplication::exec();
 }
 
