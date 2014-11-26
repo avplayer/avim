@@ -2,12 +2,12 @@
 #include <vector>
 #include <memory>
 #include <random>
-#include <openssl/evp.h>
-#include <openssl/rand.h>
 #include <QMetaType>
 #include <QTextBlock>
 #include "app.hpp"
 #include "syncobj.hpp"
+#include <openssl/evp.h>
+#include <openssl/rand.h>
 
 #ifdef _WIN32
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 #ifdef _WIN32
 	// avoid calling RAND_poll that will crash on windows
 
-	std::random_device rnd();
+	std::random_device rnd;
 	for(int i=0; i<4; i++)
 	{
 		unsigned int seed = rnd();
