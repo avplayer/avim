@@ -1,4 +1,4 @@
-
+﻿
 @echo off
 
 echo setting build environment
@@ -13,7 +13,7 @@ echo make sure protobuf is built first !!!!
 set BOOST_ROOT=%BOOST_ROOT%
 set OPENSSL_ROOT=%OPENSSL_ROOT_DIR%
 set PROTOBUF_SRC_ROOT_FOLDER=%~dp0\third_party\protobuf-2.6.1\
-
+set CMAKE_PREFIX_PATH=c:\Qt\lib\cmake
 
 echo "making build directory"
 md build
