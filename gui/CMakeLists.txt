@@ -38,6 +38,7 @@ if(WIN32 AND MSVC AND ENABLE_QT_STATIC)
 	ADD_DEFINITIONS(-DSTATIC_QT5)
 endif()
 
+add_subdirectory(librichtext)
 
 file(GLOB HDRS include/*.h*)
 file(GLOB SRCS *.cpp *.h*)
