@@ -18,6 +18,15 @@
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 
 Q_IMPORT_PLUGIN(QICOPlugin);
+Q_IMPORT_PLUGIN(QSVGPlugin);
+
+#ifdef _DEBUG
+#pragma comment(lib, "Qt5PlatformSupportd.lib"
+#pragma comment(lib, "qwindowsd.lib")
+#else
+#pragma comment(lib, "Qt5PlatformSupport.lib")
+#pragma comment(lib, "qwindows.lib")
+#endif
 
 #endif
 #endif
