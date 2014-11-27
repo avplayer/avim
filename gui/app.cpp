@@ -57,10 +57,11 @@ QIcon avimApp::get_icon()
 #ifndef _WIN32
 	ico = QIcon(":/avim/logo.svg");
 #else
+	extern QPixmap qt_pixmapFromWinHICON(HICON);
 	HICON hicon = (HICON)::LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(1),
 		IMAGE_ICON, 0, 0, LR_DEFAULTSIZE|LR_LOADTRANSPARENT);
-	ico = QIcon(QPixmap::fromWinHICON(hicon));
-	::DestroyIcon(hIcon);
+	ico = QIcon(qt_pixmapFromWinHICON(hicon));
+	::DestroyIcon(hicon);
 #endif
 	return ico;
 }
