@@ -57,7 +57,7 @@ $ make -j8  # 默认带GUI; 如不需编译GUI的, 可以用 $ cmake .. -DBUILD_
 
 [ubuntu版本 编译说明](https://github.com/avplayer/avim/wiki/How-to-build-avim---Ubuntu-platform)
 
-[MacOS版本 编译说明](https://github.com/avplayer/avim/wiki/How-to-build-avim-on-MacOS)
+[MacOS版本 编译说明](https://github.com/avplayer/avim/wiki/How-to-build-avim-on-OS-X)
 
 ## 协议
 协议本身将进入　public domain，允许任何人自行实现。
