@@ -40,6 +40,8 @@ endif()
 
 add_subdirectory(librichtext)
 
+include_directories(librichtext/)
+
 file(GLOB HDRS include/*.h*)
 file(GLOB SRCS *.cpp *.h*)
 file(GLOB UIS *.ui)
@@ -57,7 +59,7 @@ if(APPLE)
 endif()
 
 add_executable(avim WIN32 MACOSX_BUNDLE ${SRCS})
-target_link_libraries(avim Qt5::Widgets)
+target_link_libraries(avim richtext Qt5::Widgets)
 
 if(APPLE)
 	set_target_properties(avim PROPERTIES
