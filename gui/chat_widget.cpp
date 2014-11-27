@@ -91,14 +91,7 @@ namespace avui
 		htmlMsg.append(QStringLiteral("<br /></div>"));
 
 		ui.messageBrowser->insertHtml(htmlMsg);
-
-		// TODO 从 protobuf 消息里解码出文字消息,图片消息 etc, 插入到 GUI 控件里
-// 		qDebug() << "recvHandle()" << sender << " sendMsg: " << data;
-// 		QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-// 		ui.messageBrowser->setTextColor(Qt::blue);
-// 		ui.messageBrowser->setCurrentFont(QFont("Times New Roman", 12));
-// 		ui.messageBrowser->append("[" + sender + "]" + time);
-// 		ui.messageBrowser->append(data);
+		ui.messageBrowser->moveCursor(QTextCursor::End);
 	}
 
 	proto::avim_message_packet chat_widget::get_message()
