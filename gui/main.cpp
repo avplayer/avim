@@ -50,21 +50,6 @@ int main(int argc, char *argv[])
 	qRegisterMetaType<std::string>("std::string");
 	// 初始化该初始化的东西
 	OpenSSL_add_all_algorithms();
-
-#ifdef _WIN32
-	// avoid calling RAND_poll that will crash on windows
-
-	std::random_device rnd;
-	for(int i=0; i<4; i++)
-	{
-		unsigned int seed = rnd();
-		RAND_seed(&seed, sizeof(seed));
-	}
-
-#endif
-
-	RAND_poll();
-
 	// 创建 QApp 对象
 	avimApp app(argc, argv);
 	// 开跑
