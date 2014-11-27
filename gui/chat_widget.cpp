@@ -65,6 +65,7 @@ namespace avui
 		Q_EMIT send_message(get_message());
 		ui.messageTextEdit->clear();
 		ui.messageTextEdit->setFocus();
+		ui.messageBrowser->moveCursor(QTextCursor::End);
 	}
 
 	void chat_widget::append_message(proto::avim_message_packet msgpkt)

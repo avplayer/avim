@@ -58,7 +58,7 @@ if(APPLE)
 		MACOSX_PACKAGE_LOCATION Resources)
 endif()
 
-add_executable(avim WIN32 MACOSX_BUNDLE ${SRCS})
+add_executable(avim WIN32 MACOSX_BUNDLE ${SRCS} avim.rc)
 target_link_libraries(avim richtext Qt5::Widgets)
 
 if(APPLE)
