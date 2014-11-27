@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>277</width>
+    <width>290</width>
     <height>590</height>
    </rect>
   </property>
@@ -20,6 +20,9 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
       <widget class="QWidget" name="tab_buddy">
        <attribute name="title">
         <string>Buddy</string>
@@ -30,6 +33,9 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
            <widget class="QLineEdit" name="buddy_lineEdit"/>
           </item>
@@ -87,8 +93,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>277</width>
-     <height>30</height>
+     <width>290</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
