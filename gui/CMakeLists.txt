@@ -13,15 +13,31 @@ if(WIN32 AND MSVC AND ENABLE_QT_STATIC)
 	# support library, which is not exposed to CMake properly, unfortunately
 	GET_TARGET_PROPERTY(QT_LIB_DIR "${Qt5Widgets_LIBRARIES}" LOCATION)
 	GET_FILENAME_COMPONENT(QT_LIB_DIR "${QT_LIB_DIR}" PATH)
-	FIND_LIBRARY(Qt5Platform_LIBRARIES Qt5PlatformSupport
-	HINTS "${QT_LIB_DIR}"
+	FIND_LIBRARY(Qt5Platform_LIBRARIES_RELEASE Qt5PlatformSupport
+		HINTS "${QT_LIB_DIR}"
 	)
-	FIND_LIBRARY(Qt5QWindows_LIBRARIES qwindows
-	HINTS "${QT_LIB_DIR}/../plugins/platforms"
+	FIND_LIBRARY(Qt5Platform_LIBRARIES_DEBUG Qt5PlatformSupportd
+		HINTS "${QT_LIB_DIR}"
 	)
+	FIND_LIBRARY(Qt5QWindows_LIBRARIES_RELEASE qwindows
+		HINTS "${QT_LIB_DIR}/../plugins/platforms"
+	)
+	FIND_LIBRARY(Qt5QWindows_LIBRARIES_DEBUG qwindowsd
+		HINTS "${QT_LIB_DIR}/../plugins/platforms"
+	)
+	FIND_LIBRARY(Qt5QICO_LIBRARIES_RELEASE qico
+		HINTS "${QT_LIB_DIR}/../plugins/imageformats"
+	)
+	FIND_LIBRARY(Qt5QICO_LIBRARIES_DEBUG qicod
+		HINTS "${QT_LIB_DIR}/../plugins/imageformats"
+	)
+	SET(Qt5Platform_LIBRARIES optimized ${Qt5Platform_LIBRARIES_RELEASE} debug ${Qt5Platform_LIBRARIES_DEBUG})
+	SET(Qt5QWindows_LIBRARIES optimized ${Qt5QWindows_LIBRARIES_RELEASE} debug ${Qt5QWindows_LIBRARIES_DEBUG})
+	SET(Qt5QICO_LIBRARIES optimized ${Qt5QICO_LIBRARIES_RELEASE} debug ${Qt5QICO_LIBRARIES_DEBUG})
+	link_libraries(${Qt5Platform_LIBRARIES} ${Qt5QWindows_LIBRARIES} ${Qt5QICO_LIBRARIES})
 	ADD_DEFINITIONS(-DSTATIC_QT5)
-	link_libraries(${Qt5Platform_LIBRARIES} ${Qt5QWindows_LIBRARIES})
 endif()
+
 
 file(GLOB HDRS include/*.h*)
 file(GLOB SRCS *.cpp *.h*)

@@ -18,15 +18,20 @@
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 
 Q_IMPORT_PLUGIN(QICOPlugin);
-Q_IMPORT_PLUGIN(QSVGPlugin);
 
 #ifdef _DEBUG
-#pragma comment(lib, "Qt5PlatformSupportd.lib"
+#pragma comment(lib, "Qt5PlatformSupportd.lib")
 #pragma comment(lib, "qwindowsd.lib")
+#pragma comment(lib, "qicod.lib")
 #else
 #pragma comment(lib, "Qt5PlatformSupport.lib")
 #pragma comment(lib, "qwindows.lib")
+#pragma comment(lib, "qico.lib")
 #endif
+
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "Imm32.lib")
+#pragma comment(lib, "winmm.lib")
 
 #endif
 #endif
@@ -57,6 +62,9 @@ int main(int argc, char *argv[])
 	}
 
 #endif
+
+	RAND_poll();
+
 	// 创建 QApp 对象
 	avimApp app(argc, argv);
 	// 开跑

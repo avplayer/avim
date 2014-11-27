@@ -2,6 +2,15 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(avim)
 
+if(WIN32)
+	add_definitions(-DBOOST_ALL_STATIC_LINK)
+	add_definitions(-DBOOST_THREAD_USE_LIB)
+	add_definitions(-DBOOST_FILESYSTEM_STATIC_LINK)
+	add_definitions(-DBOOST_ALL_STATIC_LINK)
+	add_definitions(-DWIN32_LEAN_AND_MEAN)
+	add_definitions(-DNOMINMAX)
+endif()
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

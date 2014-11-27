@@ -51,6 +51,7 @@ void AVConnection::start_login()
 {
 	Q_ASSERT(m_state == CONNECTED);
 	// 创建协程干活
+	m_avif.reset(new avjackif(m_socket));
 	boost::asio::spawn(m_io_service, std::bind(&AVConnection::login_coroutine, this, std::placeholders::_1));
 }
 
@@ -106,8 +107,6 @@ void AVConnection::connect_coroutine(boost::asio::yield_context yield_context)
 
 void AVConnection::login_coroutine(boost::asio::yield_context yield_context)
 {
-	m_avif.reset(new avjackif(m_socket));
-
 	m_avif->set_pki(m_key, m_cert);
 
 	if (m_avif->async_handshake(yield_context))

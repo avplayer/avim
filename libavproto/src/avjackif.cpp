@@ -1,11 +1,12 @@
-
+#include <random>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include <openssl/rand.h>
 #include <openssl/asn1.h>
 #include <openssl/dh.h>
 #include <openssl/pem.h>
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
 
 #include "serialization.hpp"
 
@@ -68,6 +69,10 @@ void avjackif::set_pki(std::shared_ptr<RSA> _key, std::shared_ptr<X509> cert)
 avjackif::avjackif(std::shared_ptr<boost::asio::ip::tcp::socket> _sock)
 	: m_sock(_sock)
 {
+	m_dh.reset(DH_new(), DH_free);
+	DH_generate_parameters_ex(m_dh.get(), 64, DH_GENERATOR_5, NULL);
+	DH_generate_key(m_dh.get());
+
 	static unsigned t = 0;
 	m_ifname = boost::str(boost::format("avjack%d") % t++);
 }
@@ -104,17 +109,13 @@ std::string avjackif::async_client_hello(boost::asio::yield_context yield_contex
 {
 	unsigned char to[512] = { 0 };
 
-	DH* dh = DH_new();
-	DH_generate_parameters_ex(dh, 64, DH_GENERATOR_5, NULL);
-	DH_generate_key(dh);
-
 	proto::client_hello client_hello;
 	client_hello.set_client("avim");
 	client_hello.set_version(0001);
 	// 把 g,p, pubkey 传过去
-	client_hello.set_random_g((const void*)to, BN_bn2bin(dh->g, to));
-	client_hello.set_random_p((const void*)to, BN_bn2bin(dh->p, to));
-	client_hello.set_random_pub_key((const void*)to, BN_bn2bin(dh->pub_key, to));
+	client_hello.set_random_g((const void*)to, BN_bn2bin(m_dh->g, to));
+	client_hello.set_random_p((const void*)to, BN_bn2bin(m_dh->p, to));
+	client_hello.set_random_pub_key((const void*)to, BN_bn2bin(m_dh->pub_key, to));
 
 	auto tobesend = av_proto::encode(client_hello);
 
@@ -130,19 +131,18 @@ std::string avjackif::async_client_hello(boost::asio::yield_context yield_contex
 	auto server_pubkey = BN_bin2bn((const unsigned char *) server_hello->random_pub_key().data(),
 		server_hello->random_pub_key().length(), NULL);
 
-	m_shared_key.resize(DH_size(dh));
+	m_shared_key.resize(DH_size(m_dh.get()));
 	// 密钥就算出来啦！
-	DH_compute_key(&m_shared_key[0], server_pubkey, dh);
+	DH_compute_key(&m_shared_key[0], server_pubkey, m_dh.get());
 	BN_free(server_pubkey);
 
     std::printf("key = 0x");
-    for (int i=0; i<DH_size(dh); ++i)
+	for (int i = 0; i<DH_size(m_dh.get()); ++i)
 	{
         std::printf("%x%x", (m_shared_key[i] >> 4) & 0xf, m_shared_key[i] & 0xf);
     }
     std::printf("\n");
-	DH_free(dh);
-
+	m_dh.reset();
 	return server_hello->random_pub_key();
 }
 
