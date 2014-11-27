@@ -60,6 +60,8 @@ public:
 		return QStandardPaths::standardLocations(QStandardPaths::DataLocation).first().toStdString();
 	}
 
+	QIcon get_icon();
+
 	int exec();
 
 public Q_SLOTS:

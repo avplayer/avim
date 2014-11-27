@@ -10,7 +10,7 @@ class avim_system_tray : public QSystemTrayIcon
 Q_SIGNALS:
 	void menu_request_quit();
 public:
-	avim_system_tray();
+	avim_system_tray(const QIcon&);
 private:
 	std::unique_ptr<QMenu> m_context_menu;
 };

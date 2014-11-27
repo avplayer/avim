@@ -51,6 +51,20 @@ avimApp::~avimApp()
 	m_io_thread.join();
 }
 
+QIcon avimApp::get_icon()
+{
+	QIcon ico;
+#ifndef _WIN32
+	ico = QIcon(":/avim/logo.svg");
+#else
+	HICON hicon = (HICON)::LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(1),
+		IMAGE_ICON, 0, 0, LR_DEFAULTSIZE|LR_LOADTRANSPARENT);
+	ico = QIcon(QPixmap::fromWinHICON(hicon));
+	::DestroyIcon(hIcon);
+#endif
+	return ico;
+}
+
 bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
 {
 	if (cur_key.empty())
@@ -129,6 +143,7 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
 
 int avimApp::exec()
 {
+	setWindowIcon(get_icon());
 	load_cfg();
 
 	std::string auto_login = m_cfg->get<std::string>("global.auto_login");
@@ -206,7 +221,7 @@ int avimApp::start_main()
 	boost::asio::spawn(m_io_service, std::bind(&avimApp::recive_coroutine, this, std::placeholders::_1));
 
 	// 显示 tray icon
-	m_tray_icon.reset(new avim_system_tray);
+	m_tray_icon.reset(new avim_system_tray(get_icon()));
 	m_tray_icon->show();
 
 	connect(m_tray_icon.get(), SIGNAL(menu_request_quit()), this, SLOT(quit()));
