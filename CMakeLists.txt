@@ -9,6 +9,7 @@ if(WIN32)
 	add_definitions(-DBOOST_ALL_STATIC_LINK)
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
 	add_definitions(-DNOMINMAX)
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
