@@ -15,6 +15,7 @@ namespace fs = boost::filesystem;
 #include <QInputDialog>
 
 #include "chat_widget.hpp"
+#include "qrichtext.hpp"
 
 namespace avui
 {
@@ -55,7 +56,7 @@ namespace avui
 		//doc->setDefaultStyleSheet("p { color: red; text-align: right;}");
 		// ui.messageBrowser->setDocument(doc);
 
-		ui.messageBrowser->insertHtml(htmlMsg);
+		//ui.messageBrowser->insertHtml(htmlMsg);
 		qDebug() << "getMessage()" << QString::fromStdString(msg);
 		// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
 
@@ -65,34 +66,15 @@ namespace avui
 		Q_EMIT send_message(get_message());
 		ui.messageTextEdit->clear();
 		ui.messageTextEdit->setFocus();
-		ui.messageBrowser->moveCursor(QTextCursor::End);
 	}
 
 	void chat_widget::append_message(proto::avim_message_packet msgpkt)
 	{
-		qRegisterMetaType<QTextBlock>("QTextBlock");
-		qRegisterMetaType<QTextCursor>("QTextCursor");
+		message_block msg;
+		msg.sender = "me";
+		msg.msg = msgpkt;
 
-		QString htmlMsg;
-
-		htmlMsg += QStringLiteral("<div><h>%1 说:</h>").arg(m_chat_target.c_str());
-
-		for (proto::avim_message im_message_item : msgpkt.avim())
-		{
-			if (im_message_item.has_item_text())
-			{
-				proto::text_message text_message = im_message_item.item_text();
-				std::string text = text_message.text();
-				// TODO 更好的格式化
-				htmlMsg.append(QStringLiteral(" <p> %1</p>").arg(QString::fromStdString(text)));
-			}
-			// TODO 添加图片功能!
-		}
-
-		htmlMsg.append(QStringLiteral("<br /></div>"));
-
-		ui.messageBrowser->insertHtml(htmlMsg);
-		ui.messageBrowser->moveCursor(QTextCursor::End);
+		ui.messageBrowser->append_message(msg);
 	}
 
 	proto::avim_message_packet chat_widget::get_message()

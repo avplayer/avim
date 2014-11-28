@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>763</width>
-    <height>623</height>
+    <width>599</width>
+    <height>582</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="4">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,6,0,2,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
        <item>
@@ -35,7 +35,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QTextBrowser" name="messageBrowser"/>
+      <widget class="QRichText" name="messageBrowser"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -69,18 +69,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QTextEdit" name="messageTextEdit">
-       <property name="html">
-        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'DejaVu Sans Mono'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="placeholderText" stdset="0">
-        <string/>
-       </property>
-      </widget>
+      <widget class="QTextEdit" name="messageTextEdit"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -117,6 +106,13 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QRichText</class>
+   <extends>QTextBrowser</extends>
+   <header>qrichtext.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
