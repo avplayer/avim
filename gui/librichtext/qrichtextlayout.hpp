@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <vector>
+#include <QWidget>
 #include <QLayout>
 
 class QRichTextLayout : public QLayout
@@ -9,9 +11,24 @@ public:
 	explicit QRichTextLayout(QWidget *parent, int margin = -1);
 	explicit QRichTextLayout(int margin = -1);
 
+public:
+	virtual QSize minimumSize() const;
+	virtual QSize sizeHint() const;
+	virtual void addItem(QLayoutItem*);
+	virtual QLayoutItem* itemAt(int index) const;
+	virtual QLayoutItem* takeAt(int index);
+	virtual int count() const;
+
+	virtual Qt::Orientations expandingDirections() const;
+
 Q_SIGNALS:
 
 public Q_SLOTS:
 
+
+private:
+	void doLayout(const QRect &rect, bool testOnly) const;
+
+	std::vector<QLayoutItem*> m_item_list;
 };
 

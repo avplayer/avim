@@ -1,8 +1,8 @@
 ﻿#include <QToolTip>
 #include <QLabel>
 #include <boost/concept_check.hpp>
-#include "qrichtext.hpp"
 #include "qrichtextlayout.hpp"
+#include "qrichtext.hpp"
 
 class msg_block : public message_block
 {
@@ -18,6 +18,8 @@ QRichText::QRichText(QWidget* parent)
 {
 	qRegisterMetaType<QRichText*>("QRichText*");
 	qRegisterMetaType<msg_block*>("msg_block*");
+
+	this->setLayout(m_layout = new QRichTextLayout());
 
 	connect(this, &QRichText::message_appended, this, &QRichText::on_message_append, Qt::QueuedConnection);
 }
@@ -55,8 +57,10 @@ void QRichText::on_message_append(msg_block* blk)
 	}
 
 	htmlMsg.append(QStringLiteral("<br /></div>"));
-	auto l = new QLabel(this);
+	auto l = new QLabel();
 	l->setText(htmlMsg);
 	l->show();
+
+	m_layout->addWidget(l);
 }
 
