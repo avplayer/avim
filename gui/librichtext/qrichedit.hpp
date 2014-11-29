@@ -2,6 +2,10 @@
 #include <memory>
 #include <list>
 #include <QTextEdit>
+#include <QImage>
+#include <QUrl>
+#include <QFileInfo>
+#include <QMimeData>
 
 class QRichEdit : public QTextEdit
 {
@@ -14,4 +18,6 @@ public:
 
 	virtual void insertFromMimeData(const QMimeData *source);
 
+private:
+	void dropImage(const QUrl& url, const QImage& image);
 };

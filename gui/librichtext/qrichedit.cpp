@@ -16,5 +16,23 @@ bool QRichEdit::canInsertFromMimeData(const QMimeData *source) const
 
 void QRichEdit::insertFromMimeData(const QMimeData *source)
 {
-	QTextEdit::insertFromMimeData(source);
+	if (source->hasImage())
+	{
+		static int i = 1;
+		QUrl url(QString("dropped_image_%1").arg(i++));
+		dropImage(url, qvariant_cast<QImage>(source->imageData()));
+	}
+	else
+	{
+		QTextEdit::insertFromMimeData(source);
+	}
+}
+
+void QRichEdit::dropImage(const QUrl& url, const QImage& image)
+{
+	if (!image.isNull())
+	{
+		document()->addResource(QTextDocument::ImageResource, url, image);
+		textCursor().insertImage(url.toString());
+	}
 }
