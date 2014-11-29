@@ -6,6 +6,7 @@
 #include <QUrl>
 #include <QFileInfo>
 #include <QMimeData>
+#include <QMimeDatabase>
 
 class QRichEdit : public QTextEdit
 {
@@ -20,4 +21,6 @@ public:
 
 private:
 	void dropImage(const QUrl& url, const QImage& image);
+
+	QMimeDatabase m_minedb;
 };
