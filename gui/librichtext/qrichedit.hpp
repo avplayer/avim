@@ -23,4 +23,5 @@ private:
 	void dropImage(const QUrl& url, const QImage& image);
 
 	QMimeDatabase m_minedb;
+	int m_dropped_image_tmp_idx;
 };

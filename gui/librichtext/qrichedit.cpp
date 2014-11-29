@@ -1,8 +1,10 @@
-﻿#include "qrichedit.hpp"
+﻿#include <QDebug>
+#include "qrichedit.hpp"
 
 QRichEdit::QRichEdit(QWidget*parent)
 	: QTextEdit(parent)
 {
+	m_dropped_image_tmp_idx = 0;
 }
 
 QRichEdit::~QRichEdit()
@@ -21,7 +23,7 @@ bool QRichEdit::canInsertFromMimeData(const QMimeData *source) const
 				// 查询文件的 Mime 类型
 				QMimeType type = m_minedb.mimeTypeForUrl(url);
 				auto name = type.name();
-				if (name == "image/png" || name == "image/jpeg" || name == "image/bmp")
+				if (name == "image/png" || name == "image/jpeg" || name == "image/bmp" || name == "image/gif")
 				{
 					return true;
 				}
@@ -35,8 +37,7 @@ void QRichEdit::insertFromMimeData(const QMimeData *source)
 {
 	if (source->hasImage())
 	{
-		static int i = 1;
-		QUrl url(QString("dropped_image_%1").arg(i++));
+		QUrl url(QString("dropped_image_%1").arg(m_dropped_image_tmp_idx++));
 		dropImage(url, qvariant_cast<QImage>(source->imageData()));
 	}
 	else if (source->hasUrls())
@@ -48,7 +49,7 @@ void QRichEdit::insertFromMimeData(const QMimeData *source)
 				// 查询文件的 Mime 类型
 				QMimeType type = m_minedb.mimeTypeForUrl(url);
 				auto name = type.name();
-				if (name == "image/png" || name == "image/jpeg" || name == "image/bmp")
+				if (name == "image/png" || name == "image/jpeg" || name == "image/bmp" || name == "image/gif")
 				{
 					QImage image;
 					image.load(url.toLocalFile());
