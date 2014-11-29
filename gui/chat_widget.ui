@@ -75,7 +75,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QTextEdit" name="messageTextEdit">
+      <widget class="QRichEdit" name="messageTextEdit">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
          <horstretch>0</horstretch>
@@ -130,6 +130,11 @@
    <class>QRichText</class>
    <extends>QTextBrowser</extends>
    <header>qrichtext.hpp</header>
+  </customwidget>
+  <customwidget>
+    <class>QRichEdit</class>
+    <extends>QTextEdit</extends>
+    <header>qrichedit.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
