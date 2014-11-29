@@ -236,7 +236,7 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 	{
 		std::string target,data;
 
-		qRegisterMetaType<proto::avim_message_packet>("proto::avim_message_packet");
+		qRegisterMetaType<message::avim_message_packet>("message::avim_message_packet");
 
 		m_avkernel.async_recvfrom(target, data, yield_context);
 
@@ -269,7 +269,7 @@ avui::chat_widget* avimApp::start_chat_with(std::string budy)
 
 	connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_message, this, budy, std::placeholders::_1));
 
-	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, budy, chat_widget](std::string target, proto::avim_message_packet pkt)
+	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, budy, chat_widget](std::string target, message::avim_message_packet pkt)
 	{
 		if (target == budy)
 			chat_widget->append_message(pkt);
@@ -286,7 +286,7 @@ avui::chat_widget* avimApp::start_chat_with(std::string budy)
 	return chat_widget;
 }
 
-void avimApp::on_message_recieve(std::string target, proto::avim_message_packet pkt)
+void avimApp::on_message_recieve(std::string target, message::avim_message_packet pkt)
 {
 	if (m_chats.find(target) == m_chats.end())
 	{
@@ -294,7 +294,7 @@ void avimApp::on_message_recieve(std::string target, proto::avim_message_packet 
 	}
 }
 
-void avimApp::send_message(std::string target, proto::avim_message_packet pkt)
+void avimApp::send_message(std::string target, message::avim_message_packet pkt)
 {
 	m_avkernel.async_sendto(target, encode_message(pkt), [](boost::system::error_code ec){
 		post_on_gui_thread([ec](){

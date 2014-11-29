@@ -52,7 +52,7 @@ private:
 
 	Q_SIGNALS:
 	// 收到消息的时候发射!
-	void message_recieved(std::string target, proto::avim_message_packet);
+	void message_recieved(std::string target, message::avim_message_packet);
 
 public:
 	fs::path get_app_dir()
@@ -69,8 +69,8 @@ public Q_SLOTS:
 
     bool load_key_and_cert(std::string cur_key, std::string cur_cert);
 
-	void send_message(std::string target, proto::avim_message_packet);
-	void on_message_recieve(std::string target, proto::avim_message_packet);
+	void send_message(std::string target, message::avim_message_packet);
+	void on_message_recieve(std::string target, message::avim_message_packet);
 
 protected:
 	int start_main();

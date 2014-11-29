@@ -53,11 +53,11 @@ void QRichText::on_message_append(msg_block* blk)
 
 	htmlMsg += QStringLiteral("<div><h>%1 说:</h>").arg(blk->sender.c_str());
 
-	for (proto::avim_message im_message_item : blk->msg.avim())
+	for (message::avim_message im_message_item : blk->msg.avim())
 	{
 		if (im_message_item.has_item_text())
 		{
-			proto::text_message text_message = im_message_item.item_text();
+			message::text_message text_message = im_message_item.item_text();
 			std::string text = text_message.text();
 			// TODO 更好的格式化
 			htmlMsg.append(QStringLiteral(" <p> %1</p>").arg(QString::fromStdString(text)));

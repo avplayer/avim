@@ -17,7 +17,7 @@ public:
 	std::string sender, reciver;
 	std::string time;
 
-	proto::avim_message_packet msg;
+	message::avim_message_packet msg;
 
 	//boost::signals2::signal<void()> notify_change;
 };

@@ -57,7 +57,7 @@ namespace avui
 		Q_EMIT send_message(msg_block.msg);
 	}
 
-	void chat_widget::append_message(proto::avim_message_packet msgpkt)
+	void chat_widget::append_message(message::avim_message_packet msgpkt)
 	{
 		message_block msg;
 		msg.sender = m_chat_target;
@@ -66,10 +66,9 @@ namespace avui
 		ui.messageBrowser->append_message(msg);
 	}
 
-	proto::avim_message_packet chat_widget::get_message()
+	message::avim_message_packet chat_widget::get_message()
 	{
-		// TODO
-		proto::avim_message_packet impkt;
+		message::avim_message_packet impkt;
 
 		QTextDocument* doc = ui.messageTextEdit->document();
 		int blockcount = doc->blockCount();
@@ -94,14 +93,14 @@ namespace avui
 					img.save(&buffer, "JPEG"); // writes image into ba in JPEG format
 
 					// nice, 弄到 impkt 里
-					proto::img_message item_content;
+					message::img_message item_content;
 
 					item_content.set_image(ba.data(), ba.length());
 
 					impkt.mutable_avim()->Add()->mutable_item_image()->CopyFrom(item_content);
 				}else
 				{
-					proto::text_message item_content;
+					message::text_message item_content;
 					item_content.set_text(txt.toStdString());
 
 					impkt.mutable_avim()->Add()->mutable_item_text()->CopyFrom(item_content);
