@@ -49,6 +49,11 @@ endif()
 option(RUN_PROTOC "run protoc to generate protobuf protocol parser" ON)
 option(BUILD_C_WRAPPER "build a libavproto that exports C interface" OFF)
 option(BUILD_GUI "build gui" ON)
+option(ENABLE_QT_STATIC "static link to qt" ON)
+
+set(BUILD_STATIC ${ENABLE_QT_STATIC})
+
+include(tweakvcflasgs.cmake)
 
 find_package(Threads REQUIRED)
 find_package(Boost 1.54 REQUIRED COMPONENTS thread system program_options coroutine context regex date_time chrono filesystem )

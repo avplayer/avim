@@ -6,8 +6,6 @@ add_definitions(-DQT_NO_KEYWORDS)
 
 find_package(Qt5Widgets REQUIRED)
 
-option(ENABLE_QT_STATIC "static link to qt" OFF)
-
 if(WIN32 AND MSVC AND ENABLE_QT_STATIC)
 	# For static Windows builds, we also need to pull in the Qt5 Platform
 	# support library, which is not exposed to CMake properly, unfortunately
