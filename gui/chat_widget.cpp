@@ -63,7 +63,12 @@ namespace avui
 		// TODO 从 GUI 控件里构造 protobuf 的聊天消息
 
 		qDebug() << "on_sendButton_clicked()" << QString::fromStdString(m_chat_target) << " sendMsg: " << QString::fromStdString(msg);
-		Q_EMIT send_message(get_message());
+		message_block msg_block;
+		msg_block.sender = "me";
+		msg_block.msg = get_message();
+
+		ui.messageBrowser->append_message(msg_block);
+
 		ui.messageTextEdit->clear();
 		ui.messageTextEdit->setFocus();
 	}

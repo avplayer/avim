@@ -58,9 +58,9 @@ void QRichText::on_message_append(msg_block* blk)
 
 	htmlMsg.append(QStringLiteral("<br /></div>"));
 	auto l = new QLabel();
+	l->setWordWrap(true);
 	l->setText(htmlMsg);
 	l->show();
-
 	m_layout->addWidget(l);
 }
 

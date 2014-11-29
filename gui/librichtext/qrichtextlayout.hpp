@@ -20,6 +20,7 @@ public:
 	virtual int count() const;
 
 	virtual Qt::Orientations expandingDirections() const;
+	virtual void setGeometry(const QRect&);
 
 Q_SIGNALS:
 
@@ -27,7 +28,7 @@ public Q_SLOTS:
 
 
 private:
-	void doLayout(const QRect &rect, bool testOnly) const;
+	int doLayout(const QRect &rect, bool testOnly) const;
 
 	std::vector<QLayoutItem*> m_item_list;
 };

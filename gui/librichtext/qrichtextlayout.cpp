@@ -56,19 +56,41 @@ int QRichTextLayout::count() const
 	return m_item_list.size();
 }
 
+void QRichTextLayout::setGeometry(const QRect& r)
+{
+	QLayout::setGeometry(r);
+	doLayout(r, false);
+}
+
 /*
  * 这个就是真正的排版引擎了.
  */
-void QRichTextLayout::doLayout(const QRect& rect, bool testOnly) const
+int QRichTextLayout::doLayout(const QRect& rect, bool testOnly) const
 {
 	int left, top, right, bottom;
 	getContentsMargins(&left, &top, &right, &bottom);
 	QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
 
+	int spaceY;
+	int spaceX = effectiveRect.x();
+
+	int widthfor_text = effectiveRect.width() -  200;
+
 	for (QLayoutItem* item : m_item_list)
 	{
         QWidget *wid = item->widget();
+
+		auto spaceY_inc = wid->heightForWidth(widthfor_text);
+
+        if (!testOnly)
+		{
+            item->setGeometry(
+				QRect(QPoint(0, spaceY), QSize(widthfor_text, spaceY_inc))
+			);
+		}
+		spaceY += spaceY_inc;
 	}
+	return spaceY;
 }
 
 
