@@ -1,4 +1,4 @@
-
+﻿
 #include "system_tray.hpp"
 
 avim_system_tray::avim_system_tray(const QIcon& ico)
