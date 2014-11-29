@@ -6,7 +6,8 @@ class QRichTextLayout : public QLayout
 {
 	Q_OBJECT
 public:
-	explicit QRichTextLayout(QObject *parent = 0);
+	explicit QRichTextLayout(QWidget *parent, int margin = -1);
+	explicit QRichTextLayout(int margin = -1);
 
 Q_SIGNALS:
 

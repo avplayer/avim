@@ -1,6 +1,13 @@
-﻿#include "qrichtextlayout.hpp"
+﻿
+#include "qrichtextlayout.hpp"
 
-QRichTextLayout::QRichTextLayout(QObject *parent) :
-QLayout(parent)
+QRichTextLayout::QRichTextLayout(QWidget* parent, int margin)
+	: QLayout(parent)
 {
+	setContentsMargins(margin, margin, margin, margin);
+}
+
+QRichTextLayout::QRichTextLayout(int margin)
+{
+	setContentsMargins(margin, margin, margin, margin);
 }
