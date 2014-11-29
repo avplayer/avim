@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <memory>
 #include <list>
 #include <QScrollArea>
@@ -17,7 +17,7 @@ public:
 	std::string sender, reciver;
 	std::string time;
 
-	message::avim_message_packet msg;
+	message::message_packet msg;
 
 	//boost::signals2::signal<void()> notify_change;
 };

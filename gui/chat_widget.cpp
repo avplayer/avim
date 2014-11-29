@@ -1,4 +1,4 @@
-﻿#include <boost/bind.hpp>
+#include <boost/bind.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -57,7 +57,7 @@ namespace avui
 		Q_EMIT send_message(msg_block.msg);
 	}
 
-	void chat_widget::append_message(message::avim_message_packet msgpkt)
+	void chat_widget::append_message(message::message_packet msgpkt)
 	{
 		message_block msg;
 		msg.sender = m_chat_target;
@@ -66,9 +66,9 @@ namespace avui
 		ui.messageBrowser->append_message(msg);
 	}
 
-	message::avim_message_packet chat_widget::get_message()
+	message::message_packet chat_widget::get_message()
 	{
-		message::avim_message_packet impkt;
+		message::message_packet impkt;
 
 		QTextDocument* doc = ui.messageTextEdit->document();
 		int blockcount = doc->blockCount();
