@@ -2,6 +2,7 @@
 #include <QLabel>
 #include <boost/concept_check.hpp>
 #include "qrichtext.hpp"
+#include "qrichtextlayout.hpp"
 
 class msg_block : public message_block
 {

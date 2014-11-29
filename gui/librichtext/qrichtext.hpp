@@ -23,7 +23,7 @@ public:
 };
 
 class msg_block;
-class QRichTextPrivateLayout;
+class QRichTextLayout;
 class QRichText : public QAbstractScrollArea
 {
 	Q_OBJECT
@@ -46,7 +46,7 @@ public:
 	std::shared_ptr<message_block> append_message(message_block);
 protected:
 
-
+	QRichTextLayout* m_layout;
 
 private:
 	// 保存控件内部要显示的聊天消息
