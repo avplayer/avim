@@ -29,6 +29,7 @@ class QRichText : public QScrollArea
 	Q_OBJECT
 public:
 	explicit QRichText(QWidget*);
+	~QRichText();
 
 Q_SIGNALS:
 	// 滚动条拉动到顶部后还继续拉, 发出此信号

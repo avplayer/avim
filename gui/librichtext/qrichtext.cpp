@@ -14,6 +14,10 @@ public:
 	}
 };
 
+QRichText::~QRichText()
+{
+}
+
 QRichText::QRichText(QWidget* parent)
 	: QScrollArea(parent)
 {
