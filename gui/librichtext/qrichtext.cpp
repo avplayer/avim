@@ -1,4 +1,4 @@
-#include <QToolTip>
+﻿#include <QToolTip>
 #include <QLabel>
 #include <boost/concept_check.hpp>
 #include "qrichtext.hpp"

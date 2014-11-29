@@ -1,8 +1,9 @@
-#pragma once
+﻿#pragma once
 #include <memory>
 #include <list>
 #include <QAbstractScrollArea>
 #include <QScrollBar>
+#include <QLayout>
 #include <boost/signals2.hpp>
 
 #include "avim_proto/im.pb.h"
@@ -22,6 +23,7 @@ public:
 };
 
 class msg_block;
+class QRichTextPrivateLayout;
 class QRichText : public QAbstractScrollArea
 {
 	Q_OBJECT
