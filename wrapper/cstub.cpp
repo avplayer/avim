@@ -3,8 +3,6 @@
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
-#include <avif.hpp>
-#include <avjackif.hpp>
 #include <avproto.hpp>
 
 #include <openssl/bio.h>
