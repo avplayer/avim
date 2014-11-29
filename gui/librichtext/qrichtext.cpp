@@ -1,6 +1,7 @@
 ﻿#include <QToolTip>
 #include <QLabel>
 #include <QTimer>
+#include <QImage>
 #include <boost/concept_check.hpp>
 #include "qrichtextlayout.hpp"
 #include "qrichtext.hpp"

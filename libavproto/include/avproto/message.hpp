@@ -1,8 +1,9 @@
-#pragma once
+﻿#pragma once
 /*
  * 这个文件决定了 avpakcet->payload 里面的数据的解释格式
  */
 #include <string>
+#include <cstdint>
 #include <exception>
 #include "avim_proto/im.pb.h"
 
@@ -28,7 +29,8 @@ struct im_message{
 
 // 检测是否经过了对称密钥的加密, 并返回加密key的 ID
 // 返回 0 表示木加密
-uint32_t is_encrypted_message(const std::string& payload);
+
+std::uint32_t is_encrypted_message(const std::string& payload);
 
 im_message decode_message(const std::string& payload);
 

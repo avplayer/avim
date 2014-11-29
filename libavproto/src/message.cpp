@@ -1,7 +1,7 @@
-#include "avproto/message.hpp"
+﻿#include "avproto/message.hpp"
 
 #include "avproto/serialization.hpp"
-#include <netinet/in.h>
+#include <boost/asio.hpp>
 
 enum message_header_type_indicator {
 	TPYE_ENCRYPTED = 0x01,
@@ -33,7 +33,7 @@ bool is_plain_message(const std::string& payload)
 	return type == 0;
 }
 
-uint32_t is_encrypted_message(const std::string& payload)
+std::uint32_t is_encrypted_message(const std::string& payload)
 {
 	unsigned char type = *((unsigned char*)payload.data());
 	if (type & TPYE_ENCRYPTED)
