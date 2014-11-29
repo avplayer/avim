@@ -27,7 +27,7 @@ avimApp::avimApp(int argc, char* argv[])
 		catch (std::exception& e)
 		{
 			std::cerr << "main exception: " << e.what() << std::endl;
-			return -1;
+			std::exit(1);
 		}
 	});
 
