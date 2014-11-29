@@ -8,9 +8,9 @@ class QRichTextLayout : public QLayout
 public:
 	explicit QRichTextLayout(QObject *parent = 0);
 
-signals:
+Q_SIGNALS:
 
-public slots:
+public Q_SLOTS:
 
 };
 
