@@ -1,4 +1,4 @@
-#include <atomic>
+﻿#include <atomic>
 
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
