@@ -236,7 +236,7 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 	{
 		std::string target,data;
 
-		qRegisterMetaType<message::message_packet>("message::message_packet");
+		qRegisterMetaType<im_message>("im_message");
 
 		m_avkernel.async_recvfrom(target, data, yield_context);
 
@@ -269,10 +269,10 @@ avui::chat_widget* avimApp::start_chat_with(std::string budy)
 
 	connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_message, this, budy, std::placeholders::_1));
 
-	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, budy, chat_widget](std::string target, message::message_packet pkt)
+	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, budy, chat_widget](std::string target, im_message pkt)
 	{
-		if (target == budy)
-			chat_widget->append_message(pkt);
+		if (target == budy && pkt.is_message)
+			chat_widget->append_message(pkt.impkt);
 	}, Qt::QueuedConnection);
 
 	m_chats.insert(std::pair<std::string, QWidget*>(budy, (QWidget*)chat_widget));
@@ -286,11 +286,12 @@ avui::chat_widget* avimApp::start_chat_with(std::string budy)
 	return chat_widget;
 }
 
-void avimApp::on_message_recieve(std::string target, message::message_packet pkt)
+void avimApp::on_message_recieve(std::string target, im_message pkt)
 {
 	if (m_chats.find(target) == m_chats.end())
 	{
-		start_chat_with(target)->append_message(pkt);
+		if (pkt.is_message)
+			start_chat_with(target)->append_message(pkt.impkt);
 	}
 }
 
