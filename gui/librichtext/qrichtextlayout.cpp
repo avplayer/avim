@@ -84,6 +84,8 @@ int QRichTextLayout::doLayout(const QRect& rect, bool testOnly) const
 
 	for (QLayoutItem* item : m_item_list)
 	{
+		if (item->isEmpty())
+			continue;
         QWidget *wid = item->widget();
 
 		auto spaceY_inc = wid->heightForWidth(widthfor_text);
