@@ -1,6 +1,7 @@
 #include "avproto/message.hpp"
 
 #include "avproto/serialization.hpp"
+#include <netinet/in.h>
 
 enum message_header_type_indicator {
 	TPYE_ENCRYPTED = 0x01,
@@ -32,9 +33,13 @@ bool is_plain_message(const std::string& payload)
 	return type == 0;
 }
 
-bool is_message_packet(const std::string& payload)
+uint32_t is_encrypted_message(const std::string& payload)
 {
-
+	unsigned char type = *((unsigned char*)payload.data());
+	if (type & TPYE_ENCRYPTED)
+		return ntohl(*reinterpret_cast<const uint32_t*>(payload.data()+1));
+	else
+		return 0;
 }
 
 /*
@@ -45,12 +50,14 @@ im_message decode_message(const std::string& payload)
 {
 	im_message ret;
 	ret.is_encrypted_message = false;
+	int offset = 1;
 
 	// payload 的第一个字节表示消息是否加密, 有的话, 返回失败, 必须使用对称加密的密钥解开
 	unsigned char type = *((unsigned char*)payload.data());
 
 	switch (type & TPYE_ENCRYPTED)
 	{
+		offset +=4;
 		throw im_decode_error(0, "encrypted message");
 	}
 
@@ -62,7 +69,7 @@ im_message decode_message(const std::string& payload)
 	ret.is_control_message = false;
 	ret.is_message = true;
 
-	if (!ret.impkt.ParseFromArray(payload.data()+1, payload.length()-1))
+	if (!ret.impkt.ParseFromArray(payload.data()+offset, payload.length()-1))
 	{
 		throw im_decode_error(1, "protobuf decode error");
 	}

@@ -26,8 +26,9 @@ struct im_message{
 };
 
 
-// 检测是否经过了对称密钥的加密
-bool is_encrypted_message(const std::string& payload);
+// 检测是否经过了对称密钥的加密, 并返回加密key的 ID
+// 返回 0 表示木加密
+uint32_t is_encrypted_message(const std::string& payload);
 
 im_message decode_message(const std::string& payload);
 
