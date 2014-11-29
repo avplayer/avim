@@ -7,12 +7,16 @@ namespace fs = boost::filesystem;
 #include <openssl/pem.h>
 #include <openssl/evp.h>
 
-#include <QtCore/QDateTime>
-#include <QtCore/QDebug>
+#include <QDateTime>
+#include <QDebug>
 #include <QScrollBar>
 #include <QStandardPaths>
-#include <QTextBlock>
-#include <QInputDialog>
+#include <QTextDocument>
+#include <QTextDocumentFragment>
+#include <QTextFrame>
+#include <QTextImageFormat>
+#include <QBuffer>
+#include <QImage>
 
 #include "chat_widget.hpp"
 #include "qrichtext.hpp"
@@ -32,12 +36,6 @@ namespace avui
 		qDebug() << "~avim()";
 	}
 
-	std::string chat_widget::getMessage()
-	{
-		QString msg = ui.messageTextEdit->toPlainText();
-		return msg.toStdString();
-	}
-
 	void chat_widget::on_sendButton_clicked()
 	{
 		if (ui.messageTextEdit->toPlainText() == "")
@@ -46,22 +44,7 @@ namespace avui
 			return;
 		}
 
-		std::string msg = getMessage();
-		QString htmlMsg = QStringLiteral("<div><h>我 说:</h><p>%1</p><br /></div>").arg(msg.c_str());
-
-		// TODO: new public method chat_widget::loadLocalUserCssPreference
-		// FIXME: memory leaking
-		//QTextDocument* doc = new QTextDocument(this);
-		//doc->setDefaultStyleSheet("p { color: red; text-align: right;}");
-		// ui.messageBrowser->setDocument(doc);
-
-		//ui.messageBrowser->insertHtml(htmlMsg);
-		qDebug() << "getMessage()" << QString::fromStdString(msg);
-		// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
-
 		// TODO 从 GUI 控件里构造 protobuf 的聊天消息
-
-		qDebug() << "on_sendButton_clicked()" << QString::fromStdString(m_chat_target) << " sendMsg: " << QString::fromStdString(msg);
 		message_block msg_block;
 		msg_block.sender = "me";
 		msg_block.msg = get_message();
@@ -81,22 +64,51 @@ namespace avui
 		msg.msg = msgpkt;
 
 		ui.messageBrowser->append_message(msg);
-
 	}
 
 	proto::avim_message_packet chat_widget::get_message()
 	{
 		// TODO
-		proto::avim_message_packet ret;
+		proto::avim_message_packet impkt;
 
-		auto txtmsg = getMessage();
+		QTextDocument* doc = ui.messageTextEdit->document();
+		int blockcount = doc->blockCount();
 
-		proto::text_message txt_msg;
-		txt_msg.set_text(txtmsg);
+		for (QTextBlock blk = doc->begin(); blk != doc->end(); blk = blk.next())
+		{
+			for (auto blkit = blk.begin(); blkit != blk.end(); ++blkit)
+			{
+				QTextFragment docfrag = blkit.fragment();
+				auto txt = docfrag.text();
+				if (docfrag.charFormat().isImageFormat() )
+				{
+					QTextImageFormat imgformat = docfrag.charFormat().toImageFormat();
 
-		ret.mutable_avim()->Add()->mutable_item_text()->CopyFrom(txt_msg);
+					QVariant img_res = doc->resource(QTextDocument::ImageResource, imgformat.name());
 
-		return ret;
+					QImage img = img_res.value<QImage>();
+
+					QByteArray ba;
+					QBuffer buffer(&ba);
+					buffer.open(QIODevice::WriteOnly);
+					img.save(&buffer, "JPEG"); // writes image into ba in JPEG format
+
+					// nice, 弄到 impkt 里
+					proto::img_message item_content;
+
+					item_content.set_image(ba.data(), ba.length());
+
+					impkt.mutable_avim()->Add()->mutable_item_image()->CopyFrom(item_content);
+				}else
+				{
+					proto::text_message item_content;
+					item_content.set_text(txt.toStdString());
+
+					impkt.mutable_avim()->Add()->mutable_item_text()->CopyFrom(item_content);
+				}
+			}
+		}
+		return impkt;
 	}
 
 	void chat_widget::closeEvent(QCloseEvent* e)

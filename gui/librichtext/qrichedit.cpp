@@ -33,6 +33,10 @@ void QRichEdit::dropImage(const QUrl& url, const QImage& image)
 	if (!image.isNull())
 	{
 		document()->addResource(QTextDocument::ImageResource, url, image);
-		textCursor().insertImage(url.toString());
+		auto textcursor = textCursor();
+		textcursor.insertImage(url.toString());
+		setTextCursor(textcursor);
+
+		Q_EMIT textChanged();
 	}
 }

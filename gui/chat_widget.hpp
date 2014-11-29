@@ -27,8 +27,6 @@ namespace avui
 		void append_message(proto::avim_message_packet);
 
 	protected:
-		std::string getMessage();
-
 		// 从控件里构建 avim_message_packet
 		proto::avim_message_packet get_message();
 

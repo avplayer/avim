@@ -49,9 +49,6 @@ std::shared_ptr<message_block> QRichText::append_message(message_block textblock
 
 void QRichText::on_message_append(msg_block* blk)
 {
-	QPoint pos;
-	QToolTip::showText(pos, "stub, message appended", this);\
-
 	QString htmlMsg;
 
 	htmlMsg += QStringLiteral("<div><h>%1 说:</h>").arg(blk->sender.c_str());
@@ -64,16 +61,25 @@ void QRichText::on_message_append(msg_block* blk)
 			std::string text = text_message.text();
 			// TODO 更好的格式化
 			htmlMsg.append(QStringLiteral(" <p> %1</p>").arg(QString::fromStdString(text)));
+
+			htmlMsg.append(QStringLiteral("<br /></div>"));
+			auto l = new QLabel();
+			l->setWordWrap(true);
+			l->setText(htmlMsg);
+			m_layout->addWidget(l);
+			l->show();
 		}
 		// TODO 添加图片功能!
+		// 图片来啦!
+		else if (im_message_item.has_item_image())
+		{
+			QPixmap img;
+			img.loadFromData((const uchar*) im_message_item.item_image().image().data(), im_message_item.item_image().image().length());
+			auto l = new QLabel();
+			l->setPixmap(img);
+			m_layout->addWidget(l);
+		}
 	}
-
-	htmlMsg.append(QStringLiteral("<br /></div>"));
-	auto l = new QLabel();
-	l->setWordWrap(true);
-	l->setText(htmlMsg);
-	l->show();
-	m_layout->addWidget(l);
 
 	QTimer::singleShot(50, this,  SLOT(scroll_to_end()));
 }
