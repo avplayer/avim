@@ -52,18 +52,24 @@ void QRichText::on_message_append(msg_block* blk)
 	QString htmlMsg;
 
 	htmlMsg += QStringLiteral("<div><h>%1 说:</h>").arg(blk->sender.c_str());
+	auto l = new QLabel(m_container);
+	l->setWordWrap(true);
+	l->setText(htmlMsg);
+	m_layout->addWidget(l);
+	l->show();
 
 	for (message::avim_message im_message_item : blk->msg.avim())
 	{
 		if (im_message_item.has_item_text())
 		{
+			QString htmlMsg;
 			message::text_message text_message = im_message_item.item_text();
 			std::string text = text_message.text();
 			// TODO 更好的格式化
 			htmlMsg.append(QStringLiteral(" <p> %1</p>").arg(QString::fromStdString(text)));
 
 			htmlMsg.append(QStringLiteral("<br /></div>"));
-			auto l = new QLabel();
+			auto l = new QLabel(m_container);
 			l->setWordWrap(true);
 			l->setText(htmlMsg);
 			m_layout->addWidget(l);
@@ -73,11 +79,17 @@ void QRichText::on_message_append(msg_block* blk)
 		// 图片来啦!
 		else if (im_message_item.has_item_image())
 		{
-			QPixmap img;
-			img.loadFromData((const uchar*) im_message_item.item_image().image().data(), im_message_item.item_image().image().length());
-			auto l = new QLabel();
-			l->setPixmap(img);
+			QImage img;
+
+			Q_ASSERT(img.loadFromData((const uchar*) im_message_item.item_image().image().data(), im_message_item.item_image().image().length()));
+
+			auto l = new QLabel(m_container);
+			l->setPixmap(QPixmap::fromImage(img));
+//			l->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+			l->setFixedSize(QSize(img.width(), img.height()));
 			m_layout->addWidget(l);
+			l->setScaledContents(true);
+			l->show();
 		}
 	}
 

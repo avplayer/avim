@@ -89,8 +89,12 @@ int QRichTextLayout::doLayout(const QRect& rect, bool testOnly) const
 			continue;
         QWidget *wid = item->widget();
 
-		auto spaceY_inc = wid->heightForWidth(widthfor_text);
+		int spaceY_inc;
 
+		if (wid->hasHeightForWidth())
+			spaceY_inc = wid->heightForWidth(widthfor_text);
+		else
+			spaceY_inc = wid->sizeHint().height();
         if (!testOnly)
 		{
             item->setGeometry(
