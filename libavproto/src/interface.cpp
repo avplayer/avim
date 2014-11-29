@@ -1,4 +1,3 @@
-#include "avif.hpp"
 
 #include <atomic>
 
@@ -13,6 +12,8 @@
 
 #include "avim_proto/message.pb.h"
 #include "async_coro_queue.hpp"
+
+#include "avproto/interface.hpp"
 
 proto::av_address av_address_from_string(std::string av_address)
 {

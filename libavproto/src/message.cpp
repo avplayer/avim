@@ -1,6 +1,6 @@
-#include "message.hpp"
+#include "avproto/message.hpp"
 
-#include "serialization.hpp"
+#include "avproto/serialization.hpp"
 
 message::avim_message_packet decode_message(const std::string& payload)
 {

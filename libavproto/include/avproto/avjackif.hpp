@@ -3,7 +3,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/signals2.hpp>
 
-#include "avif.hpp"
+#include "avproto/interface.hpp"
 
 // 这个是 和 JACK 写的 router 对接的接口
 struct avjackif : boost::noncopyable

@@ -7,7 +7,6 @@
 #include <QDebug>
 
 #include "avproto.hpp"
-#include "avjackif.hpp"
 
 #include "avconnection.hpp"
 

@@ -7,7 +7,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#include "message.hpp"
+#include "avproto.hpp"
 #include "app.hpp"
 #include "chat_widget.hpp"
 #include "system_tray.hpp"

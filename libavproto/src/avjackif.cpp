@@ -8,10 +8,10 @@
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 
-#include "serialization.hpp"
+#include "avproto/serialization.hpp"
 
-#include "avjackif.hpp"
-#include "avproto.hpp"
+#include "avproto/avjackif.hpp"
+#include "avproto/avkernel.hpp"
 
 #include "avim_proto/message.pb.h"
 #include "avim_proto/user.pb.h"

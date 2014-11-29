@@ -14,8 +14,8 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
-#include "avif.hpp"
-#include "avproto.hpp"
+#include "avproto/interface.hpp"
+#include "avproto/avkernel.hpp"
 #include "async_coro_queue.hpp"
 #include "avim_proto/message.pb.h"
 

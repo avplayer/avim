@@ -6,7 +6,7 @@ set(SRCS
 	src/root_ca.cpp
 	src/serialization.cpp
 	src/avkernel.cpp
-	src/avif.cpp
+	src/interface.cpp
 	src/avjackif.cpp
 	src/message.cpp
 )
