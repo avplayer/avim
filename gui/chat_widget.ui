@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>599</width>
-    <height>582</height>
+    <width>601</width>
+    <height>579</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,6 +27,12 @@
        </item>
        <item>
         <widget class="QLabel" name="currentChat">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>TextLabel</string>
          </property>
@@ -35,7 +41,26 @@
       </layout>
      </item>
      <item>
-      <widget class="QRichText" name="messageBrowser"/>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>585</width>
+          <height>295</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QRichText" name="messageBrowser"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -69,7 +94,20 @@
       </layout>
      </item>
      <item>
-      <widget class="QTextEdit" name="messageTextEdit"/>
+      <widget class="QTextEdit" name="messageTextEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>150</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">

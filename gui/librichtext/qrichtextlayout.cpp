@@ -19,8 +19,14 @@ QSize QRichTextLayout::sizeHint() const
 
 QSize QRichTextLayout::minimumSize() const
 {
-	return QSize(500,300);
+	return QSize(500, 300);
 }
+
+int QRichTextLayout::heightForWidth(int width) const
+{
+	return doLayout(QRect(0, 0, width, 0), true);
+}
+
 
 Qt::Orientations QRichTextLayout::expandingDirections() const
 {
@@ -71,10 +77,10 @@ int QRichTextLayout::doLayout(const QRect& rect, bool testOnly) const
 	getContentsMargins(&left, &top, &right, &bottom);
 	QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
 
-	int spaceY;
+	int spaceY = effectiveRect.top();
 	int spaceX = effectiveRect.x();
 
-	int widthfor_text = effectiveRect.width() -  200;
+	int widthfor_text = effectiveRect.width() -  50;
 
 	for (QLayoutItem* item : m_item_list)
 	{

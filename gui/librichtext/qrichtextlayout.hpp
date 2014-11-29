@@ -22,6 +22,9 @@ public:
 	virtual Qt::Orientations expandingDirections() const;
 	virtual void setGeometry(const QRect&);
 
+	virtual bool hasHeightForWidth() const {return true;}
+	virtual int heightForWidth(int) const;
+
 Q_SIGNALS:
 
 public Q_SLOTS:
