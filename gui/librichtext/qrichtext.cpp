@@ -1,5 +1,6 @@
 ﻿#include <QToolTip>
 #include <QLabel>
+#include <QTimer>
 #include <boost/concept_check.hpp>
 #include "qrichtextlayout.hpp"
 #include "qrichtext.hpp"
@@ -14,12 +15,19 @@ public:
 };
 
 QRichText::QRichText(QWidget* parent)
-	: QAbstractScrollArea(parent)
+	: QScrollArea(parent)
 {
 	qRegisterMetaType<QRichText*>("QRichText*");
 	qRegisterMetaType<msg_block*>("msg_block*");
 
-	this->setLayout(m_layout = new QRichTextLayout());
+	m_container = new QWidget();
+
+	setWidgetResizable(true);
+	setWidget(m_container);
+
+	setBackgroundRole(QPalette::Base);
+
+	m_layout = new QRichTextLayout(m_container);
 
 	connect(this, &QRichText::message_appended, this, &QRichText::on_message_append, Qt::QueuedConnection);
 }
@@ -62,5 +70,12 @@ void QRichText::on_message_append(msg_block* blk)
 	l->setText(htmlMsg);
 	l->show();
 	m_layout->addWidget(l);
+
+	QTimer::singleShot(50, this,  SLOT(scroll_to_end()));
+}
+
+void QRichText::scroll_to_end()
+{
+	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 

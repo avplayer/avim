@@ -1,4 +1,6 @@
 ﻿
+#include <QScrollArea>
+
 #include "qrichtextlayout.hpp"
 
 QRichTextLayout::QRichTextLayout(QWidget* parent, int margin)
@@ -19,14 +21,13 @@ QSize QRichTextLayout::sizeHint() const
 
 QSize QRichTextLayout::minimumSize() const
 {
-	return QSize(500, 300);
+	return QSize(500, 100);
 }
 
 int QRichTextLayout::heightForWidth(int width) const
 {
 	return doLayout(QRect(0, 0, width, 0), true);
 }
-
 
 Qt::Orientations QRichTextLayout::expandingDirections() const
 {

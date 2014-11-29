@@ -45,7 +45,6 @@ namespace avui
 			qDebug() << "Can not send null!";
 			return;
 		}
-		ui.messageBrowser->verticalScrollBar()->setValue(ui.messageBrowser->verticalScrollBar()->maximum());
 
 		std::string msg = getMessage();
 		QString htmlMsg = QStringLiteral("<div><h>我 说:</h><p>%1</p><br /></div>").arg(msg.c_str());
@@ -71,15 +70,18 @@ namespace avui
 
 		ui.messageTextEdit->clear();
 		ui.messageTextEdit->setFocus();
+
+		Q_EMIT send_message(msg_block.msg);
 	}
 
 	void chat_widget::append_message(proto::avim_message_packet msgpkt)
 	{
 		message_block msg;
-		msg.sender = "me";
+		msg.sender = m_chat_target;
 		msg.msg = msgpkt;
 
 		ui.messageBrowser->append_message(msg);
+
 	}
 
 	proto::avim_message_packet chat_widget::get_message()

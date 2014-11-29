@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include <list>
-#include <QAbstractScrollArea>
+#include <QScrollArea>
 #include <QScrollBar>
 #include <QLayout>
 #include <boost/signals2.hpp>
@@ -24,11 +24,11 @@ public:
 
 class msg_block;
 class QRichTextLayout;
-class QRichText : public QAbstractScrollArea
+class QRichText : public QScrollArea
 {
 	Q_OBJECT
 public:
-	QRichText(QWidget*);
+	explicit QRichText(QWidget*);
 
 Q_SIGNALS:
 	// 滚动条拉动到顶部后还继续拉, 发出此信号
@@ -39,13 +39,14 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void on_message_append(msg_block*);
+	void scroll_to_end();
 
 public:
 
 	// 给 avim 用的接口, 用于添加文字, 添加图片, etc etc 的显示
 	std::shared_ptr<message_block> append_message(message_block);
 protected:
-
+	QWidget* m_container;
 	QRichTextLayout* m_layout;
 
 private:
