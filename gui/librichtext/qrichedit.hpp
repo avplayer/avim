@@ -29,6 +29,14 @@ public:
 
 	void set_content(message::message_packet);
 
+	virtual bool hasHeightForWidth() const;
+
+	void set_hasHeightForWidth(bool = true);
+
+	virtual QSize sizeHint() const;
+
+	virtual int heightForWidth(int) const;
+
 private:
 	void dropImage(const QUrl& url, const QImage& image);
 	void dropGIF(const QUrl& url, QMovie* );
@@ -65,4 +73,6 @@ private:
 
 	std::map<QUrl, std::shared_ptr<QMovie>> m_gif;
 	std::map<QUrl, std::shared_ptr<image_data>> m_image_raw_data;
+
+	bool m_hasHeightForWidth;
 };

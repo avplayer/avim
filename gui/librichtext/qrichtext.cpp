@@ -63,6 +63,8 @@ void QRichText::on_message_append(msg_block* blk)
 	auto richeditor = new QRichEdit(m_container);
 
 	richeditor->setReadOnly(true);
+	richeditor->set_hasHeightForWidth(true);
+	richeditor->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 
 	richeditor->set_content(blk->msg);
 	m_layout->addWidget(richeditor);

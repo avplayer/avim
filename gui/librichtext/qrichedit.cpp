@@ -8,6 +8,7 @@ QRichEdit::QRichEdit(QWidget*parent)
 	: QTextEdit(parent)
 {
 	m_dropped_image_tmp_idx = 0;
+	m_hasHeightForWidth = QTextEdit::hasHeightForWidth();
 }
 
 QRichEdit::~QRichEdit()
@@ -170,4 +171,39 @@ void QRichEdit::set_content(message::message_packet msg)
 			}
 		}
 	}
+}
+
+bool QRichEdit::hasHeightForWidth() const
+{
+	bool is = QTextEdit::hasHeightForWidth();
+	return m_hasHeightForWidth;
+}
+
+void QRichEdit::set_hasHeightForWidth(bool v)
+{
+	m_hasHeightForWidth = v;
+}
+
+int QRichEdit::heightForWidth(int w) const
+{
+	int h;
+	if (m_hasHeightForWidth)
+	{
+		document()->size().setWidth(w);
+		h = document()->size().height() + 5;
+	}
+	else
+	{
+		h = QWidget::heightForWidth(w);
+	}
+	return h;
+}
+
+QSize QRichEdit::sizeHint() const
+{
+	if (m_hasHeightForWidth)
+	{
+		return viewport()->sizeHint();
+	}
+	return QAbstractScrollArea::sizeHint();
 }
