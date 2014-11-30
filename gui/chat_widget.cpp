@@ -1,4 +1,4 @@
-#include <boost/bind.hpp>
+﻿#include <boost/bind.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -11,10 +11,6 @@ namespace fs = boost::filesystem;
 #include <QDebug>
 #include <QScrollBar>
 #include <QStandardPaths>
-#include <QTextDocument>
-#include <QTextDocumentFragment>
-#include <QTextFrame>
-#include <QTextImageFormat>
 #include <QBuffer>
 #include <QImage>
 
@@ -68,39 +64,7 @@ namespace avui
 
 	message::message_packet chat_widget::get_message()
 	{
-		message::message_packet impkt;
-
-		QTextDocument* doc = ui.messageTextEdit->document();
-		int blockcount = doc->blockCount();
-
-		for (QTextBlock blk = doc->begin(); blk != doc->end(); blk = blk.next())
-		{
-			for (auto blkit = blk.begin(); blkit != blk.end(); ++blkit)
-			{
-				QTextFragment docfrag = blkit.fragment();
-				auto txt = docfrag.text();
-				if (docfrag.charFormat().isImageFormat() )
-				{
-					QTextImageFormat imgformat = docfrag.charFormat().toImageFormat();
-
-					const QByteArray& ba = ui.messageTextEdit->get_image_data(imgformat.name());
-
-					// nice, 弄到 impkt 里
-					message::img_message item_content;
-
-					item_content.set_image(ba.data(), ba.length());
-
-					impkt.mutable_avim()->Add()->mutable_item_image()->CopyFrom(item_content);
-				}else
-				{
-					message::text_message item_content;
-					item_content.set_text(txt.toStdString());
-
-					impkt.mutable_avim()->Add()->mutable_item_text()->CopyFrom(item_content);
-				}
-			}
-		}
-		return impkt;
+		return ui.messageTextEdit->get_content();
 	}
 
 	void chat_widget::closeEvent(QCloseEvent* e)

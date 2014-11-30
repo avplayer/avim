@@ -2,7 +2,13 @@
 #include <QBuffer>
 #include <QFile>
 #include <QByteArray>
+#include <QTextDocument>
+#include <QTextDocumentFragment>
+#include <QTextFrame>
+#include <QTextImageFormat>
+#include <QTextBlock>
 #include "qrichedit.hpp"
+#include <avproto/message.hpp>
 
 QRichEdit::QRichEdit(QWidget*parent)
 	: QTextEdit(parent)
@@ -140,6 +146,46 @@ void QRichEdit::clear()
 	m_image_raw_data.clear();
 }
 
+message::message_packet QRichEdit::get_content()
+{
+	message::message_packet impkt;
+
+	QTextDocument* doc = document();
+	int blockcount = doc->blockCount();
+
+	for (QTextBlock blk = doc->begin(); blk != doc->end(); blk = blk.next())
+	{
+		for (auto blkit = blk.begin(); blkit != blk.end(); ++blkit)
+		{
+			QTextFragment docfrag = blkit.fragment();
+			auto txt = docfrag.text();
+			if (docfrag.charFormat().isImageFormat())
+			{
+				QTextImageFormat imgformat = docfrag.charFormat().toImageFormat();
+
+				const QByteArray& ba = get_image_data(imgformat.name());
+
+				// nice, 弄到 impkt 里
+				message::img_message item_content;
+
+				item_content.set_animated(m_is_gif.contains(imgformat.name()));
+
+				item_content.set_image(ba.data(), ba.length());
+
+				impkt.mutable_avim()->Add()->mutable_item_image()->CopyFrom(item_content);
+			}
+			else
+			{
+				message::text_message item_content;
+				item_content.set_text(txt.toStdString());
+
+				impkt.mutable_avim()->Add()->mutable_item_text()->CopyFrom(item_content);
+			}
+		}
+	}
+	return impkt;
+}
+
 void QRichEdit::set_content(message::message_packet msg)
 {
 	for (message::avim_message im_message_item : msg.avim())
@@ -158,13 +204,24 @@ void QRichEdit::set_content(message::message_packet msg)
 			auto img_data = std::make_shared<image_data>(ba);
 			auto inserted = m_image_raw_data.insert(std::make_pair(tmpurl, img_data));
 
-			// 检查是 GIF 还是普通图片
-			auto type = m_minedb.mimeTypeForData(ba);
+			bool use_gif = false;
 
-			if (type.name() == "image/gif")
+			if (im_message_item.item_image().has_animated())
+			{
+				use_gif = im_message_item.item_image().animated();
+			}
+			else
+			{
+				// 检查是 GIF 还是普通图片
+				auto type = m_minedb.mimeTypeForData(ba);
+				use_gif = (type.name() == "image/gif");
+			}
+
+			if (use_gif)
 			{
 				dropGIF(tmpurl, new QMovie(img_data->get_io_device()));
-			}else{
+			}else
+			{
 				QImage img;
 				img.loadFromData(img_data->get_bytes());
 				dropImage(tmpurl, img);

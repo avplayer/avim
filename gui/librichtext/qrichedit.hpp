@@ -25,10 +25,12 @@ public:
 
 	void clear();
 
+	void set_content(message::message_packet);
+	message::message_packet get_content();
+
 	const QByteArray& get_image_data(const QString&);
 
-	void set_content(message::message_packet);
-
+public:
 	virtual bool hasHeightForWidth() const;
 
 	void set_hasHeightForWidth(bool = true);
