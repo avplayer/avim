@@ -6,6 +6,7 @@
 #include "qrichtextlayout.hpp"
 #include "qrichtext.hpp"
 #include "qrichedit.hpp"
+#include "ui_chat_segment_widget.h"
 
 class msg_block : public message_block
 {
@@ -33,7 +34,7 @@ QRichText::QRichText(QWidget* parent)
 
 	setBackgroundRole(QPalette::Base);
 
-	m_layout = new QRichTextLayout(m_container);
+	m_layout = new QVBoxLayout(m_container);// QRichTextLayout(m_container);
 
 	connect(this, &QRichText::message_appended, this, &QRichText::on_message_append, Qt::QueuedConnection);
 }
@@ -51,26 +52,29 @@ std::shared_ptr<message_block> QRichText::append_message(message_block textblock
 
 void QRichText::on_message_append(msg_block* blk)
 {
-	QString htmlMsg;
+	auto talk_segment = new QWidget;
 
-	htmlMsg += QStringLiteral("<div><h>%1 说:</h>").arg(blk->sender.c_str());
-	auto l = new QLabel(m_container);
-	l->setWordWrap(true);
-	l->setText(htmlMsg);
-	l->show();
-	m_layout->addWidget(l);
+	Ui::chat_segment_widget ui;
+
+	auto talk_segment_ui = &ui;
+
+	talk_segment_ui->setupUi(talk_segment);
+	m_layout->addWidget(talk_segment);
+
+	talk_segment_ui->horizontalLayout->setDirection(blk->dir);
+
+
+	QString htmlMsg = QStringLiteral("<div><h>%1 说:</h>").arg(blk->sender.c_str());
+	talk_segment_ui->sender->setText(htmlMsg);
 
 	// 把图片插入到 QRichEdit!
-	auto richeditor = new QRichEdit(m_container);
+	auto richeditor = talk_segment_ui->content;
 
 	richeditor->setReadOnly(true);
 	richeditor->set_hasHeightForWidth(true);
 	richeditor->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 
 	richeditor->set_content(blk->msg);
-	m_layout->addWidget(richeditor);
-
-//	m_container->update();
 
 	QTimer::singleShot(10, m_container,  SLOT(update()));
 	QTimer::singleShot(0, this,  SLOT(scroll_to_end()));

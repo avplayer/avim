@@ -44,6 +44,7 @@ namespace avui
 		message_block msg_block;
 		msg_block.sender = "me";
 		msg_block.msg = get_message();
+		msg_block.dir = QBoxLayout::LeftToRight;
 
 		ui.messageBrowser->append_message(msg_block);
 
@@ -58,6 +59,7 @@ namespace avui
 		message_block msg;
 		msg.sender = m_chat_target;
 		msg.msg = msgpkt;
+		msg.dir = QBoxLayout::RightToLeft;
 
 		ui.messageBrowser->append_message(msg);
 	}

@@ -4,6 +4,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QLayout>
+#include <QBoxLayout>
 #include <boost/signals2.hpp>
 
 #include "avim_proto/im.pb.h"
@@ -17,13 +18,14 @@ public:
 	std::string sender, reciver;
 	std::string time;
 
+	QBoxLayout::Direction dir;
+
 	message::message_packet msg;
 
 	//boost::signals2::signal<void()> notify_change;
 };
 
 class msg_block;
-class QRichTextLayout;
 class QRichText : public QScrollArea
 {
 	Q_OBJECT
@@ -48,7 +50,7 @@ public:
 	std::shared_ptr<message_block> append_message(message_block);
 protected:
 	QWidget* m_container;
-	QRichTextLayout* m_layout;
+	QLayout* m_layout;
 
 private:
 	// 保存控件内部要显示的聊天消息
