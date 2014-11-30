@@ -123,6 +123,7 @@ void QRichEdit::dropGIF(const QUrl& url, QMovie* gif)
 		QImage image = gif->currentImage();
 		document()->addResource(QTextDocument::ImageResource, url, image);
 		viewport()->update();
+		Q_EMIT textChanged();
 	});
 
 	QImage image = gif->currentImage();
@@ -199,10 +200,11 @@ void QRichEdit::set_content(message::message_packet msg)
 		else if (im_message_item.has_item_image())
 		{
 			QUrl tmpurl(QString("image_%1").arg(m_dropped_image_tmp_idx++));
-			QByteArray ba = QByteArray::fromRawData(im_message_item.item_image().image().data(),
-				im_message_item.item_image().image().length());
-			auto img_data = std::make_shared<image_data>(ba);
-			auto inserted = m_image_raw_data.insert(std::make_pair(tmpurl, img_data));
+			auto img_data = std::make_shared<image_data>(
+				QByteArray::fromRawData(im_message_item.item_image().image().data(),
+					im_message_item.item_image().image().length()
+				)
+			);
 
 			bool use_gif = false;
 
@@ -213,10 +215,16 @@ void QRichEdit::set_content(message::message_packet msg)
 			else
 			{
 				// 检查是 GIF 还是普通图片
-				auto type = m_minedb.mimeTypeForData(ba);
+				auto type = m_minedb.mimeTypeForData(img_data->get_bytes());
 				use_gif = (type.name() == "image/gif");
 			}
 
+			img_data = std::make_shared<image_data>(
+				QByteArray::fromRawData(im_message_item.item_image().image().data(),
+				im_message_item.item_image().image().length()
+				)
+			);
+			auto inserted = m_image_raw_data.insert(std::make_pair(tmpurl, img_data));
 			if (use_gif)
 			{
 				dropGIF(tmpurl, new QMovie(img_data->get_io_device()));
