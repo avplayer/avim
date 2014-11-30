@@ -12,7 +12,6 @@
 
 #include "avim_proto/im.pb.h"
 
-class QGIFObjectInterface;
 class QRichEdit : public QTextEdit
 {
 	Q_OBJECT
@@ -37,6 +36,7 @@ public:
 	virtual QSize sizeHint() const;
 
 	virtual int heightForWidth(int) const;
+
 private:
 	void dropImage(const QUrl& url, const QImage& image);
 	void dropGIF(const QUrl& url, QMovie* );
@@ -72,7 +72,4 @@ private:
 	const QByteArray& get_image_data(const QString&);
 
 	bool m_hasHeightForWidth;
-
-	QGIFObjectInterface* m_obj_interface_gif;
-	friend class QGIFObjectInterface;
 };
