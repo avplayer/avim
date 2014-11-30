@@ -6,8 +6,9 @@
 #include "avproto/interface.hpp"
 
 // 这个是 和 JACK 写的 router 对接的接口
-struct avjackif : boost::noncopyable
+class avjackif : boost::noncopyable
 {
+public:
 	std::vector<unsigned char> m_shared_key;
 public:
 	avjackif(std::shared_ptr<boost::asio::ip::tcp::socket> _sock);

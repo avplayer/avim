@@ -8,6 +8,7 @@
 #include <QMimeData>
 #include <QMimeDatabase>
 #include <QMovie>
+#include <QBuffer>
 
 class QRichEdit : public QTextEdit
 {
@@ -22,6 +23,8 @@ public:
 
 	void clear();
 
+	const QByteArray& get_image_data(const QString&);
+
 private:
 	void dropImage(const QUrl& url, const QImage& image);
 	void dropGIF(const QUrl& url, QMovie* );
@@ -30,6 +33,32 @@ private:
 	int m_dropped_image_tmp_idx;
 
 	QList<QUrl> m_is_gif;
+
+	struct image_data{
+		QByteArray data;
+		QBuffer io;
+
+		image_data(QByteArray&& _data)
+			: data(_data)
+			, io(&data)
+		{
+		}
+		image_data(const QByteArray& _data)
+			: data(_data)
+			, io(&data)
+		{
+		}
+		QIODevice* get_io_device()
+		{
+			return &io;
+		}
+
+		QByteArray& get_bytes()
+		{
+			return data;
+		}
+	};
+
 	std::map<QUrl, std::shared_ptr<QMovie>> m_gif;
-	std::map<QUrl, QByteArray> m_image_raw_data;
+	std::map<QUrl, std::shared_ptr<image_data>> m_image_raw_data;
 };

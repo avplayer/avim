@@ -83,14 +83,7 @@ namespace avui
 				{
 					QTextImageFormat imgformat = docfrag.charFormat().toImageFormat();
 
-					QVariant img_res = doc->resource(QTextDocument::ImageResource, imgformat.name());
-
-					QImage img = img_res.value<QImage>();
-
-					QByteArray ba;
-					QBuffer buffer(&ba);
-					buffer.open(QIODevice::WriteOnly);
-					img.save(&buffer, "JPEG"); // writes image into ba in JPEG format
+					QByteArray ba = ui.messageTextEdit->get_image_data(imgformat.name());
 
 					// nice, 弄到 impkt 里
 					message::img_message item_content;
