@@ -1,4 +1,4 @@
-#include <QDebug>
+﻿#include <QDebug>
 #include <QBuffer>
 #include <QFile>
 #include <QByteArray>
