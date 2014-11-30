@@ -83,7 +83,7 @@ namespace avui
 				{
 					QTextImageFormat imgformat = docfrag.charFormat().toImageFormat();
 
-					QByteArray ba = ui.messageTextEdit->get_image_data(imgformat.name());
+					const QByteArray& ba = ui.messageTextEdit->get_image_data(imgformat.name());
 
 					// nice, 弄到 impkt 里
 					message::img_message item_content;

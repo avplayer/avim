@@ -40,7 +40,14 @@ void QRichEdit::insertFromMimeData(const QMimeData *source)
 	if (source->hasImage())
 	{
 		QUrl url(QString("dropped_image_%1").arg(m_dropped_image_tmp_idx++));
-		dropImage(url, qvariant_cast<QImage>(source->imageData()));
+		QByteArray ba;
+		QBuffer io(&ba);
+		io.open(QIODevice::ReadWrite);
+		QImage img = qvariant_cast<QImage>(source->imageData());
+		img.save(&io);
+		auto imgdata = std::make_shared<image_data>(ba);
+		auto inserted = m_image_raw_data.insert(std::make_pair(url, imgdata));
+		dropImage(url, img);
 	}
 	else if (source->hasUrls())
 	{
