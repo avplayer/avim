@@ -41,9 +41,10 @@ void QRichEdit::insertFromMimeData(const QMimeData *source)
 	{
 		QUrl url(QString("dropped_image_%1").arg(m_dropped_image_tmp_idx++));
 		QByteArray ba;
+		QImage img;
 		{ QBuffer io(&ba);
 		io.open(QIODevice::WriteOnly);
-		QImage img = qvariant_cast<QImage>(source->imageData());
+		img = qvariant_cast<QImage>(source->imageData());
 		img.save(&io, "JPEG");
 		}
 		auto imgdata = std::make_shared<image_data>(ba);
