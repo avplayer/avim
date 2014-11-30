@@ -28,8 +28,6 @@ public:
 	void set_content(message::message_packet);
 	message::message_packet get_content();
 
-	const QByteArray& get_image_data(const QString&);
-
 public:
 	virtual bool hasHeightForWidth() const;
 
@@ -52,15 +50,11 @@ private:
 		QByteArray data;
 		QBuffer io;
 
-		image_data(QByteArray&& _data)
-			: data(_data)
-			, io(&data)
-		{
-		}
 		image_data(const QByteArray& _data)
 			: data(_data)
 			, io(&data)
 		{
+			io.open(QIODevice::ReadOnly);
 		}
 		QIODevice* get_io_device()
 		{
@@ -75,6 +69,7 @@ private:
 
 	std::map<QUrl, std::shared_ptr<QMovie>> m_gif;
 	std::map<QUrl, std::shared_ptr<image_data>> m_image_raw_data;
+	const QByteArray& get_image_data(const QString&);
 
 	bool m_hasHeightForWidth;
 };

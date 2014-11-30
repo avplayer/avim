@@ -57,6 +57,7 @@ void QRichText::on_message_append(msg_block* blk)
 	auto l = new QLabel(m_container);
 	l->setWordWrap(true);
 	l->setText(htmlMsg);
+	l->show();
 	m_layout->addWidget(l);
 
 	// 把图片插入到 QRichEdit!
@@ -68,9 +69,11 @@ void QRichText::on_message_append(msg_block* blk)
 
 	richeditor->set_content(blk->msg);
 	m_layout->addWidget(richeditor);
-	l->show();
-	richeditor->show();
-	QTimer::singleShot(50, this,  SLOT(scroll_to_end()));
+
+//	m_container->update();
+
+	QTimer::singleShot(10, m_container,  SLOT(update()));
+	QTimer::singleShot(0, this,  SLOT(scroll_to_end()));
 }
 
 void QRichText::scroll_to_end()

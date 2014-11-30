@@ -80,7 +80,7 @@ void QRichEdit::insertFromMimeData(const QMimeData *source)
 				{
 					auto inserted = m_image_raw_data.insert(std::make_pair(tmpurl, imgdata));
 					QImage image;
-					image.load(imgdata->get_bytes());
+					image.loadFromData(imgdata->get_bytes());
 					dropImage(tmpurl, image);
 				}
 				else if (name == "image/gif")
@@ -141,9 +141,14 @@ const QByteArray& QRichEdit::get_image_data(const QString& name)
 
 void QRichEdit::clear()
 {
+	for (auto &i : m_gif)
+	{
+		i.second->stop();
+	}
+	m_gif.clear();
+
 	QTextEdit::clear();
 	m_is_gif.clear();
-	m_gif.clear();
 	m_image_raw_data.clear();
 }
 
@@ -199,10 +204,12 @@ void QRichEdit::set_content(message::message_packet msg)
 		}
 		else if (im_message_item.has_item_image())
 		{
+			message::img_message item_image = im_message_item.item_image();
+
 			QUrl tmpurl(QString("image_%1").arg(m_dropped_image_tmp_idx++));
 			auto img_data = std::make_shared<image_data>(
-				QByteArray::fromRawData(im_message_item.item_image().image().data(),
-					im_message_item.item_image().image().length()
+				QByteArray::fromRawData(item_image.image().data(),
+					item_image.image().length()
 				)
 			);
 
@@ -220,8 +227,8 @@ void QRichEdit::set_content(message::message_packet msg)
 			}
 
 			img_data = std::make_shared<image_data>(
-				QByteArray::fromRawData(im_message_item.item_image().image().data(),
-				im_message_item.item_image().image().length()
+				QByteArray::fromRawData(item_image.image().data(),
+					item_image.image().length()
 				)
 			);
 			auto inserted = m_image_raw_data.insert(std::make_pair(tmpurl, img_data));
@@ -236,6 +243,8 @@ void QRichEdit::set_content(message::message_packet msg)
 			}
 		}
 	}
+
+	Q_EMIT textChanged();
 }
 
 bool QRichEdit::hasHeightForWidth() const
@@ -255,6 +264,7 @@ int QRichEdit::heightForWidth(int w) const
 	if (m_hasHeightForWidth)
 	{
 		document()->size().setWidth(w);
+		document()->setTextWidth(w-5);
 		h = document()->size().height() + 5;
 	}
 	else
@@ -268,7 +278,7 @@ QSize QRichEdit::sizeHint() const
 {
 	if (m_hasHeightForWidth)
 	{
-		return viewport()->sizeHint();
+		return document()->size().toSize();
 	}
 	return QAbstractScrollArea::sizeHint();
 }
