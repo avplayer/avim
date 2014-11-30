@@ -2,23 +2,52 @@
 #include <QBuffer>
 #include <QFile>
 #include <QByteArray>
+#include <QString>
 #include <QTextDocument>
 #include <QTextDocumentFragment>
 #include <QTextFrame>
 #include <QTextImageFormat>
 #include <QTextBlock>
+#include <QAbstractTextDocumentLayout>
+#include <QPainter>
+
 #include "qrichedit.hpp"
+#include "giftextobject.hpp"
+
 #include <avproto/message.hpp>
+
+
+void QGIFObjectInterface::drawObject(QPainter* painter, const QRectF& rect, QTextDocument* doc, int posInDocument, const QTextFormat& format)
+{
+	QUrl gifname = format.property(Property_Image_Name()).toString();
+
+	auto qmovie = m_parent->m_gif[gifname];
+
+	painter->drawImage(rect, qmovie->currentImage());
+}
+
+QSizeF QGIFObjectInterface::intrinsicSize(QTextDocument* doc, int posInDocument, const QTextFormat& format)
+{
+	QUrl gifname = format.property(Property_Image_Name()).toString();
+
+	auto qmovie = m_parent->m_gif[gifname];
+
+	return qmovie->currentImage().size();
+}
 
 QRichEdit::QRichEdit(QWidget*parent)
 	: QTextEdit(parent)
 {
 	m_dropped_image_tmp_idx = 0;
 	m_hasHeightForWidth = QTextEdit::hasHeightForWidth();
+
+	m_obj_interface_gif = new QGIFObjectInterface(this);
+	document()->documentLayout()->registerHandler(GIFTextFormat, dynamic_cast<QObject*>(m_obj_interface_gif));
 }
 
 QRichEdit::~QRichEdit()
 {
+	delete m_obj_interface_gif;
 }
 
 bool QRichEdit::canInsertFromMimeData(const QMimeData *source) const
@@ -116,22 +145,17 @@ void QRichEdit::dropGIF(const QUrl& url, QMovie* gif)
 	m_gif[url].reset(gif);
 	m_is_gif.append(url);
 
+	auto cursor = textCursor();
+
+	QTextCharFormat charfmt = cursor.charFormat();
+
+	charfmt.setObjectType(GIFTextFormat);
+	charfmt.setProperty(m_obj_interface_gif->Property_Image_Name(), url.toString());
+
+	cursor.insertText(QString(QChar::ObjectReplacementCharacter), charfmt);
+	setTextCursor(cursor);
+	QObject::connect(gif, SIGNAL(updated(const QRect &)), viewport(), SLOT(update()), Qt::QueuedConnection);
 	gif->start();
-
-	connect(gif, &QMovie::updated, this, [this, gif, url](const QRect&)
-	{
-		QImage image = gif->currentImage();
-		document()->addResource(QTextDocument::ImageResource, url, image);
-		viewport()->update();
-		Q_EMIT textChanged();
-	});
-
-	QImage image = gif->currentImage();
-
-	document()->addResource(QTextDocument::ImageResource, url, image);
-	auto textcursor = textCursor();
-	textcursor.insertImage(url.toString());
-	setTextCursor(textcursor);
 }
 
 const QByteArray& QRichEdit::get_image_data(const QString& name)
@@ -175,6 +199,21 @@ message::message_packet QRichEdit::get_content()
 				message::img_message item_content;
 
 				item_content.set_animated(m_is_gif.contains(imgformat.name()));
+
+				item_content.set_image(ba.data(), ba.length());
+
+				impkt.mutable_avim()->Add()->mutable_item_image()->CopyFrom(item_content);
+			}
+			else if(docfrag.charFormat().isCharFormat() && docfrag.charFormat().objectType() == GIFTextFormat)
+			{
+				QTextCharFormat charformat = docfrag.charFormat().toCharFormat();
+
+				const QByteArray& ba = get_image_data(charformat.property(m_obj_interface_gif->Property_Image_Name()).toString());
+
+				// nice, 弄到 impkt 里
+				message::img_message item_content;
+
+				item_content.set_animated(1);
 
 				item_content.set_image(ba.data(), ba.length());
 
