@@ -10,6 +10,8 @@
 #include <QMovie>
 #include <QBuffer>
 
+#include "avim_proto/im.pb.h"
+
 class QRichEdit : public QTextEdit
 {
 	Q_OBJECT
@@ -24,6 +26,8 @@ public:
 	void clear();
 
 	const QByteArray& get_image_data(const QString&);
+
+	void set_content(message::message_packet);
 
 private:
 	void dropImage(const QUrl& url, const QImage& image);

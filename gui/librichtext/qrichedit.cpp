@@ -1,6 +1,7 @@
-﻿#include <QDebug>
+#include <QDebug>
 #include <QBuffer>
 #include <QFile>
+#include <QByteArray>
 #include "qrichedit.hpp"
 
 QRichEdit::QRichEdit(QWidget*parent)
@@ -136,4 +137,37 @@ void QRichEdit::clear()
 	m_is_gif.clear();
 	m_gif.clear();
 	m_image_raw_data.clear();
+}
+
+void QRichEdit::set_content(message::message_packet msg)
+{
+	for (message::avim_message im_message_item : msg.avim())
+	{
+		if (im_message_item.has_item_text())
+		{
+			message::text_message text_message = im_message_item.item_text();
+			std::string text = text_message.text();
+			textCursor().insertText(QString::fromStdString(text));
+		}
+		else if (im_message_item.has_item_image())
+		{
+			QUrl tmpurl(QString("image_%1").arg(m_dropped_image_tmp_idx++));
+			QByteArray ba = QByteArray::fromRawData(im_message_item.item_image().image().data(),
+				im_message_item.item_image().image().length());
+			auto img_data = std::make_shared<image_data>(ba);
+			auto inserted = m_image_raw_data.insert(std::make_pair(tmpurl, img_data));
+
+			// 检查是 GIF 还是普通图片
+			auto type = m_minedb.mimeTypeForData(ba);
+
+			if (type.name() == "image/gif")
+			{
+				dropGIF(tmpurl, new QMovie(img_data->get_io_device()));
+			}else{
+				QImage img;
+				img.loadFromData(img_data->get_bytes());
+				dropImage(tmpurl, img);
+			}
+		}
+	}
 }
