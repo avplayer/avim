@@ -55,7 +55,6 @@ if(MSVC)
 endif()
 
 option(RUN_PROTOC "run protoc to generate protobuf protocol parser" ON)
-option(BUILD_GUI "build gui" ON)
 option(ENABLE_QT_STATIC "static link to qt" ON)
 
 set(BUILD_STATIC ${ENABLE_QT_STATIC})
@@ -83,21 +82,24 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX OR CMAKE_COMPILER_IS_UN
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 endif()
 
+check_library_exists(rt clock_gettime "" HAVE_CLOCK_GETTIME)
+if(HAVE_CLOCK_GETTIME)
+        link_libraries(-lrt)
+endif(HAVE_CLOCK_GETTIME)
+
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/avim_proto/CMakeLists.txt )
 	add_subdirectory(avim_proto)
 else()
 	message( FATAL_ERROR "please run 'git submodule update --init' to get avim_proto")
 endif()
 
-check_library_exists(rt clock_gettime "" HAVE_CLOCK_GETTIME)
-if(HAVE_CLOCK_GETTIME)
-        link_libraries(-lrt)
-endif(HAVE_CLOCK_GETTIME)
 
-add_subdirectory(libavim)
-link_libraries(avim++)
-
-if(BUILD_GUI)
-add_subdirectory(gui)
+if(EXISTS ${PROJECT_SOURCE_DIR}/libavim/CMakeLists.txt )
+	add_subdirectory(libavim)
+	link_libraries(avim++)
+else()
+	message( FATAL_ERROR "please run 'git submodule update --init' to get libavim")
 endif()
 
+add_subdirectory(src)
