@@ -7,7 +7,7 @@
 #include <QBoxLayout>
 #include <boost/signals2.hpp>
 
-#include "avim_proto/im.pb.h"
+#include "im.pb.h"
 
 // 这一个对象表示一条消息
 // 没办法, 继承自 QObject 是为了使用 信号/slot 机制

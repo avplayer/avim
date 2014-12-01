@@ -72,13 +72,11 @@ find_package(OpenSSL REQUIRED)
 #pkg_check_modules(PKCS11 REQUIRED libpkcs11-helper-1 )
 
 include_directories(
-	${PROTOBUF_INCLUDE_DIRS}
-	${CMAKE_CURRENT_BINARY_DIR}
 	${Boost_INCLUDE_DIRS}
 	${OPENSSL_INCLUDE_DIR}
-	#${PKCS11_INCLUDE_DIRS}
-	libavproto/include
+	libavim/include
 )
+
 link_directories(${Boost_LIB_DIRS})
 
 link_libraries(${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} ${PKCS11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
@@ -98,7 +96,7 @@ if(HAVE_CLOCK_GETTIME)
         link_libraries(-lrt)
 endif(HAVE_CLOCK_GETTIME)
 
-add_subdirectory(libavproto)
+add_subdirectory(libavim)
 
 link_libraries(avproto++)
 

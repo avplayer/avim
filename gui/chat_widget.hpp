@@ -3,7 +3,7 @@
 #include <QWidget>
 #include "ui_chat_widget.h"
 
-#include "avim_proto/im.pb.h"
+#include "im.pb.h"
 
 
 namespace avui

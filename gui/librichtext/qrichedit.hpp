@@ -10,7 +10,7 @@
 #include <QMovie>
 #include <QBuffer>
 
-#include "avim_proto/im.pb.h"
+#include "im.pb.h"
 
 class QRichEdit : public QTextEdit
 {
