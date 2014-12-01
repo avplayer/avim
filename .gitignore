@@ -19,3 +19,4 @@ build/
 # For Qt
 *.pro.user
 Win32/
+CMakeLists.txt.user
