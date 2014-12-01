@@ -36,9 +36,6 @@ Q_SIGNALS:
 	void server_not_found();
 
 	// 连接被拒绝
-	void connection_refused();
-	void server_connected();
-
 	void login_success();
 
 	// 内核接受了该连接, 此连接已经可以正式使用了
@@ -50,7 +47,6 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X509> cert);
 
-	void start_connect();
 	void start_login();
 
 	void handover_to_avkernel(avkernel&);
@@ -58,7 +54,6 @@ public Q_SLOTS:
 	boost::asio::io_service& get_io_service() {return m_io_service;}
 
 private: // coroutines
-	void connect_coroutine(boost::asio::yield_context);
 	void login_coroutine(boost::asio::yield_context);
 
 private:
@@ -67,6 +62,5 @@ private:
 	boost::asio::io_service& m_io_service;
 	std::shared_ptr<RSA> m_key;
 	std::shared_ptr<X509> m_cert;
-	std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 	std::shared_ptr<avjackif> m_avif;
 };

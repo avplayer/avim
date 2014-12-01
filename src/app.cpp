@@ -209,14 +209,12 @@ int avimApp::start_main()
 	connect(this, &avimApp::login_success, m_mainwindow.get(), &main_window::on_login_success, Qt::QueuedConnection);
 	connect(m_mainwindow.get(), SIGNAL(chat_opened(std::string)), this, SLOT(start_chat_with(std::string)), Qt::QueuedConnection);
 
-	// 连接成功后马上登录
-	connect(m_avconnection.get(), SIGNAL(server_connected()), m_avconnection.get(), SLOT(start_login()), Qt::QueuedConnection);
 	// 要登录成功的消息!
 	connect(m_avconnection.get(), &AVConnection::login_success, this, &avimApp::login_success, Qt::QueuedConnection);
 	connect(m_avconnection.get(), &AVConnection::login_success, std::bind(&AVConnection::handover_to_avkernel, m_avconnection.get(), std::ref(m_avkernel)));
 
 	m_mainwindow->show();
-	m_avconnection->start_connect();
+	m_avconnection->start_login();
 
 	// 开启消息接收协程
 	boost::asio::spawn(m_io_service, std::bind(&avimApp::recive_coroutine, this, std::placeholders::_1));

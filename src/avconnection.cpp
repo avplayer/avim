@@ -34,7 +34,7 @@ void AVConnection::set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X5
 	m_cert = cert;
 }
 
-void AVConnection::start_connect()
+void AVConnection::start_login()
 {
 	// 检查 cert 和 key 是否已经设置, 没有设置的话就错误
 	if (!m_key || !m_cert)
@@ -42,15 +42,9 @@ void AVConnection::start_connect()
 		return Q_EMIT invalid_cert();
 	}
 
+	Q_ASSERT(m_state == DISCONNECTED);
 	// 创建协程干活
-	boost::asio::spawn(m_io_service, std::bind(&AVConnection::connect_coroutine, this, std::placeholders::_1));
-}
-
-void AVConnection::start_login()
-{
-	Q_ASSERT(m_state == CONNECTED);
-	// 创建协程干活
-	m_avif.reset(new avjackif(m_socket));
+	m_avif.reset(new avjackif(m_io_service));
 	boost::asio::spawn(m_io_service, std::bind(&AVConnection::login_coroutine, this, std::placeholders::_1));
 }
 
@@ -72,43 +66,12 @@ void AVConnection::handover_to_avkernel(avkernel& kernel)
 	}
 }
 
-void AVConnection::connect_coroutine(boost::asio::yield_context yield_context)
-{
-	boost::system::error_code ec;
-	// 传教到 avim.avplayer.org 的连接
-	using namespace boost::asio::ip;
-
-	tcp::resolver resolver(get_io_service());
-
-	auto _debug_host = getenv("AVIM_HOST");
-	tcp::resolver::query query(_debug_host?_debug_host:"avim.avplayer.org", "24950");
-
-	auto endpoint_iterator = resolver.async_resolve(query, yield_context[ec]);
-
-	if (ec || endpoint_iterator == tcp::resolver::iterator())
-	{
-		return Q_EMIT server_not_found();
-	}
-
-	m_socket.reset(new tcp::socket(get_io_service()));
-
-	boost::asio::async_connect(*m_socket, endpoint_iterator, yield_context[ec]);
-
-	if (ec)
-	{
-		qDebug() << QString(ec.message().c_str());
-		return Q_EMIT connection_refused();
-	}
-
-	Q_EMIT server_connected();
-	set_state(CONNECTED);
-}
-
 void AVConnection::login_coroutine(boost::asio::yield_context yield_context)
 {
 	m_avif->set_pki(m_key, m_cert);
+	auto _debug_host = getenv("AVIM_HOST");
 
-	if (m_avif->async_handshake(yield_context))
+	if (m_avif->async_handshake(_debug_host?_debug_host:"avim.avplayer.org", "24950", yield_context))
 	{
 		// 成功
 		Q_EMIT login_success();
