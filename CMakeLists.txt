@@ -55,7 +55,6 @@ if(MSVC)
 endif()
 
 option(RUN_PROTOC "run protoc to generate protobuf protocol parser" ON)
-option(BUILD_C_WRAPPER "build a libavproto that exports C interface" OFF)
 option(BUILD_GUI "build gui" ON)
 option(ENABLE_QT_STATIC "static link to qt" ON)
 
@@ -74,7 +73,6 @@ find_package(OpenSSL REQUIRED)
 include_directories(
 	${Boost_INCLUDE_DIRS}
 	${OPENSSL_INCLUDE_DIR}
-	libavim/include
 )
 
 link_directories(${Boost_LIB_DIRS})
@@ -97,11 +95,9 @@ if(HAVE_CLOCK_GETTIME)
 endif(HAVE_CLOCK_GETTIME)
 
 add_subdirectory(libavim)
-
-link_libraries(avproto++)
+link_libraries(avim++)
 
 if(BUILD_GUI)
 add_subdirectory(gui)
 endif()
 
-add_subdirectory(wrapper)
