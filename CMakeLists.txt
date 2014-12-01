@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(avim)
 
+include(CheckCCompilerFlag)
+check_c_compiler_flag(-fvisibility=hidden HAS_VISIVILITY)
+if (HAS_VISIVILITY)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+endif()
+
+
 if(WIN32)
 	add_definitions(-DBOOST_ALL_STATIC_LINK)
 	add_definitions(-DBOOST_THREAD_USE_LIB)

@@ -3,6 +3,23 @@
 #pragma comment(lib,"avproto.lib")
 #endif
 
+#if __GNUC__ >= 4
+#  if (defined(_WIN32) || defined(__WIN32__) || defined(WIN32)) && !defined(__CYGWIN__)
+     // All Win32 development environments, including 64-bit Windows and MinGW, define
+     // _WIN32 or one of its variant spellings. Note that Cygwin is a POSIX environment,
+     // so does not define _WIN32 or its variants.
+#    define AV_HAS_DECLSPEC
+#    define AV_SYMBOL_EXPORT __attribute__((__dllexport__))
+#    define AV_SYMBOL_IMPORT __attribute__((__dllimport__))
+#  else
+#    define AV_SYMBOL_EXPORT __attribute__((__visibility__("default")))
+#    define AV_SYMBOL_IMPORT
+#  endif
+#  define AV_SYMBOL_VISIBLE __attribute__((__visibility__("default")))
+#else
+#  define AV_SYMBOL_EXPORT
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,7 +31,11 @@ extern "C" {
 	#define AVPROTO_API    __declspec(dllimport)
 	#endif
 #else
-	#define AVPROTO_API extern
+	#define AVPROTO_API AV_SYMBOL_EXPORT
+#endif
+
+#ifdef BUILD_STATIC
+#define AVPROTO_API
 #endif
 
 /*
