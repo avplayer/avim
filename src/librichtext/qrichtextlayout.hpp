@@ -2,9 +2,9 @@
 
 #include <vector>
 #include <QWidget>
-#include <QLayout>
+#include <QVBoxLayout>
 
-class QRichTextLayout : public QLayout
+class QRichTextLayout : public QVBoxLayout
 {
 	Q_OBJECT
 public:

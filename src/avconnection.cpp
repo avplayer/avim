@@ -17,6 +17,7 @@ Q_DECLARE_METATYPE(AVConnection::ConState);
 AVConnection::AVConnection(boost::asio::io_service& _io)
 	: m_io_service(_io)
 {
+	m_state = DISCONNECTED;
 }
 
 void AVConnection::set_state(AVConnection::ConState _s)

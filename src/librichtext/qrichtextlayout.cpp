@@ -4,7 +4,7 @@
 #include "qrichtextlayout.hpp"
 
 QRichTextLayout::QRichTextLayout(QWidget* parent, int margin)
-	: QLayout(parent)
+	: QVBoxLayout(parent)
 {
 	setContentsMargins(margin, margin, margin, margin);
 }

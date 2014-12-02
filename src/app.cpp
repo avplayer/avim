@@ -142,6 +142,12 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
 	return true;
 }
 
+void avimApp::start_avconnection()
+{
+
+}
+
+
 int avimApp::exec()
 {
 	setWindowIcon(get_icon());
@@ -211,10 +217,11 @@ int avimApp::start_main()
 
 	// 要登录成功的消息!
 	connect(m_avconnection.get(), &AVConnection::login_success, this, &avimApp::login_success, Qt::QueuedConnection);
-	connect(m_avconnection.get(), &AVConnection::login_success, std::bind(&AVConnection::handover_to_avkernel, m_avconnection.get(), std::ref(m_avkernel)));
+	connect(m_avconnection.get(), &AVConnection::login_success, m_avconnection.get(), std::bind(&AVConnection::handover_to_avkernel, m_avconnection.get(), std::ref(m_avkernel)));
 
 	m_mainwindow->show();
 	m_avconnection->start_login();
+	connect(m_avconnection.get(), &AVConnection::interface_removed, m_avconnection.get(), std::bind(&AVConnection::start_login, m_avconnection.get()));
 
 	// 开启消息接收协程
 	boost::asio::spawn(m_io_service, std::bind(&avimApp::recive_coroutine, this, std::placeholders::_1));

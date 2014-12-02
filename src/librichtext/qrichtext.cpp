@@ -34,7 +34,7 @@ QRichText::QRichText(QWidget* parent)
 
 	setBackgroundRole(QPalette::Base);
 
-	m_layout = new QVBoxLayout(m_container);// QRichTextLayout(m_container);
+	m_layout = new QRichTextLayout(m_container);// QRichTextLayout(m_container);
 
 	connect(this, &QRichText::message_appended, this, &QRichText::on_message_append, Qt::QueuedConnection);
 }
