@@ -18,10 +18,13 @@ public:
 	std::string get_key_path();
 
 Q_SIGNALS:
-	void request_registring();
+	void request_registering();
+
+private Q_SLOTS:
+	void on_request_register();
+	void on_login();
 
 private:
-	void on_login();
 	std::shared_ptr<Ui::login_dialog> m_ui;
 	std::shared_ptr<register_dialog> m_register_dialog;
 

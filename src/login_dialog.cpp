@@ -27,12 +27,22 @@ login_dialog::login_dialog(avim::ini* _cfg)
 
 	QObject::connect(m_ui->register_button, &QPushButton::clicked, [this](bool checked)
 	{
-		Q_EMIT request_registring();
+		Q_EMIT request_registering();
 	});
+
+	QObject::connect(this, SIGNAL(request_registering()), this, SLOT(on_request_register()));
 
 	m_ui->cert_path->setText(QString::fromStdString(cfg->get<std::string>("global.cert")));
 	m_ui->key_path->setText(QString::fromStdString(cfg->get<std::string>("global.key")));
 }
+
+void login_dialog::on_request_register()
+{
+	m_register_dialog.reset(new register_dialog(this));
+
+	m_register_dialog->exec();
+}
+
 
 void login_dialog::on_login()
 {
