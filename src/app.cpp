@@ -147,6 +147,15 @@ void avimApp::start_avconnection()
 
 }
 
+void avimApp::login_dialog_accepted()
+{
+	if (!load_key_and_cert(m_login_dialog->get_key_path(), m_login_dialog->get_cert_path()))
+	{
+		QApplication::quit();
+	}
+	m_login_dialog.reset();
+	start_main();
+}
 
 int avimApp::exec()
 {
@@ -155,47 +164,27 @@ int avimApp::exec()
 
 	std::string auto_login = m_cfg->get<std::string>("global.auto_login");
 
+	m_login_dialog.reset(new login_dialog(m_cfg.get()));
+	QObject::connect(m_login_dialog.get(), SIGNAL(accepted()), this, SLOT(login_dialog_accepted()));
+
 	if (auto_login == "true")
 	{
 		if (load_key_and_cert(m_cfg->get<std::string>("global.key"), m_cfg->get<std::string>("global.cert")))
 		{
-			return start_main();
+			m_login_dialog.reset();
+			start_main();
 		}
 		else
 		{
-			m_login_dialog.reset(new login_dialog(m_cfg.get()));
-			if (m_login_dialog->exec() == QDialog::Accepted)
-			{
-				if (!load_key_and_cert(m_login_dialog->get_key_path(), m_login_dialog->get_cert_path()))
-				{
-					return 1;
-				}
-				m_login_dialog.reset();
-				return start_main();
-			}
-			else
-			{
-				return 0;
-			}
+			m_login_dialog->show();
 		}
 	}
 	else
 	{
-		m_login_dialog.reset(new login_dialog(m_cfg.get()));
-		if (m_login_dialog->exec() == QDialog::Accepted)
-		{
-			if (!load_key_and_cert(m_login_dialog->get_key_path(), m_login_dialog->get_cert_path()))
-			{
-				return 1;
-			}
-			m_login_dialog.reset();
-			return start_main();
-		}
-		else
-		{
-			return 0;
-		}
+		m_login_dialog->show();
 	}
+
+	return QApplication::exec();
 }
 
 void avimApp::load_cfg()
@@ -214,12 +203,12 @@ int avimApp::start_main()
 	m_mainwindow.reset(new main_window());
 	connect(this, &avimApp::login_success, m_mainwindow.get(), &main_window::on_login_success, Qt::QueuedConnection);
 	connect(m_mainwindow.get(), SIGNAL(chat_opened(std::string)), this, SLOT(start_chat_with(std::string)), Qt::QueuedConnection);
+	m_mainwindow->show();
 
 	// 要登录成功的消息!
 	connect(m_avconnection.get(), &AVConnection::login_success, this, &avimApp::login_success, Qt::QueuedConnection);
 	connect(m_avconnection.get(), &AVConnection::login_success, m_avconnection.get(), std::bind(&AVConnection::handover_to_avkernel, m_avconnection.get(), std::ref(m_avkernel)));
 
-	m_mainwindow->show();
 	m_avconnection->start_login();
 	connect(m_avconnection.get(), &AVConnection::interface_removed, m_avconnection.get(), std::bind(&AVConnection::start_login, m_avconnection.get()));
 
@@ -231,8 +220,6 @@ int avimApp::start_main()
 	m_tray_icon->show();
 
 	connect(m_tray_icon.get(), SIGNAL(menu_request_quit()), this, SLOT(quit()));
-
-	return QApplication::exec();
 }
 
 void avimApp::recive_coroutine(boost::asio::yield_context yield_context)

@@ -33,7 +33,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="edit_username">
        <property name="text">
         <string>test</string>
        </property>
@@ -47,7 +47,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_2">
+      <widget class="QLineEdit" name="edit_email">
        <property name="text">
         <string>test@example.com</string>
        </property>
@@ -61,7 +61,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="lineEdit_3">
+      <widget class="QLineEdit" name="edit_phone">
        <property name="text">
         <string/>
        </property>
@@ -85,7 +85,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton">
+      <widget class="QToolButton" name="button_registe">
        <property name="text">
         <string>注册</string>
        </property>

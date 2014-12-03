@@ -65,7 +65,10 @@ public:
 	int exec();
 
 public Q_SLOTS:
+
 	void load_cfg();
+
+	void login_dialog_accepted();
 
     bool load_key_and_cert(std::string cur_key, std::string cur_cert);
 

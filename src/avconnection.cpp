@@ -71,11 +71,14 @@ void AVConnection::login_coroutine(boost::asio::yield_context yield_context)
 {
 	m_avif->set_pki(m_key, m_cert);
 	auto _debug_host = getenv("AVIM_HOST");
-
-	if (m_avif->async_handshake(_debug_host?_debug_host:"avim.avplayer.org", "24950", yield_context))
+	bool ret = m_avif->async_handshake(_debug_host?_debug_host:"avim.avplayer.org", "24950", yield_context);
+	if (ret)
 	{
 		// 成功
 		Q_EMIT login_success();
 		set_state(AUTHORIZED);
+	}else
+	{
+		Q_EMIT login_failed(1);
 	}
 }

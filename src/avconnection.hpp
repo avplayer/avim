@@ -30,13 +30,16 @@ public:
 	AVConnection(boost::asio::io_service&);
 Q_SIGNALS:
 	void connection_state_change(ConState);
+
+	// 没 cert 就登录
 	void invalid_cert();
-	void cert_accepted();
 	// 服务器没找到, 检查 DNS 设置或者网络连接
 	void server_not_found();
 
-	// 连接被拒绝
+	// 登录成功
 	void login_success();
+
+	void login_failed(int);
 
 	// 内核接受了该连接, 此连接已经可以正式使用了
 	void kernel_accepted();
