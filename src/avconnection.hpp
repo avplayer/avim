@@ -48,6 +48,8 @@ Q_SIGNALS:
 	void interface_removed();
 
 public Q_SLOTS:
+	void do_register_user(std::string user, std::string mailaddr, std::string phone, std::function<void(int)> handler);
+
 	void set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X509> cert);
 
 	void start_login();

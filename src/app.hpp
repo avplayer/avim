@@ -68,6 +68,8 @@ public Q_SLOTS:
 
 	void load_cfg();
 
+	void do_register_user(QString user, QString mailaddr, QString phone);
+
 	void login_dialog_accepted();
 
     bool load_key_and_cert(std::string cur_key, std::string cur_cert);

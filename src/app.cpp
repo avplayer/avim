@@ -157,6 +157,19 @@ void avimApp::login_dialog_accepted()
 	start_main();
 }
 
+void avimApp::do_register_user(QString user, QString mailaddr, QString phone)
+{
+	if (!m_avconnection)
+		m_avconnection.reset(new AVConnection(m_io_service));
+	m_avconnection->do_register_user(user.toStdString(), mailaddr.toStdString(), phone.toStdString(), [](int code)
+	{
+		post_on_gui_thread([code]()
+		{
+			// 处理注册结果
+		});
+	});
+}
+
 int avimApp::exec()
 {
 	setWindowIcon(get_icon());
@@ -166,6 +179,7 @@ int avimApp::exec()
 
 	m_login_dialog.reset(new login_dialog(m_cfg.get()));
 	QObject::connect(m_login_dialog.get(), SIGNAL(accepted()), this, SLOT(login_dialog_accepted()));
+	QObject::connect(m_login_dialog.get(), &login_dialog::request_registering, this, &avimApp::do_register_user);
 
 	if (auto_login == "true")
 	{
