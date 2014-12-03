@@ -41,7 +41,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>sender</string>
+        <string>me</string>
        </property>
       </widget>
      </item>

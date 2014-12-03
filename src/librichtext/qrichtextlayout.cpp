@@ -81,7 +81,7 @@ int QRichTextLayout::doLayout(const QRect& rect, bool testOnly) const
 	int spaceY = effectiveRect.top();
 	int spaceX = effectiveRect.x();
 
-	int widthfor_text = effectiveRect.width() -  50;
+	int widthfor_text = effectiveRect.width();
 
 	for (QLayoutItem* item : m_item_list)
 	{
