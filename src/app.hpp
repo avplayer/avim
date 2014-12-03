@@ -21,7 +21,7 @@ namespace fs = boost::filesystem;
 #include "im.pb.h"
 
 #include "chat_widget.hpp"
-#include "login_dialog.h"
+#include "login_dialog.hpp"
 #include "avconnection.hpp"
 #include "main_window.hpp"
 #include "system_tray.hpp"

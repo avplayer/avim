@@ -16,6 +16,9 @@ public:
 	std::string get_cert_path();
 	std::string get_key_path();
 
+Q_SIGNALS:
+	void register_new_user();
+
 private:
 	void on_login();
 	std::unique_ptr<Ui::login_dialog> ui_;

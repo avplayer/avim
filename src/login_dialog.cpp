@@ -1,5 +1,5 @@
 
-#include "login_dialog.h"
+#include "login_dialog.hpp"
 
 #include <memory>
 #include <QFileDialog>
@@ -23,6 +23,11 @@ login_dialog::login_dialog(avim::ini* _cfg)
 		ui_->key_path->setText(filename);
 	});
 	connect(ui_->login_button, &QPushButton::clicked, this, &login_dialog::on_login);
+
+	QObject::connect(ui_->register_button, &QPushButton::clicked, [this](bool checked)
+	{
+		Q_EMIT register_new_user();
+	});
 
 	ui_->cert_path->setText(QString::fromStdString(cfg->get<std::string>("global.cert")));
 	ui_->key_path->setText(QString::fromStdString(cfg->get<std::string>("global.key")));
