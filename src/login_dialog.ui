@@ -2,16 +2,22 @@
 <ui version="4.0">
  <class>login_dialog</class>
  <widget class="QDialog" name="login_dialog">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>130</height>
+    <width>391</width>
+    <height>137</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Login</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

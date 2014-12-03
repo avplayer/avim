@@ -1,11 +1,12 @@
-#ifndef LOGIN_DIALOG_H
-#define LOGIN_DIALOG_H
+#pragma once
 
 #include <memory>
 #include <QDialog>
 
-#include "ui_login_dialog.h"
+#include "register_dialog.hpp"
 #include "ini.h"
+
+namespace Ui{class login_dialog;}
 
 class login_dialog : public QDialog
 {
@@ -17,13 +18,12 @@ public:
 	std::string get_key_path();
 
 Q_SIGNALS:
-	void register_new_user();
+	void request_registring();
 
 private:
 	void on_login();
-	std::unique_ptr<Ui::login_dialog> ui_;
+	std::shared_ptr<Ui::login_dialog> m_ui;
+	std::shared_ptr<register_dialog> m_register_dialog;
 
 	avim::ini* cfg;
 };
-
-#endif

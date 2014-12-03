@@ -1,36 +1,37 @@
 
-#include "login_dialog.hpp"
-
 #include <memory>
 #include <QFileDialog>
-#include <QtCore/QDebug>
+#include <QDebug>
+
+#include "login_dialog.hpp"
+#include "ui_login_dialog.h"
 
 login_dialog::login_dialog(avim::ini* _cfg)
-	: ui_(std::make_unique<Ui::login_dialog>())
+	: QDialog(nullptr, Qt::WindowContextHelpButtonHint)
 	, cfg(_cfg)
 {
-	ui_->setupUi(this);
-	this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
+	m_ui.reset(new Ui::login_dialog());
+	m_ui->setupUi(this);
 
-	connect(ui_->browse_cert_button, &QPushButton::clicked, [&]
+	connect(m_ui->browse_cert_button, &QPushButton::clicked, [&]
 	{
 		auto filename = QFileDialog::getOpenFileName(this, tr("Open Certificate"));
-		ui_->cert_path->setText(filename);
+		m_ui->cert_path->setText(filename);
 	});
-	connect(ui_->browse_key_button, &QPushButton::clicked, [&]
+	connect(m_ui->browse_key_button, &QPushButton::clicked, [&]
 	{
 		auto filename = QFileDialog::getOpenFileName(this, tr("Open Key"));
-		ui_->key_path->setText(filename);
+		m_ui->key_path->setText(filename);
 	});
-	connect(ui_->login_button, &QPushButton::clicked, this, &login_dialog::on_login);
+	connect(m_ui->login_button, &QPushButton::clicked, this, &login_dialog::on_login);
 
-	QObject::connect(ui_->register_button, &QPushButton::clicked, [this](bool checked)
+	QObject::connect(m_ui->register_button, &QPushButton::clicked, [this](bool checked)
 	{
-		Q_EMIT register_new_user();
+		Q_EMIT request_registring();
 	});
 
-	ui_->cert_path->setText(QString::fromStdString(cfg->get<std::string>("global.cert")));
-	ui_->key_path->setText(QString::fromStdString(cfg->get<std::string>("global.key")));
+	m_ui->cert_path->setText(QString::fromStdString(cfg->get<std::string>("global.cert")));
+	m_ui->key_path->setText(QString::fromStdString(cfg->get<std::string>("global.key")));
 }
 
 void login_dialog::on_login()
@@ -41,8 +42,8 @@ void login_dialog::on_login()
 		return;
 	}
 
-	bool auto_lgoin = Qt::Checked == ui_->login_automatically->checkState();
-	if (Qt::Checked == ui_->remember_me->checkState() || auto_lgoin)
+	bool auto_lgoin = Qt::Checked == m_ui->login_automatically->checkState();
+	if (Qt::Checked == m_ui->remember_me->checkState() || auto_lgoin)
 	{
 		cfg->put("global.cert", get_cert_path());
 		cfg->put("global.key", get_key_path());
@@ -58,10 +59,10 @@ void login_dialog::on_login()
 
 std::string login_dialog::get_cert_path()
 {
-	return ui_->cert_path->text().toStdString();
+	return m_ui->cert_path->text().toStdString();
 }
 
 std::string login_dialog::get_key_path()
 {
-	return ui_->key_path->text().toStdString();
+	return m_ui->key_path->text().toStdString();
 }
