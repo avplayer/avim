@@ -211,7 +211,7 @@ void avimApp::load_cfg()
 	m_cfg.reset(new avim::ini(appdatadir / "config.ini"));
 }
 
-int avimApp::start_main()
+void avimApp::start_main()
 {
 	// 创建主窗口, 开始真正的 GUI 之旅
 	m_mainwindow.reset(new main_window());
