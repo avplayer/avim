@@ -38,7 +38,7 @@ void AVConnection::set_cert_and_key(std::shared_ptr<RSA> key, std::shared_ptr<X5
 void AVConnection::do_register_user(std::string user, std::string mailaddr, std::string phone, std::function<void(int)> handler)
 {
 	// 处理吧
-	boost::asio::spawn(m_io_service, [=,this](boost::asio::yield_context yield_context)
+	boost::asio::spawn(m_io_service, [=](boost::asio::yield_context yield_context)
 	{
 		if (!m_avif)
 			m_avif.reset(new avjackif(m_io_service));

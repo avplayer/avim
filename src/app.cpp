@@ -249,7 +249,7 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 		try
 		{
 			post_on_gui_thread([this, target, data](){
-				Q_EMIT message_recieved(target, decode_message(data));
+				Q_EMIT message_recieved(target, decode_im_message(data));
 			});
 		}catch (std::exception&)
 		{
@@ -303,7 +303,7 @@ void avimApp::on_message_recieve(std::string target, im_message pkt)
 
 void avimApp::send_message(std::string target, message::message_packet pkt)
 {
-	m_avkernel.async_sendto(target, encode_message(pkt), [](boost::system::error_code ec){
+	m_avkernel.async_sendto(target, encode_im_message(pkt), [](boost::system::error_code ec){
 		post_on_gui_thread([ec](){
 			// TODO 处理消息发送成功 OR 失败的结果
 		});
