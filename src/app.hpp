@@ -80,7 +80,7 @@ public Q_SLOTS:
 	void on_message_recieve(std::string target, im_message);
 
 protected:
-	int start_main();
+	void start_main();
 
 private:
 	boost::asio::io_service m_io_service;
