@@ -78,9 +78,9 @@ public Q_SLOTS:
 
     bool load_key_and_cert(std::string cur_key, std::string cur_cert);
 
-	void start_avconnection();
-
-	void send_message(std::string target, message::message_packet);
+	void send_im_message(std::string target, message::message_packet);
+	void send_group_message(std::string target, message::message_packet);
+	void send_raw_message(std::string target, std::string);
 	void on_message_recieve(std::string target, im_message);
 
 protected Q_SLOTS:

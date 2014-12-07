@@ -14,6 +14,8 @@
 #include "chat_widget.hpp"
 #include "system_tray.hpp"
 
+#include "group.pb.h"
+
 avimApp::avimApp(int argc, char* argv[])
 	: QApplication(argc, argv)
 	, m_io_work(m_io_service)
@@ -156,11 +158,6 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
 	return true;
 }
 
-void avimApp::start_avconnection()
-{
-
-}
-
 void avimApp::login_dialog_accepted()
 {
 	if (!load_key_and_cert(m_login_dialog->get_key_path(), m_login_dialog->get_cert_path()))
@@ -299,7 +296,24 @@ avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 	auto chat_widget = new avui::chat_widget(target, is_group);
 	chat_widget->show();
 
-	connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_message, this, target, std::placeholders::_1));
+	if (is_group)
+		connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_group_message, this, target, std::placeholders::_1));
+	else
+		connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_im_message, this, target, std::placeholders::_1));
+
+	// 如果是个群聊, 开始刷群列表
+
+	if (is_group)
+	{
+		std::string m;
+
+		proto::group::list_request list_request;
+
+		//encode_control_message(list_request);
+
+		// send_raw_message(target, m);
+	}
+
 
 	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, target, chat_widget](std::string _target, im_message pkt)
 	{
@@ -327,12 +341,35 @@ void avimApp::on_message_recieve(std::string target, im_message pkt)
 	}
 }
 
-void avimApp::send_message(std::string target, message::message_packet pkt)
+void avimApp::send_raw_message(std::string target, std::string msg)
+{
+	m_avkernel.async_sendto(target, msg, [](boost::system::error_code ec){
+		post_on_gui_thread([ec](){
+			// TODO 处理消息发送成功 OR 失败的结果
+		});
+	});
+}
+
+void avimApp::send_im_message(std::string target, message::message_packet pkt)
 {
 	m_avkernel.async_sendto(target, encode_im_message(pkt), [](boost::system::error_code ec){
 		post_on_gui_thread([ec](){
 			// TODO 处理消息发送成功 OR 失败的结果
 		});
 	});
+}
+
+void avimApp::send_group_message(std::string target, message::message_packet pkt)
+{
+	// TODO 获取自己的 av 地址
+	std::string my_av_addr = "";
+	// TODO 获取本群的加密 key
+	std::string my_group_key = "";
+	m_avkernel.async_sendto(target, encode_group_message(my_av_addr, my_group_key, pkt), [](boost::system::error_code ec){
+		post_on_gui_thread([ec](){
+			// TODO 处理消息发送成功 OR 失败的结果
+		});
+	});
+
 }
 
