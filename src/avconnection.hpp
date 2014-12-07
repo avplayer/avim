@@ -11,8 +11,7 @@
 
 #include <QObject>
 
-class avjackif;
-class avkernel;
+#include <avproto.hpp>
 
 class AVConnection :  public QObject,  boost::noncopyable
 {
@@ -55,6 +54,8 @@ public Q_SLOTS:
 	void start_login();
 
 	void handover_to_avkernel(avkernel&);
+
+	std::string get_self_addr();
 
 	boost::asio::io_service& get_io_service() {return m_io_service;}
 

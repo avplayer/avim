@@ -56,7 +56,8 @@ private:
 
 	Q_SIGNALS:
 	// 收到消息的时候发射!
-	void message_recieved(std::string target, im_message);
+	void message_recieved(std::string sender, im_message);
+	void raw_message_recieved(std::string sender, std::string data);
 
 public:
 	fs::path get_app_dir()
@@ -99,6 +100,8 @@ private:
 	boost::asio::io_service::work m_io_work;
 
 	std::unique_ptr<avim::ini> m_cfg;
+
+    std::string m_self_addr;
 
 	std::vector<avbuddy> m_buddy, m_group, m_recent;
 

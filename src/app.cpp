@@ -245,6 +245,10 @@ void avimApp::start_main()
 	// 要登录成功的消息!
 	connect(m_avconnection.get(), &AVConnection::login_success, this, &avimApp::login_success, Qt::QueuedConnection);
 	connect(m_avconnection.get(), &AVConnection::login_success, m_avconnection.get(), std::bind(&AVConnection::handover_to_avkernel, m_avconnection.get(), std::ref(m_avkernel)));
+	connect(this, &avimApp::login_success, [this]()
+	{
+		m_self_addr = m_avconnection->get_self_addr();
+	});
 
 	m_avconnection->start_login();
 	connect(m_avconnection.get(), &AVConnection::interface_removed, m_avconnection.get(), std::bind(&AVConnection::start_login, m_avconnection.get()));
@@ -271,9 +275,21 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 
 		try
 		{
-			post_on_gui_thread([this, target, data](){
-				Q_EMIT message_recieved(target, decode_im_message(data));
-			});
+			if (is_control_message(data))
+			{
+				post_on_gui_thread([this, target, data](){
+					Q_EMIT raw_message_recieved(target, data);
+				});
+			}
+			else
+			{
+				post_on_gui_thread([this, target, data](){
+					// TODO 看是否是群消息, 如果是, 查找对应的群 key 并解码
+					// 解码后再调用重载的另一个版本 decode_im_message
+					Q_EMIT message_recieved(target, decode_im_message(data));
+				});
+			}
+
 		}catch (std::exception&)
 		{
 		}
@@ -302,18 +318,13 @@ avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 		connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_im_message, this, target, std::placeholders::_1));
 
 	// 如果是个群聊, 开始刷群列表
-
 	if (is_group)
 	{
-		std::string m;
-
 		proto::group::list_request list_request;
-
-		//encode_control_message(list_request);
-
-		// send_raw_message(target, m);
+		list_request.set_id(1);
+		auto raw = encode_control_message(list_request);
+		send_raw_message(target, raw);
 	}
-
 
 	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, target, chat_widget](std::string _target, im_message pkt)
 	{

@@ -84,6 +84,11 @@ void AVConnection::handover_to_avkernel(avkernel& kernel)
 	}
 }
 
+std::string AVConnection::get_self_addr()
+{
+	return av_address_to_string(*(m_avif->if_address()));
+}
+
 void AVConnection::login_coroutine(boost::asio::yield_context yield_context)
 {
 	m_avif->set_pki(m_key, m_cert);
