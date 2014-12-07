@@ -19,12 +19,14 @@ namespace fs = boost::filesystem;
 
 namespace avui
 {
-	chat_widget::chat_widget(std::string chat_target, QWidget* parent)
+	chat_widget::chat_widget(std::string chat_target, bool is_group, QWidget* parent)
 		: QWidget(parent)
 	{
 		ui.setupUi(this);
 		setWindowTitle(chat_target.c_str());
 		m_chat_target = chat_target;
+		if (!is_group)
+			ui.listView->hide();
 	}
 
 	chat_widget::~chat_widget()

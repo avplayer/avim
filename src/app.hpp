@@ -33,7 +33,7 @@ class avimApp : public QApplication
 Q_OBJECT
 
 private Q_SLOTS:
-	avui::chat_widget* start_chat_with(std::string);
+	avui::chat_widget* start_chat_with(std::string, bool);
 public:
 	avimApp(int argc, char *argv[]);
 

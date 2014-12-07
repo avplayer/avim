@@ -216,7 +216,7 @@ void avimApp::start_main()
 	// 创建主窗口, 开始真正的 GUI 之旅
 	m_mainwindow.reset(new main_window());
 	connect(this, &avimApp::login_success, m_mainwindow.get(), &main_window::on_login_success, Qt::QueuedConnection);
-	connect(m_mainwindow.get(), SIGNAL(chat_opened(std::string)), this, SLOT(start_chat_with(std::string)), Qt::QueuedConnection);
+	connect(m_mainwindow.get(), &main_window::chat_opened, this, &avimApp::start_chat_with, Qt::QueuedConnection);
 	m_mainwindow->show();
 
 	// 要登录成功的消息!
@@ -257,11 +257,11 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 	}
 }
 
-avui::chat_widget* avimApp::start_chat_with(std::string budy)
+avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 {
 	// 先找下是否已经有窗口打开了, 直接激活
 
-	auto chat_widget_it = m_chats.find(budy);
+	auto chat_widget_it = m_chats.find(target);
 	if (chat_widget_it != m_chats.end())
 	{
 		QWidget * w = chat_widget_it->second;
@@ -270,22 +270,22 @@ avui::chat_widget* avimApp::start_chat_with(std::string budy)
 	}
 
 	// 打开 chat 窗口
-	auto chat_widget = new avui::chat_widget(budy);
+	auto chat_widget = new avui::chat_widget(target, is_group);
 	chat_widget->show();
 
-	connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_message, this, budy, std::placeholders::_1));
+	connect(chat_widget, &avui::chat_widget::send_message, std::bind(&avimApp::send_message, this, target, std::placeholders::_1));
 
-	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, budy, chat_widget](std::string target, im_message pkt)
+	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, target, chat_widget](std::string _target, im_message pkt)
 	{
-		if (target == budy && pkt.is_message)
+		if (target == _target && pkt.is_message)
 			chat_widget->append_message(pkt.impkt);
 	}, Qt::QueuedConnection);
 
-	m_chats.insert(std::pair<std::string, QWidget*>(budy, (QWidget*)chat_widget));
+	m_chats.insert(std::pair<std::string, QWidget*>(target, (QWidget*)chat_widget));
 
-	connect(chat_widget, &avui::chat_widget::windowclosed, this, [this, budy, slot_connect]()
+	connect(chat_widget, &avui::chat_widget::windowclosed, this, [this, target, slot_connect]()
 	{
-		m_chats.erase(budy);
+		m_chats.erase(target);
 		QObject::disconnect(slot_connect);
 	});
 
@@ -297,7 +297,7 @@ void avimApp::on_message_recieve(std::string target, im_message pkt)
 	if (m_chats.find(target) == m_chats.end())
 	{
 		if (pkt.is_message)
-			start_chat_with(target)->append_message(pkt.impkt);
+			start_chat_with(target, pkt.is_group_message)->append_message(pkt.impkt);
 	}
 }
 

@@ -35,7 +35,7 @@ public:
 public:
 Q_SIGNALS:
 	// 信号, 用户开始和某用户开始交谈的时候发射
-	void chat_opened(std::string);
+	void chat_opened(std::string, bool is_group);
 
 private:
 

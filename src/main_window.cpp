@@ -34,12 +34,12 @@ main_window::main_window()
 
 	connect(m_list, &QListWidget::itemDoubleClicked, [this] (QListWidgetItem * item)
 	{
-		Q_EMIT chat_opened(item->text().toStdString());
+		Q_EMIT chat_opened(item->text().toStdString(), false);
 	});
 
 	connect(m_ui->grouplistWidget, &QListWidget::itemDoubleClicked, [this] (QListWidgetItem * item)
 	{
-		Q_EMIT chat_opened(item->text().toStdString());
+		Q_EMIT chat_opened(item->text().toStdString(), true);
 	});
 
 	QObject::connect(m_ui->add_buddyButton, &QAbstractButton::clicked, [this](bool checked)

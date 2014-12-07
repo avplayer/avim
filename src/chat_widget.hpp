@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <QWidget>
 #include "ui_chat_widget.h"
@@ -13,7 +13,7 @@ namespace avui
 		Q_OBJECT
 
 	public:
-		chat_widget(std::string chat_target, QWidget* parent = 0);
+		chat_widget(std::string chat_target, bool is_group = false, QWidget* parent = 0);
 		~chat_widget();
 
 	public:
