@@ -20,9 +20,12 @@ avimApp::avimApp(int argc, char* argv[])
 	: QApplication(argc, argv)
 	, m_io_work(m_io_service)
 	, m_avkernel(m_io_service)
-	, m_buddy_model(&m_buddy)
-	, m_group_model(&m_group)
-	, m_recent_model(&m_recent)
+	, m_buddy(std::make_shared<std::vector<avbuddy>>())
+	, m_group(std::make_shared<std::vector<avbuddy>>())
+	, m_recent(std::make_shared<std::vector<avbuddy>>())
+	, m_buddy_model(m_buddy)
+	, m_group_model(m_group)
+	, m_recent_model(m_recent)
 {
 	// 开启 boost 线程跑 io_service
 	m_io_thread = std::thread([this]()
@@ -54,11 +57,11 @@ avimApp::avimApp(int argc, char* argv[])
 	// FIXME
 	// 作为测试用途, 来, 添加点什么数据进去
 
-	m_buddy.push_back("microcai@avplayer.org");
-	m_buddy.push_back("test-client@avplayer.org");
-	m_buddy.push_back("michael.fan@avplayer.org");
+	m_buddy->push_back("microcai@avplayer.org");
+	m_buddy->push_back("test-client@avplayer.org");
+	m_buddy->push_back("michael.fan@avplayer.org");
 
-	m_group.push_back("group@avplayer.org");
+	m_group->push_back("group@avplayer.org");
 }
 
 avimApp::~avimApp()
@@ -308,8 +311,9 @@ avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 		return (avui::chat_widget*) w;
 	}
 
+	auto group_data = m_members_of_group[target];
 	// 打开 chat 窗口
-	auto chat_widget = new avui::chat_widget(target, is_group);
+	auto chat_widget = new avui::chat_widget(target, new BuddyModel(group_data));
 	chat_widget->show();
 
 	if (is_group)
@@ -332,6 +336,24 @@ avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 			if (target != _target)
 				return;
 			// TODO 解析 control 消息!
+			std::string _sender;
+			auto ctl_msg = decode_control_message(data, _sender);
+
+			if (ctl_msg->GetTypeName() == "proto.group.list_response")
+			{
+				// 解析返回的群成员列表!
+				auto list_response = dynamic_cast<proto::group::list_response*>(ctl_msg.get());
+
+				if (list_response->result() == proto::group::list_response::OK)
+				{
+					// 填充!
+					for (auto i: list_response->list())
+						m_members_of_group[_target]->push_back(i);
+				}
+
+				// 通知好了
+				chat_widget->update();
+			}
 
 		}, Qt::QueuedConnection);
 	}

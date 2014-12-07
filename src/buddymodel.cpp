@@ -1,7 +1,7 @@
 #include "buddymodel.hpp"
 #include <boost/concept_check.hpp>
 
-BuddyModel::BuddyModel(std::vector<avbuddy>* _data, QObject* parent)
+BuddyModel::BuddyModel(std::shared_ptr<std::vector<avbuddy>> _data, QObject* parent)
 	: QAbstractListModel(parent)
 	, m_data(_data)
 {

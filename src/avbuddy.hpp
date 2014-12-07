@@ -18,3 +18,8 @@ struct avbuddy
 	proto::av_address av_addr;
 	std::vector<std::string> labels;
 };
+
+inline bool operator < (const avbuddy& a, const avbuddy& b)
+{
+	return a.av_addr.domain() < b.av_addr.domain() && a.av_addr.username() < b.av_addr.username();
+}

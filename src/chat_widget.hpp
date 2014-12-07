@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QAbstractListModel>
 #include "ui_chat_widget.h"
 
 #include "im.pb.h"
@@ -13,7 +14,7 @@ namespace avui
 		Q_OBJECT
 
 	public:
-		chat_widget(std::string chat_target, bool is_group = false, QWidget* parent = 0);
+		chat_widget(std::string chat_target, QAbstractListModel* group_model = nullptr, QWidget* parent = nullptr);
 		~chat_widget();
 
 	public:

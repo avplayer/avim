@@ -8,7 +8,7 @@ class BuddyModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    BuddyModel(std::vector<avbuddy>*, QObject *parent = 0);
+    BuddyModel(std::shared_ptr<std::vector<avbuddy>>, QObject *parent = 0);
 
 public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
@@ -20,5 +20,5 @@ public:
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 private:
 
-	std::vector<avbuddy>* m_data;
+	std::shared_ptr<std::vector<avbuddy>> m_data;
 };

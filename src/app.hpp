@@ -103,9 +103,11 @@ private:
 
     std::string m_self_addr;
 
-	std::vector<avbuddy> m_buddy, m_group, m_recent;
+	std::shared_ptr<std::vector<avbuddy>> m_buddy, m_group, m_recent;
 
 	BuddyModel m_buddy_model, m_group_model, m_recent_model;
+
+	std::map<avbuddy, std::shared_ptr<std::vector<avbuddy>>> m_members_of_group;
 
 	friend class main_window;
 };
