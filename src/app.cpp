@@ -18,6 +18,9 @@ avimApp::avimApp(int argc, char* argv[])
 	: QApplication(argc, argv)
 	, m_io_work(m_io_service)
 	, m_avkernel(m_io_service)
+	, m_buddy_model(&m_buddy)
+	, m_group_model(&m_group)
+	, m_recent_model(&m_recent)
 {
 	// 开启 boost 线程跑 io_service
 	m_io_thread = std::thread([this]()
@@ -225,11 +228,7 @@ void avimApp::load_cfg()
 void avimApp::start_main()
 {
 	// 创建主窗口, 开始真正的 GUI 之旅
-	m_mainwindow.reset(new main_window(
-		new BuddyModel(&m_buddy),
-		new BuddyModel(&m_group),
-		new BuddyModel(&m_recent)
-	));
+	m_mainwindow.reset(new main_window(&m_buddy_model, &m_group_model, &m_recent_model));
 	connect(this, &avimApp::login_success, m_mainwindow.get(), &main_window::on_login_success, Qt::QueuedConnection);
 	connect(m_mainwindow.get(), &main_window::chat_opened, this, &avimApp::start_chat_with, Qt::QueuedConnection);
 	connect(m_mainwindow.get(), &main_window::close_requested, this, [this](QCloseEvent*e)

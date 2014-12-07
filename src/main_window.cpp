@@ -24,10 +24,6 @@ main_window::main_window(QAbstractItemModel* buddy, QAbstractItemModel* group, Q
 	m_ui.reset(new Ui_main_window);
 	m_ui->setupUi(this);
 
-	buddy->setParent(this);
-	group->setParent(this);
-	recent->setParent(this);
-
 	m_ui->buddylistView->setModel(buddy);
 	m_ui->grouplistView->setModel(group);
 	m_ui->recentlistView->setModel(recent);

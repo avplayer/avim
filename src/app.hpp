@@ -102,7 +102,7 @@ private:
 
 	std::vector<avbuddy> m_buddy, m_group, m_recent;
 
-//	BuddyModel m_buddy_model, m_group_model, m_recent_model;
+	BuddyModel m_buddy_model, m_group_model, m_recent_model;
 
 	friend class main_window;
 };
