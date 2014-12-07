@@ -36,7 +36,10 @@ public:
 Q_SIGNALS:
 	// 信号, 用户开始和某用户开始交谈的时候发射
 	void chat_opened(std::string, bool is_group);
+	void close_requested(QCloseEvent*e);
 
+private:
+    virtual void closeEvent(QCloseEvent*);
 private:
 
 	std::shared_ptr<Ui_main_window> m_ui;

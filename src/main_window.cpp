@@ -54,6 +54,11 @@ main_window::main_window()
 	});
 }
 
+void main_window::closeEvent(QCloseEvent*e)
+{
+	Q_EMIT close_requested(e);
+}
+
 void main_window::on_login_success()
 {
 	// TODO 更新 GUI 向用户显示

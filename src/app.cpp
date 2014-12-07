@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QCloseEvent>
 
 #include "avproto.hpp"
 #include "app.hpp"
@@ -217,6 +218,18 @@ void avimApp::start_main()
 	m_mainwindow.reset(new main_window());
 	connect(this, &avimApp::login_success, m_mainwindow.get(), &main_window::on_login_success, Qt::QueuedConnection);
 	connect(m_mainwindow.get(), &main_window::chat_opened, this, &avimApp::start_chat_with, Qt::QueuedConnection);
+	connect(m_mainwindow.get(), &main_window::close_requested, this, [this](QCloseEvent*e)
+	{
+		if (m_chats.empty())
+		{
+			e->accept();
+		}else
+		{
+			e->ignore();
+
+			m_mainwindow->setWindowState(Qt::WindowMinimized);
+		}
+	});
 	m_mainwindow->show();
 
 	// 要登录成功的消息!
