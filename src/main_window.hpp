@@ -23,7 +23,7 @@ class main_window : public QMainWindow
 {
 	Q_OBJECT
 public:
-	main_window();
+	main_window(QAbstractItemModel* buddy, QAbstractItemModel* group, QAbstractItemModel* recent);
 
 public:
 	// 槽, 登录成功调用, GUI 自己会做相应更新
@@ -43,6 +43,4 @@ private:
 private:
 
 	std::shared_ptr<Ui_main_window> m_ui;
-
-	QListWidget* m_list;
 };

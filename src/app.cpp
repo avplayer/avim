@@ -4,6 +4,7 @@
 #include <openssl/pem.h>
 
 #include <QDebug>
+#include <QTimer>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QCloseEvent>
@@ -44,6 +45,15 @@ avimApp::avimApp(int argc, char* argv[])
 	});
 
 	connect(this, &avimApp::message_recieved, this, &avimApp::on_message_recieve, Qt::QueuedConnection);
+
+	// FIXME
+	// 作为测试用途, 来, 添加点什么数据进去
+
+	m_buddy.push_back("microcai@avplayer.org");
+	m_buddy.push_back("test-client@avplayer.org");
+	m_buddy.push_back("michael.fan@avplayer.org");
+
+	m_group.push_back("group@avplayer.org");
 }
 
 avimApp::~avimApp()
@@ -187,7 +197,7 @@ int avimApp::exec()
 		if (load_key_and_cert(m_cfg->get<std::string>("global.key"), m_cfg->get<std::string>("global.cert")))
 		{
 			m_login_dialog.reset();
-			start_main();
+			QTimer::singleShot(0, this, SLOT(start_main()));
 		}
 		else
 		{
@@ -215,7 +225,11 @@ void avimApp::load_cfg()
 void avimApp::start_main()
 {
 	// 创建主窗口, 开始真正的 GUI 之旅
-	m_mainwindow.reset(new main_window());
+	m_mainwindow.reset(new main_window(
+		new BuddyModel(&m_buddy),
+		new BuddyModel(&m_group),
+		new BuddyModel(&m_recent)
+	));
 	connect(this, &avimApp::login_success, m_mainwindow.get(), &main_window::on_login_success, Qt::QueuedConnection);
 	connect(m_mainwindow.get(), &main_window::chat_opened, this, &avimApp::start_chat_with, Qt::QueuedConnection);
 	connect(m_mainwindow.get(), &main_window::close_requested, this, [this](QCloseEvent*e)

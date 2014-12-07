@@ -25,6 +25,7 @@ namespace fs = boost::filesystem;
 #include "avconnection.hpp"
 #include "main_window.hpp"
 #include "system_tray.hpp"
+#include "buddymodel.hpp"
 
 void post_on_gui_thread(std::function<void()>);
 
@@ -38,8 +39,11 @@ public:
 	avimApp(int argc, char *argv[]);
 
     ~avimApp();
-public:
-	Q_SIGNALS:
+
+Q_SIGNALS:
+
+	// 好友列表加载完毕后发射
+	void buddy_list_loaded();
 
 	// 信号,登录成功发射
 	void login_success();
@@ -79,7 +83,7 @@ public Q_SLOTS:
 	void send_message(std::string target, message::message_packet);
 	void on_message_recieve(std::string target, im_message);
 
-protected:
+protected Q_SLOTS:
 	void start_main();
 
 private:
@@ -95,6 +99,10 @@ private:
 	boost::asio::io_service::work m_io_work;
 
 	std::unique_ptr<avim::ini> m_cfg;
+
+	std::vector<avbuddy> m_buddy, m_group, m_recent;
+
+//	BuddyModel m_buddy_model, m_group_model, m_recent_model;
 
 	friend class main_window;
 };
