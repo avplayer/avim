@@ -324,6 +324,16 @@ avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 		list_request.set_id(1);
 		auto raw = encode_control_message(list_request);
 		send_raw_message(target, raw);
+
+		QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::raw_message_recieved, this, [this, target, chat_widget](std::string _target, std::string data)
+		{
+			// 检查 data 是不是发给这个群的
+			// 就是检查发送人是不是这个 group 啦!
+			if (target != _target)
+				return;
+			// TODO 解析 control 消息!
+
+		}, Qt::QueuedConnection);
 	}
 
 	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, target, chat_widget](std::string _target, im_message pkt)
