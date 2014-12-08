@@ -189,9 +189,7 @@ int avimApp::exec()
 	setWindowIcon(get_icon());
 	load_cfg();
 
-	QSettings cfg;
-
-	auto auto_login = cfg.value("global.auto_login").toBool();
+	auto auto_login = QSettings().value("global/auto_login").toBool();
 
 	m_login_dialog.reset(new login_dialog());
 	QObject::connect(m_login_dialog.get(), SIGNAL(accepted()), this, SLOT(login_dialog_accepted()));
@@ -199,6 +197,7 @@ int avimApp::exec()
 
 	if (auto_login)
 	{
+		QSettings cfg;
 		if (load_key_and_cert(cfg.value("global/key").toString().toStdString(), cfg.value("global/cert").toString().toStdString()))
 		{
 			m_login_dialog.reset();

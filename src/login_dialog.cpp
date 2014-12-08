@@ -58,7 +58,6 @@ void login_dialog::on_login()
 		{
 			cfg.setValue("global/auto_login", true);
 		}
-		cfg.sync();
 	}
 
 	this->accept();
