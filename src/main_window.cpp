@@ -54,7 +54,7 @@ main_window::main_window(QAbstractItemModel* buddy, QAbstractItemModel* group, Q
 		int row = group->rowCount();
 		group->insertRow(group->rowCount());
 		QModelIndex index = group->index(row, 0);
-		group->setData(index, m_ui->add_groupButton->text());
+		group->setData(index, m_ui->group_lineEdit->text());
 		m_ui->group_lineEdit->clear();
 	});
 }
