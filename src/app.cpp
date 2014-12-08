@@ -285,7 +285,12 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 				post_on_gui_thread([this, target, data](){
 					// TODO 看是否是群消息, 如果是, 查找对应的群 key 并解码
 					// 解码后再调用重载的另一个版本 decode_im_message
+					try{
 					Q_EMIT message_recieved(target, decode_im_message(data));
+					}catch(const std::runtime_error&)
+					{
+						qDebug() << "invalid packet recived ";
+					}
 				});
 			}
 
