@@ -6,9 +6,8 @@
 #include "login_dialog.hpp"
 #include "ui_login_dialog.h"
 
-login_dialog::login_dialog(avim::ini* _cfg)
+login_dialog::login_dialog()
 	: QDialog(nullptr, Qt::WindowContextHelpButtonHint)
-	, cfg(_cfg)
 {
 	m_ui.reset(new Ui::login_dialog());
 	m_ui->setupUi(this);
@@ -27,8 +26,8 @@ login_dialog::login_dialog(avim::ini* _cfg)
 
 	QObject::connect(m_ui->register_button, SIGNAL(clicked(bool)), this, SLOT(do_register_request()));
 
-	m_ui->cert_path->setText(QString::fromStdString(cfg->get<std::string>("global.cert")));
-	m_ui->key_path->setText(QString::fromStdString(cfg->get<std::string>("global.key")));
+	m_ui->cert_path->setText(cfg.value("global/cert").toString());
+	m_ui->key_path->setText(cfg.value("global/key").toString());
 }
 
 void login_dialog::do_register_request()
@@ -53,26 +52,26 @@ void login_dialog::on_login()
 	bool auto_lgoin = Qt::Checked == m_ui->login_automatically->checkState();
 	if (Qt::Checked == m_ui->remember_me->checkState() || auto_lgoin)
 	{
-		cfg->put("global.cert", get_cert_path());
-		cfg->put("global.key", get_key_path());
+		cfg.setValue("global/cert", get_cert_path());
+		cfg.setValue("global/key", get_key_path());
 		if (auto_lgoin)
 		{
-			cfg->put("auto_login", "true");
+			cfg.setValue("global/auto_login", true);
 		}
-		cfg->write_to_file();
+		cfg.sync();
 	}
 
 	this->accept();
 }
 
-std::string login_dialog::get_cert_path()
+QString login_dialog::get_cert_path()
 {
-	return m_ui->cert_path->text().toStdString();
+	return m_ui->cert_path->text();
 }
 
-std::string login_dialog::get_key_path()
+QString login_dialog::get_key_path()
 {
-	return m_ui->key_path->text().toStdString();
+	return m_ui->key_path->text();
 }
 
 void login_dialog::closeEvent(QCloseEvent*e)

@@ -52,6 +52,9 @@ int main(int argc, char *argv[])
 	OpenSSL_add_all_algorithms();
 	// 创建 QApp 对象
 	avimApp app(argc, argv);
+	app.setOrganizationName("avplayer");
+	app.setOrganizationDomain("avplayer.org");
+	app.setApplicationName("avim");
 	// 开跑
 	return app.exec();
 }

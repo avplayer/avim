@@ -163,7 +163,7 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
 
 void avimApp::login_dialog_accepted()
 {
-	if (!load_key_and_cert(m_login_dialog->get_key_path(), m_login_dialog->get_cert_path()))
+	if (!load_key_and_cert(m_login_dialog->get_key_path().toStdString(), m_login_dialog->get_cert_path().toStdString()))
 	{
 		QApplication::quit();
 	}
@@ -189,15 +189,17 @@ int avimApp::exec()
 	setWindowIcon(get_icon());
 	load_cfg();
 
-	std::string auto_login = m_cfg->get<std::string>("global.auto_login");
+	QSettings cfg;
 
-	m_login_dialog.reset(new login_dialog(m_cfg.get()));
+	auto auto_login = cfg.value("global.auto_login").toBool();
+
+	m_login_dialog.reset(new login_dialog());
 	QObject::connect(m_login_dialog.get(), SIGNAL(accepted()), this, SLOT(login_dialog_accepted()));
 	QObject::connect(m_login_dialog.get(), &login_dialog::request_registering, this, &avimApp::do_register_user);
 
-	if (auto_login == "true")
+	if (auto_login)
 	{
-		if (load_key_and_cert(m_cfg->get<std::string>("global.key"), m_cfg->get<std::string>("global.cert")))
+		if (load_key_and_cert(cfg.value("global/key").toString().toStdString(), cfg.value("global/cert").toString().toStdString()))
 		{
 			m_login_dialog.reset();
 			QTimer::singleShot(0, this, SLOT(start_main()));
@@ -221,8 +223,6 @@ void avimApp::load_cfg()
 
 	if (!fs::exists(appdatadir))
 		fs::create_directories(appdatadir);
-
-	m_cfg.reset(new avim::ini(appdatadir / "config.ini"));
 }
 
 void avimApp::start_main()

@@ -99,8 +99,6 @@ private:
 	std::thread m_io_thread;
 	boost::asio::io_service::work m_io_work;
 
-	std::unique_ptr<avim::ini> m_cfg;
-
     std::string m_self_addr;
 
 	std::shared_ptr<std::vector<avbuddy>> m_buddy, m_group, m_recent;
