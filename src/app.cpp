@@ -311,6 +311,11 @@ avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 		return (avui::chat_widget*) w;
 	}
 
+	if( m_members_of_group.find(target) == m_members_of_group.end())
+	{
+		m_members_of_group.insert(std::make_pair(avbuddy(target), std::make_shared<std::vector<avbuddy>>()));
+	}
+
 	auto group_data = m_members_of_group[target];
 	// 打开 chat 窗口
 	auto chat_widget = new avui::chat_widget(target, new BuddyModel(group_data));
