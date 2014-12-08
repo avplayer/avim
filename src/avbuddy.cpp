@@ -22,12 +22,14 @@ avbuddy& avbuddy::operator=(const avbuddy& other)
 {
     av_addr = other.av_addr;
     labels = other.labels;
+	return *this;
 }
 
 avbuddy& avbuddy::operator=(avbuddy&& other)
 {
     av_addr = other.av_addr;
 	labels = other.labels;
+	return *this;
 }
 
 avbuddy::avbuddy(avbuddy&& other)
