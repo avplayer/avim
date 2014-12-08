@@ -36,9 +36,9 @@ if(WIN32 AND MSVC AND ENABLE_QT_STATIC)
 	ADD_DEFINITIONS(-DSTATIC_QT5)
 endif()
 
-add_subdirectory(librichtext)
+set(AVIM_WIDGETS "")
 
-include_directories(librichtext/)
+add_subdirectory(widgets)
 
 file(GLOB HDRS include/*.h*)
 file(GLOB SRCS *.cpp *.h*)
@@ -57,7 +57,7 @@ if(APPLE)
 endif()
 
 add_executable(avim WIN32 MACOSX_BUNDLE ${SRCS} avim.rc)
-target_link_libraries(avim richtext Qt5::Widgets)
+target_link_libraries(avim ${AVIM_WIDGETS} Qt5::Widgets)
 
 if(APPLE)
 	set_target_properties(avim PROPERTIES

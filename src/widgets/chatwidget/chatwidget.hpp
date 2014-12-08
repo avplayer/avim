@@ -1,21 +1,22 @@
 #pragma once
 
+#include <memory>
 #include <QWidget>
 #include <QAbstractListModel>
-#include "ui_chat_widget.h"
 
 #include "im.pb.h"
 
+class Ui_ChatWidget;
 
 namespace avui
 {
-	class chat_widget : public QWidget
+	class ChatWidget : public QWidget
 	{
 		Q_OBJECT
 
 	public:
-		chat_widget(std::string chat_target, QAbstractListModel* group_model = nullptr, QWidget* parent = nullptr);
-		~chat_widget();
+		ChatWidget(std::string chat_target, QAbstractListModel* group_model = nullptr, QWidget* parent = nullptr);
+		~ChatWidget();
 
 	public:
 	Q_SIGNALS:
@@ -36,7 +37,7 @@ namespace avui
 		virtual void closeEvent(QCloseEvent*);
 
 	private:
-		Ui::chatClass ui;
+		std::shared_ptr<Ui_ChatWidget> ui;
 
 		//recvThread rv_thread_;
 		std::string m_chat_target;

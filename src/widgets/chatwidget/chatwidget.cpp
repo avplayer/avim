@@ -14,34 +14,36 @@ namespace fs = boost::filesystem;
 #include <QBuffer>
 #include <QImage>
 
-#include "chat_widget.hpp"
 #include "qrichtext.hpp"
+#include "chatwidget.hpp"
+#include "ui_chatwidget.h"
 
 namespace avui
 {
-	chat_widget::chat_widget(std::string chat_target,QAbstractListModel* group_model, QWidget* parent)
+	ChatWidget::ChatWidget(std::string chat_target,QAbstractListModel* group_model, QWidget* parent)
 		: QWidget(parent)
 	{
-		ui.setupUi(this);
+		ui.reset(new Ui_ChatWidget);
+		ui->setupUi(this);
 		setWindowTitle(chat_target.c_str());
 		m_chat_target = chat_target;
 		if (group_model)
 		{
-			group_model->setParent(ui.listView);
-			ui.listView->setModel(group_model);
+			group_model->setParent(ui->listView);
+			ui->listView->setModel(group_model);
 		}
 		else
-			ui.listView->hide();
+			ui->listView->hide();
 	}
 
-	chat_widget::~chat_widget()
+	ChatWidget::~ChatWidget()
 	{
 		qDebug() << "~avim()";
 	}
 
-	void chat_widget::on_sendButton_clicked()
+	void ChatWidget::on_sendButton_clicked()
 	{
-		if (ui.messageTextEdit->toPlainText() == "")
+		if (ui->messageTextEdit->toPlainText() == "")
 		{
 			qDebug() << "Can not send null!";
 			return;
@@ -53,35 +55,35 @@ namespace avui
 		msg_block.msg = get_message();
 		msg_block.dir = QBoxLayout::RightToLeft;
 
-		ui.messageBrowser->append_message(msg_block);
+		ui->messageBrowser->append_message(msg_block);
 
-		ui.messageTextEdit->clear();
-		ui.messageTextEdit->setFocus();
+		ui->messageTextEdit->clear();
+		ui->messageTextEdit->setFocus();
 
 		Q_EMIT send_message(msg_block.msg);
 	}
 
-	void chat_widget::append_message(message::message_packet msgpkt)
+	void ChatWidget::append_message(message::message_packet msgpkt)
 	{
 		message_block msg;
 		msg.sender = m_chat_target;
 		msg.msg = msgpkt;
 		msg.dir = QBoxLayout::LeftToRight;
 
-		ui.messageBrowser->append_message(msg);
+		ui->messageBrowser->append_message(msg);
 	}
 
-	void chat_widget::group_updated()
+	void ChatWidget::group_updated()
 	{
-		ui.listView->setEnabled(true);
+		ui->listView->setEnabled(true);
 	}
 
-	message::message_packet chat_widget::get_message()
+	message::message_packet ChatWidget::get_message()
 	{
-		return ui.messageTextEdit->get_content();
+		return ui->messageTextEdit->get_content();
 	}
 
-	void chat_widget::closeEvent(QCloseEvent* e)
+	void ChatWidget::closeEvent(QCloseEvent* e)
 	{
 		Q_EMIT windowclosed();
 		QWidget::closeEvent(e);

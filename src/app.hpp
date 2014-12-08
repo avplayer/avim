@@ -20,7 +20,7 @@ namespace fs = boost::filesystem;
 #include "avproto.hpp"
 #include "im.pb.h"
 
-#include "chat_widget.hpp"
+#include "chatwidget.hpp"
 #include "login_dialog.hpp"
 #include "avconnection.hpp"
 #include "main_window.hpp"
@@ -34,7 +34,7 @@ class avimApp : public QApplication
 Q_OBJECT
 
 private Q_SLOTS:
-	avui::chat_widget* start_chat_with(std::string, bool);
+	avui::ChatWidget* start_chat_with(std::string, bool);
 public:
 	avimApp(int argc, char *argv[]);
 
