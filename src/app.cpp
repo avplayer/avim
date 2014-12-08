@@ -317,8 +317,9 @@ avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 	}
 
 	auto group_data = m_members_of_group[target];
+	auto group_data_model = new BuddyModel(group_data);
 	// 打开 chat 窗口
-	auto chat_widget = new avui::chat_widget(target, new BuddyModel(group_data));
+	auto chat_widget = new avui::chat_widget(target, group_data_model);
 	chat_widget->show();
 
 	if (is_group)
@@ -334,7 +335,7 @@ avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 		auto raw = encode_control_message(list_request);
 		send_raw_message(target, raw);
 
-		QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::raw_message_recieved, this, [this, target, chat_widget](std::string _target, std::string data)
+		QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::raw_message_recieved, this, [this, target, chat_widget, group_data_model](std::string _target, std::string data)
 		{
 			// 检查 data 是不是发给这个群的
 			// 就是检查发送人是不是这个 group 啦!
@@ -351,13 +352,19 @@ avui::chat_widget* avimApp::start_chat_with(std::string target, bool is_group)
 
 				if (list_response->result() == proto::group::list_response::OK)
 				{
+					m_members_of_group[_target]->clear();
 					// 填充!
 					for (auto i: list_response->list())
 						m_members_of_group[_target]->push_back(i);
 				}
 
 				// 通知好了
-				chat_widget->update();
+
+				auto top = group_data_model->index(0,0);
+				auto bottom = group_data_model->index(group_data_model->rowCount(),1);
+
+				group_data_model->dataChanged(top, bottom);
+				chat_widget->group_updated();
 			}
 
 		}, Qt::QueuedConnection);
@@ -413,8 +420,6 @@ void avimApp::send_im_message(std::string target, message::message_packet pkt)
 
 void avimApp::send_group_message(std::string target, message::message_packet pkt)
 {
-	// TODO 获取自己的 av 地址
-	std::string my_av_addr = "";
 	// TODO 获取本群的加密 key
 	std::string my_group_key = "";
 
@@ -422,7 +427,7 @@ void avimApp::send_group_message(std::string target, message::message_packet pkt
 
 	uint32_t keyid = 0;
 
-	m_avkernel.async_sendto(target, encode_group_message(my_av_addr, my_group_key, keyid, pkt), [](boost::system::error_code ec)
+	m_avkernel.async_sendto(target, encode_group_message(m_self_addr, my_group_key, keyid, pkt), [](boost::system::error_code ec)
 	{
 		post_on_gui_thread([ec]()
 		{

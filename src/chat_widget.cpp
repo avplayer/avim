@@ -71,6 +71,11 @@ namespace avui
 		ui.messageBrowser->append_message(msg);
 	}
 
+	void chat_widget::group_updated()
+	{
+		ui.listView->setEnabled(true);
+	}
+
 	message::message_packet chat_widget::get_message()
 	{
 		return ui.messageTextEdit->get_content();

@@ -27,6 +27,8 @@ namespace avui
 	public Q_SLOTS:
 		void append_message(message::message_packet);
 
+		void group_updated();
+
 	protected:
 		// 从控件里构建 avim_message_packet
 		message::message_packet get_message();
