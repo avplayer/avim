@@ -101,9 +101,13 @@ private:
 
     std::string m_self_addr;
 
-	std::shared_ptr<std::vector<avbuddy>> m_buddy, m_group, m_recent;
+	std::shared_ptr<std::vector<avbuddy>> m_buddy = std::make_shared<std::vector<avbuddy>>();
+	std::shared_ptr<std::vector<avbuddy>> m_group = std::make_shared<std::vector<avbuddy>>();
+	std::shared_ptr<std::vector<avbuddy>> m_recent = std::make_shared<std::vector<avbuddy>>();
 
-	BuddyModel m_buddy_model, m_group_model, m_recent_model;
+	BuddyModel m_buddy_model;
+	BuddyModel m_group_model;
+	BuddyModel m_recent_model;
 
 	std::map<avbuddy, std::shared_ptr<std::vector<avbuddy>>> m_members_of_group;
 
