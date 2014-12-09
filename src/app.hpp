@@ -83,6 +83,7 @@ public Q_SLOTS:
 	void send_group_message(std::string target, message::message_packet);
 	void send_raw_message(std::string target, std::string);
 	void on_message_recieve(std::string target, im_message);
+	void on_login_success();
 
 protected Q_SLOTS:
 	void start_main();

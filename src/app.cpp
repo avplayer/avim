@@ -50,6 +50,7 @@ avimApp::avimApp(int argc, char* argv[])
 	});
 
 	connect(this, &avimApp::message_recieved, this, &avimApp::on_message_recieve, Qt::QueuedConnection);
+	connect(this, &avimApp::login_success, this, &avimApp::on_login_success, Qt::QueuedConnection);
 
 	// FIXME
 	// 作为测试用途, 来, 添加点什么数据进去
@@ -447,3 +448,7 @@ void avimApp::send_group_message(std::string target, message::message_packet pkt
 
 }
 
+void avimApp::on_login_success()
+{
+	m_tray_icon->setToolTip(m_self_addr.c_str());
+}
