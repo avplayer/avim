@@ -33,7 +33,11 @@ namespace avui
 			ui->listView->setModel(group_model);
 		}
 		else
+		{
 			ui->listView->hide();
+			ui->listView->deleteLater();
+			ui->listView = NULL;
+		}
 	}
 
 	ChatWidget::~ChatWidget()

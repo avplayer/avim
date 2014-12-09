@@ -303,6 +303,7 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 avui::ChatWidget* avimApp::start_chat_with(std::string target, bool is_group)
 {
 	// 先找下是否已经有窗口打开了, 直接激活
+	QAbstractListModel* group_data_model = NULL;
 
 	auto chat_widget_it = m_chats.find(target);
 	if (chat_widget_it != m_chats.end())
@@ -312,13 +313,16 @@ avui::ChatWidget* avimApp::start_chat_with(std::string target, bool is_group)
 		return (avui::ChatWidget*) w;
 	}
 
-	if( m_members_of_group.find(target) == m_members_of_group.end())
+	if (is_group)
 	{
-		m_members_of_group.insert(std::make_pair(avbuddy(target), std::make_shared<std::vector<avbuddy>>()));
-	}
+		if( m_members_of_group.find(target) == m_members_of_group.end())
+		{
+			m_members_of_group.insert(std::make_pair(avbuddy(target), std::make_shared<std::vector<avbuddy>>()));
+		}
 
-	auto group_data = m_members_of_group[target];
-	auto group_data_model = new BuddyModel(group_data);
+		auto group_data = m_members_of_group[target];
+		group_data_model = new BuddyModel(group_data);
+	}
 	// 打开 chat 窗口
 	auto chat_widget = new avui::ChatWidget(target, group_data_model);
 	chat_widget->show();
