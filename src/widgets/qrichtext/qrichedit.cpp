@@ -1,4 +1,5 @@
-﻿#include <QDebug>
+﻿#include <boost/algorithm/string.hpp>
+#include <QDebug>
 #include <QBuffer>
 #include <QFile>
 #include <QByteArray>
@@ -7,6 +8,7 @@
 #include <QTextFrame>
 #include <QTextImageFormat>
 #include <QTextBlock>
+#include <QTextLayout>
 #include "qrichedit.hpp"
 #include <avproto/message.hpp>
 
@@ -183,8 +185,15 @@ message::message_packet QRichEdit::get_content()
 			else
 			{
 				message::text_message item_content;
-				item_content.set_text(txt.toStdString());
 
+				for(QChar& qc : txt)
+				{
+					if (qc == QChar::LineSeparator)
+					{
+						qc = '\n';
+					}
+				}
+				item_content.set_text(txt.toStdString());
 				impkt.mutable_avim()->Add()->mutable_item_text()->CopyFrom(item_content);
 			}
 		}
@@ -194,6 +203,13 @@ message::message_packet QRichEdit::get_content()
 
 void QRichEdit::set_content(message::message_packet msg)
 {
+	clear();
+
+	// 记录每行的长度!
+	std::vector<double> lines_width;
+
+	double current_line_width = 0.0;
+
 	for (message::avim_message im_message_item : msg.avim())
 	{
 		if (im_message_item.has_item_text())
@@ -201,6 +217,35 @@ void QRichEdit::set_content(message::message_packet msg)
 			message::text_message text_message = im_message_item.item_text();
 			std::string text = text_message.text();
 			textCursor().insertText(QString::fromStdString(text));
+			QFont font = textCursor().charFormat().font();
+
+			// 在这里计算 m_natural_width
+
+			// 找换行符, 只计算到换行符号!
+			auto newline_pos = text.find_first_of("\r\n");
+
+			if (newline_pos == std::string::npos)
+			{
+				// 无换行, 那么就继续累加
+				current_line_width += do_calc_line_length(QString::fromStdString(text), font);
+			}
+			else
+			{
+				if (newline_pos==0)
+				{
+					lines_width.push_back(current_line_width);
+					current_line_width = 0;
+				}
+
+				std::vector<std::string> lines;
+				boost::split(lines, text, boost::is_any_of("\r\n"));
+
+				for(auto l : lines)
+				{
+					lines_width.push_back(current_line_width + do_calc_line_length(QString::fromStdString(l), font));
+					current_line_width = 0;
+				}
+			}
 		}
 		else if (im_message_item.has_item_image())
 		{
@@ -234,15 +279,25 @@ void QRichEdit::set_content(message::message_packet msg)
 			auto inserted = m_image_raw_data.insert(std::make_pair(tmpurl, img_data));
 			if (use_gif)
 			{
-				dropGIF(tmpurl, new QMovie(img_data->get_io_device()));
+				auto qmovie = new QMovie(img_data->get_io_device());
+				dropGIF(tmpurl, qmovie);
+				current_line_width += qmovie->currentImage().width();
 			}else
 			{
 				QImage img;
 				img.loadFromData(img_data->get_bytes());
 				dropImage(tmpurl, img);
+				current_line_width +=  img.width();
 			}
 		}
 	}
+
+	lines_width.push_back(current_line_width);
+
+	// 计算出最长的那条
+	m_natural_width = *std::max_element(lines_width.begin(), lines_width.end());
+
+	m_natural_height = lines_width.size() * 20;
 
 	Q_EMIT textChanged();
 }
@@ -278,12 +333,26 @@ QSize QRichEdit::sizeHint() const
 {
 	if (m_hasHeightForWidth)
 	{
-		return document()->size().toSize();
+		// 来, 我们返回文本要求的最佳长度
+
+		return QSize(m_natural_width + 15, m_natural_height);
+
 	}
 	return QAbstractScrollArea::sizeHint();
 }
 
 QSize QRichEdit::minimumSizeHint() const
 {
-    return QSize(8,8);
+    return QSize(1,1);
+}
+
+double QRichEdit::do_calc_line_length(const QString& text, const QFont& font)
+{
+	QTextLayout layout(text, font);
+	layout.beginLayout();
+	QTextLine  line = layout.createLine();
+	if (line.isValid())
+		line.setPosition(QPointF(0.0, 0.0));
+	layout.endLayout();
+	return layout.maximumWidth();
 }

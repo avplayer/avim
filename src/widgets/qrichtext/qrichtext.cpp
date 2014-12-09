@@ -59,7 +59,6 @@ void QRichText::on_message_append(msg_block* blk)
 	auto talk_segment_ui = &ui;
 
 	talk_segment_ui->setupUi(talk_segment);
-	m_layout->addWidget(talk_segment);
 
 	talk_segment_ui->horizontalLayout->setDirection(blk->dir);
 
@@ -73,6 +72,8 @@ void QRichText::on_message_append(msg_block* blk)
 	richeditor->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 
 	richeditor->set_content(blk->msg);
+
+	m_layout->addWidget(talk_segment);
 
 	QTimer::singleShot(10, m_container,  SLOT(update()));
 	QTimer::singleShot(25, this,  SLOT(scroll_to_end()));

@@ -38,10 +38,13 @@ public:
 
 	virtual int heightForWidth(int) const;
 
-private:
+protected:
+    double do_calc_line_length(const QString& text, const QFont&);
+
 	void dropImage(const QUrl& url, const QImage& image);
 	void dropGIF(const QUrl& url, QMovie* );
 
+private:
 	QMimeDatabase m_minedb;
 	int m_dropped_image_tmp_idx;
 
@@ -73,4 +76,7 @@ private:
 	const QByteArray& get_image_data(const QString&);
 
 	bool m_hasHeightForWidth;
+
+	double m_natural_width, m_natural_height;
+
 };
