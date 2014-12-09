@@ -399,7 +399,11 @@ void avimApp::on_message_recieve(std::string target, im_message pkt)
 
 void avimApp::send_raw_message(std::string target, std::string msg)
 {
-	m_avkernel.async_sendto(target, msg, [](boost::system::error_code ec)
+	std::shared_ptr<std::string> _msg(new std::string);
+
+	* _msg = msg;
+
+	m_avkernel.async_sendto(target, *_msg, [_msg](boost::system::error_code ec)
 	{
 		post_on_gui_thread([ec]()
 		{
@@ -410,7 +414,11 @@ void avimApp::send_raw_message(std::string target, std::string msg)
 
 void avimApp::send_im_message(std::string target, message::message_packet pkt)
 {
-	m_avkernel.async_sendto(target, encode_im_message(pkt), [](boost::system::error_code ec)
+	std::shared_ptr<std::string> msg(new std::string);
+
+	*msg = encode_im_message(pkt);
+
+	m_avkernel.async_sendto(target, *msg, [msg](boost::system::error_code ec)
 	{
 		post_on_gui_thread([ec]()
 		{
@@ -428,7 +436,11 @@ void avimApp::send_group_message(std::string target, message::message_packet pkt
 
 	uint32_t keyid = 0;
 
-	m_avkernel.async_sendto(target, encode_group_message(m_self_addr, my_group_key, keyid, pkt), [](boost::system::error_code ec)
+	std::shared_ptr<std::string> msg(new std::string);
+
+	*msg = encode_group_message(m_self_addr, my_group_key, keyid, pkt);
+
+	m_avkernel.async_sendto(target, *msg, [msg](boost::system::error_code ec)
 	{
 		post_on_gui_thread([ec]()
 		{
