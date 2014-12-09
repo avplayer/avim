@@ -63,9 +63,7 @@ void QRichText::on_message_append(msg_block* blk)
 
 	talk_segment_ui->horizontalLayout->setDirection(blk->dir);
 
-
-	QString htmlMsg = QStringLiteral("<div><h>%1 说:</h>").arg(blk->sender.c_str());
-	talk_segment_ui->sender->setText(htmlMsg);
+	talk_segment_ui->sender->setText(blk->sender.c_str());
 
 	// 把图片插入到 QRichEdit!
 	auto richeditor = talk_segment_ui->content;
@@ -77,7 +75,7 @@ void QRichText::on_message_append(msg_block* blk)
 	richeditor->set_content(blk->msg);
 
 	QTimer::singleShot(10, m_container,  SLOT(update()));
-	QTimer::singleShot(0, this,  SLOT(scroll_to_end()));
+	QTimer::singleShot(25, this,  SLOT(scroll_to_end()));
 }
 
 void QRichText::scroll_to_end()
