@@ -378,8 +378,13 @@ avui::ChatWidget* avimApp::start_chat_with(std::string target, bool is_group)
 
 	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, target, chat_widget](std::string _target, im_message pkt)
 	{
-		if (target == _target)
+		if (target == _target){
+			if ((!pkt.impkt.has_sender()) && (!pkt.sender.empty()))
+			{
+				pkt.impkt.mutable_sender()->CopyFrom(av_address_from_string(pkt.sender));
+			}
 			chat_widget->append_message(pkt.impkt);
+		}
 	}, Qt::QueuedConnection);
 
 	m_chats.insert(std::pair<std::string, QWidget*>(target, (QWidget*)chat_widget));
