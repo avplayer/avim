@@ -57,6 +57,7 @@ avimApp::avimApp(int argc, char* argv[])
 	m_buddy->push_back("microcai@avplayer.org");
 	m_buddy->push_back("test-client@avplayer.org");
 	m_buddy->push_back("michael.fan@avplayer.org");
+	m_buddy->push_back("peter@avplayer.org");
 
 	m_group->push_back("group@avplayer.org");
 }
