@@ -70,7 +70,8 @@ namespace avui
 	void ChatWidget::append_message(message::message_packet msgpkt)
 	{
 		message_block msg;
-		msg.sender = m_chat_target;
+		if (msg.sender.empty())
+			msg.sender = m_chat_target;
 		msg.msg = msgpkt;
 		msg.dir = QBoxLayout::LeftToRight;
 
