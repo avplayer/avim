@@ -21,7 +21,20 @@ QSize QRichTextLayout::sizeHint() const
 
 QSize QRichTextLayout::minimumSize() const
 {
-	return QSize(500, 100);
+	int w = 0, h = 0;
+	for (QLayoutItem* item : m_item_list)
+	{
+		if (item->isEmpty())
+			continue;
+        QWidget *wid = item->widget();
+
+		QSize ws = wid->minimumSizeHint();
+
+		if (w <= ws.width())
+			w = ws.width();
+
+	}
+	return QSize(w, h);
 }
 
 int QRichTextLayout::heightForWidth(int width) const

@@ -34,6 +34,7 @@ public:
 	void set_hasHeightForWidth(bool = true);
 
 	virtual QSize sizeHint() const;
+    virtual QSize minimumSizeHint() const;
 
 	virtual int heightForWidth(int) const;
 

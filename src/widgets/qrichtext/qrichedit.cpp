@@ -282,3 +282,8 @@ QSize QRichEdit::sizeHint() const
 	}
 	return QAbstractScrollArea::sizeHint();
 }
+
+QSize QRichEdit::minimumSizeHint() const
+{
+    return QSize(8,8);
+}
