@@ -378,7 +378,7 @@ avui::ChatWidget* avimApp::start_chat_with(std::string target, bool is_group)
 
 	QMetaObject::Connection slot_connect = QObject::connect(this, &avimApp::message_recieved, this, [this, target, chat_widget](std::string _target, im_message pkt)
 	{
-		if (target == _target && pkt.is_message)
+		if (target == _target)
 			chat_widget->append_message(pkt.impkt);
 	}, Qt::QueuedConnection);
 
@@ -397,8 +397,7 @@ void avimApp::on_message_recieve(std::string target, im_message pkt)
 {
 	if (m_chats.find(target) == m_chats.end())
 	{
-		if (pkt.is_message)
-			start_chat_with(target, pkt.is_group_message)->append_message(pkt.impkt);
+		start_chat_with(target, pkt.is_group_message)->append_message(pkt.impkt);
 	}
 }
 
