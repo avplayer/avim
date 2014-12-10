@@ -316,11 +316,13 @@ void QRichEdit::set_hasHeightForWidth(bool v)
 int QRichEdit::heightForWidth(int w) const
 {
 	int h;
-	if (m_hasHeightForWidth)
+	if (m_hasHeightForWidth && w > 10)
 	{
-		document()->size().setWidth(w);
-		document()->setTextWidth(w-5);
-		h = document()->size().height() + 5;
+		std::unique_ptr<QTextDocument> doc(document()->clone());
+
+		doc->size().setWidth(w);
+		doc->setTextWidth(w-5);
+		h = doc->size().height() + 5;
 	}
 	else
 	{
@@ -334,9 +336,7 @@ QSize QRichEdit::sizeHint() const
 	if (m_hasHeightForWidth)
 	{
 		// 来, 我们返回文本要求的最佳长度
-
-		return QSize(m_natural_width + 15, m_natural_height);
-
+		return QSize(m_natural_width + 18, heightForWidth(m_natural_width + 18));
 	}
 	return QAbstractScrollArea::sizeHint();
 }
@@ -355,4 +355,9 @@ double QRichEdit::do_calc_line_length(const QString& text, const QFont& font)
 		line.setPosition(QPointF(0.0, 0.0));
 	layout.endLayout();
 	return layout.maximumWidth();
+}
+
+void QRichEdit::updateGeometry()
+{
+	QTextEdit::updateGeometry();
 }

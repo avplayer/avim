@@ -37,6 +37,8 @@ public:
     virtual QSize minimumSizeHint() const;
 
 	virtual int heightForWidth(int) const;
+public Q_SLOTS:
+	void updateGeometry();
 
 protected:
     double do_calc_line_length(const QString& text, const QFont&);

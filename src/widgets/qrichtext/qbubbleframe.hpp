@@ -11,6 +11,8 @@ public:
 	virtual int heightForWidth(int);
 	virtual bool hasHeightForWidth();
 
+    virtual QSize sizeHint() const;
+
 protected:
 	virtual void paintEvent(QPaintEvent*);
 

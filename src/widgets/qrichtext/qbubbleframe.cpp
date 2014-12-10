@@ -8,7 +8,7 @@ QBubbleFrame::QBubbleFrame(QWidget* parent)
 
 int QBubbleFrame::heightForWidth(int w)
 {
-	return QFrame::heightForWidth(w);
+	
 }
 
 bool QBubbleFrame::hasHeightForWidth()
@@ -19,5 +19,10 @@ bool QBubbleFrame::hasHeightForWidth()
 void QBubbleFrame::paintEvent(QPaintEvent*e)
 {
 	QFrame::paintEvent(e);
+}
+
+QSize QBubbleFrame::sizeHint() const
+{
+    return QFrame::sizeHint();
 }
 

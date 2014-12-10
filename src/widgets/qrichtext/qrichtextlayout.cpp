@@ -16,7 +16,7 @@ QRichTextLayout::QRichTextLayout(int margin)
 
 QSize QRichTextLayout::sizeHint() const
 {
-	return QSize(500,300);
+	return minimumSize();
 }
 
 QSize QRichTextLayout::minimumSize() const

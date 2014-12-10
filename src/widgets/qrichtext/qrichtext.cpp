@@ -75,6 +75,9 @@ void QRichText::on_message_append(msg_block* blk)
 
 	m_layout->addWidget(talk_segment);
 
+	talk_segment->updateGeometry();
+
+	QTimer::singleShot(15, richeditor,  SLOT(updateGeometry()));
 	QTimer::singleShot(10, m_container,  SLOT(update()));
 	QTimer::singleShot(25, this,  SLOT(scroll_to_end()));
 }
