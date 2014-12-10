@@ -1,4 +1,4 @@
-#include "qbubbleframe.hpp"
+﻿#include "qbubbleframe.hpp"
 #include <QPainter>
 #include <QStylePainter>
 #include <QPaintEvent>
@@ -10,7 +10,7 @@ QBubbleFrame::QBubbleFrame(QWidget* parent)
 
 int QBubbleFrame::heightForWidth(int w)
 {
-	QFrame::heightForWidth(w);
+	return QFrame::heightForWidth(w);
 }
 
 bool QBubbleFrame::hasHeightForWidth()
