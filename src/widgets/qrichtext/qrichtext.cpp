@@ -71,7 +71,8 @@ void QRichText::on_message_append(msg_block* blk)
 	richeditor->set_hasHeightForWidth(true);
 	richeditor->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 
-	richeditor->set_content(blk->msg);
+	QVariant msg; msg.setValue(blk->msg);
+	richeditor->setProperty("content", msg);
 
 	m_layout->addWidget(talk_segment);
 

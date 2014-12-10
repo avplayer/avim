@@ -12,9 +12,15 @@
 
 #include "im.pb.h"
 
+Q_DECLARE_METATYPE(message::message_packet)
+
 class QRichEdit : public QTextEdit
 {
 	Q_OBJECT
+
+	Q_PROPERTY(message::message_packet content READ get_content WRITE set_content STORED false)
+	Q_PROPERTY(bool HeightForWidth READ hasHeightForWidth WRITE set_hasHeightForWidth )
+
 public:
 	explicit QRichEdit(QWidget*);
 	~QRichEdit();
