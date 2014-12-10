@@ -74,4 +74,6 @@ void main_window::on_login_success()
 void main_window::on_lost_connection(int reason)
 {
 	// TODO 更新 GUI 报告用户
+	m_ui->buddylistView->setEnabled(false);
+	m_ui->grouplistView->setEnabled(false);
 }

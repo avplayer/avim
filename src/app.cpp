@@ -37,17 +37,8 @@ avimApp::avimApp(int argc, char* argv[])
 			std::exit(1);
 		}
 	});
-
-	// 发送一个测试 信号, 看能不能顺利的在2个线程里同步
-	qDebug() << "test GUI thread and IO thread interactivity" ;
-	m_io_service.post([]()
-	{
-		std::cerr << "this code run in asio thread : " << std::this_thread::get_id() << std::endl;
-		post_on_gui_thread([]()
-		{
-			std::cerr << "this code run in GUI thread : " << std::this_thread::get_id() << std::endl;
-		});
-	});
+	// 开启消息接收协程
+	boost::asio::spawn(m_io_service, std::bind(&avimApp::recive_coroutine, this, std::placeholders::_1));
 
 	connect(this, &avimApp::message_recieved, this, &avimApp::on_message_recieve, Qt::QueuedConnection);
 	connect(this, &avimApp::login_success, this, &avimApp::on_login_success, Qt::QueuedConnection);
@@ -63,7 +54,6 @@ avimApp::avimApp(int argc, char* argv[])
 	m_group->push_back("group@avplayer.org");
 
 	// 构建状态机
-
 	setup_state_machine();
 }
 
@@ -260,14 +250,9 @@ void avimApp::start_main()
 		m_self_addr = m_avconnection->get_self_addr();
 	});
 
-	(m_avconnection.get(), &AVConnection::start_login);
-
 	m_avconnection->start_login();
 
 	connect(m_avconnection.get(), &AVConnection::interface_removed, m_avconnection.get(), std::bind(&AVConnection::start_login, m_avconnection.get()));
-
-	// 开启消息接收协程
-	boost::asio::spawn(m_io_service, std::bind(&avimApp::recive_coroutine, this, std::placeholders::_1));
 
 	// 显示 tray icon
 	m_tray_icon.reset(new avim_system_tray(get_icon()));
