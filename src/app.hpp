@@ -122,9 +122,9 @@ private:
 	// Staget Machine
 
 	QStateMachine m_state_machine;
+
+	// 在线
 	QState* m_state_online;
-	// 登录中
-	QState* m_state_logining;
 	// 掉线
 	QState* m_state_offline;
 

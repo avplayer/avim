@@ -249,7 +249,9 @@ void avimApp::start_main()
 	m_mainwindow->show();
 
 	// 要登录成功的消息!
-	m_state_logining->addTransition(m_avconnection.get(), SIGNAL(login_success()), m_state_online);
+	m_state_offline->addTransition(m_avconnection.get(), SIGNAL(login_success()), m_state_online);
+	m_state_online->addTransition(m_avconnection.get(), SIGNAL(interface_removed()), m_state_offline);
+	m_state_online->addTransition(m_avconnection.get(), SIGNAL(login_failed(int)), m_state_offline);
 
 	connect(m_avconnection.get(), &AVConnection::login_success, m_avconnection.get(), std::bind(&AVConnection::handover_to_avkernel, m_avconnection.get(), std::ref(m_avkernel)));
 
@@ -476,13 +478,12 @@ void avimApp::on_login_success()
 
 void avimApp::setup_state_machine()
 {
-	m_state_online = new QState();
-	m_state_offline = new QState();
-	m_state_app_quit = new QFinalState();
-	m_state_logining = new QState();
+	m_state_online = new QState(&m_state_machine);
+	m_state_offline = new QState(&m_state_machine);
+	m_state_app_quit = new QFinalState(&m_state_machine);
 
 	connect(m_state_online, &QState::entered, this, &avimApp::login_success, Qt::QueuedConnection);
 
-	m_state_machine.start();
 	m_state_machine.setInitialState(m_state_offline);
+	m_state_machine.start();
 }
