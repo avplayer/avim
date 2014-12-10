@@ -16,6 +16,9 @@ namespace fs = boost::filesystem;
 #include <QWindow>
 #include <QListWidget>
 #include <QDialog>
+#include <QState>
+#include <QStateMachine>
+#include <QFinalState>
 
 #include "avproto.hpp"
 #include "im.pb.h"
@@ -53,6 +56,7 @@ Q_SIGNALS:
 private:
 
 	void recive_coroutine(boost::asio::yield_context);
+    void setup_state_machine();
 
 	Q_SIGNALS:
 	// 收到消息的时候发射!
@@ -89,17 +93,20 @@ protected Q_SLOTS:
 	void start_main();
 
 private:
+	// for asio
 	boost::asio::io_service m_io_service;
 	avkernel m_avkernel;
+	boost::asio::io_service::work m_io_work;
+	std::thread m_io_thread;
+
+	// UI widgets
 	std::unique_ptr<AVConnection> m_avconnection;
 	std::unique_ptr<login_dialog> m_login_dialog;
 	std::unique_ptr<main_window> m_mainwindow;
 	std::unique_ptr<avim_system_tray> m_tray_icon;
 	std::map<std::string, QWidget*> m_chats;
 
-	std::thread m_io_thread;
-	boost::asio::io_service::work m_io_work;
-
+	// local state storage
     std::string m_self_addr;
 
 	std::shared_ptr<std::vector<avbuddy>> m_buddy = std::make_shared<std::vector<avbuddy>>();
@@ -112,6 +119,15 @@ private:
 
 	std::map<avbuddy, std::shared_ptr<std::vector<avbuddy>>> m_members_of_group;
 
-	friend class main_window;
+	// Staget Machine
+
+	QStateMachine m_state_machine;
+	QState* m_state_online;
+	// 登录中
+	QState* m_state_logining;
+	// 掉线
+	QState* m_state_offline;
+
+	QFinalState* m_state_app_quit;
 };
 

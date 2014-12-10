@@ -61,6 +61,10 @@ avimApp::avimApp(int argc, char* argv[])
 	m_buddy->push_back("peter@avplayer.org");
 
 	m_group->push_back("group@avplayer.org");
+
+	// 构建状态机
+
+	setup_state_machine();
 }
 
 avimApp::~avimApp()
@@ -228,6 +232,7 @@ void avimApp::start_main()
 	// 创建主窗口, 开始真正的 GUI 之旅
 	m_mainwindow.reset(new main_window(&m_buddy_model, &m_group_model, &m_recent_model));
 	connect(this, &avimApp::login_success, m_mainwindow.get(), &main_window::on_login_success, Qt::QueuedConnection);
+
 	connect(m_mainwindow.get(), &main_window::chat_opened, this, &avimApp::start_chat_with, Qt::QueuedConnection);
 	connect(m_mainwindow.get(), &main_window::close_requested, this, [this](QCloseEvent*e)
 	{
@@ -244,14 +249,19 @@ void avimApp::start_main()
 	m_mainwindow->show();
 
 	// 要登录成功的消息!
-	connect(m_avconnection.get(), &AVConnection::login_success, this, &avimApp::login_success, Qt::QueuedConnection);
+	m_state_logining->addTransition(m_avconnection.get(), SIGNAL(login_success()), m_state_online);
+
 	connect(m_avconnection.get(), &AVConnection::login_success, m_avconnection.get(), std::bind(&AVConnection::handover_to_avkernel, m_avconnection.get(), std::ref(m_avkernel)));
+
 	connect(this, &avimApp::login_success, [this]()
 	{
 		m_self_addr = m_avconnection->get_self_addr();
 	});
 
+	(m_avconnection.get(), &AVConnection::start_login);
+
 	m_avconnection->start_login();
+
 	connect(m_avconnection.get(), &AVConnection::interface_removed, m_avconnection.get(), std::bind(&AVConnection::start_login, m_avconnection.get()));
 
 	// 开启消息接收协程
@@ -278,17 +288,28 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 		{
 			if (is_control_message(data))
 			{
-				post_on_gui_thread([this, target, data](){
-					Q_EMIT raw_message_recieved(target, data);
+				post_on_gui_thread([this, target, data]()
+				{
+					// TODO 看是否是群消息, 如果是, 查找对应的群 key 并解码
+					// 解码后再调用重载的另一个版本 decode_im_message
+					try
+					{
+						Q_EMIT raw_message_recieved(target, data);
+					}catch(const std::runtime_error&)
+					{
+						qDebug() << "invalid packet recived ";
+					}
 				});
 			}
 			else
 			{
-				post_on_gui_thread([this, target, data](){
+				post_on_gui_thread([this, target, data]()
+				{
 					// TODO 看是否是群消息, 如果是, 查找对应的群 key 并解码
 					// 解码后再调用重载的另一个版本 decode_im_message
-					try{
-					Q_EMIT message_recieved(target, decode_im_message(data));
+					try
+					{
+						Q_EMIT message_recieved(target, decode_im_message(data));
 					}catch(const std::runtime_error&)
 					{
 						qDebug() << "invalid packet recived ";
@@ -451,4 +472,17 @@ void avimApp::send_group_message(std::string target, message::message_packet pkt
 void avimApp::on_login_success()
 {
 	m_tray_icon->setToolTip(m_self_addr.c_str());
+}
+
+void avimApp::setup_state_machine()
+{
+	m_state_online = new QState();
+	m_state_offline = new QState();
+	m_state_app_quit = new QFinalState();
+	m_state_logining = new QState();
+
+	connect(m_state_online, &QState::entered, this, &avimApp::login_success, Qt::QueuedConnection);
+
+	m_state_machine.start();
+	m_state_machine.setInitialState(m_state_offline);
 }
