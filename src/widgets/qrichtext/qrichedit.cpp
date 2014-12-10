@@ -138,7 +138,23 @@ void QRichEdit::dropGIF(const QUrl& url, QMovie* gif)
 
 const QByteArray& QRichEdit::get_image_data(const QString& name)
 {
-	return m_image_raw_data[name]->get_bytes();
+	auto meimg = m_image_raw_data.find(name);
+	if (meimg != m_image_raw_data.end())
+		return (meimg->second)->get_bytes();
+	// 到 documet 的资源里找
+	QVariant var = document()->resource(QTextDocument::ImageResource, name);
+	QImage realimage = qvariant_cast<QImage>(var);
+
+	// 格式化 realimage 数据到 QByteArray
+	QByteArray ba;
+	{ QBuffer io(&ba);
+	io.open(QIODevice::WriteOnly);
+	realimage.save(&io, "PNG");
+	}
+	auto imgdata = std::make_shared<image_data>(ba);
+	auto inserted = m_image_raw_data.insert(std::make_pair(name, imgdata));
+
+	return imgdata->get_bytes();
 }
 
 void QRichEdit::clear()
