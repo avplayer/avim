@@ -216,7 +216,16 @@ void QRichEdit::set_content(message::message_packet msg)
 		{
 			message::text_message text_message = im_message_item.item_text();
 			std::string text = text_message.text();
-			textCursor().insertText(QString::fromStdString(text));
+
+			QString qtext = QString::fromStdString(text);
+
+			for (QChar& qc : qtext)
+			{
+				if (qc == '\n')
+					qc = QChar::LineSeparator;
+			}
+
+			textCursor().insertText(qtext);
 			QFont font = textCursor().charFormat().font();
 
 			// 在这里计算 m_natural_width
