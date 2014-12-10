@@ -15,6 +15,7 @@ public:
 
 protected:
 	virtual void paintEvent(QPaintEvent*);
+    Qt::LayoutDirection get_parent_layoutDirection();
 
 private:
 };
