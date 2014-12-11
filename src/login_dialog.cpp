@@ -12,12 +12,12 @@ login_dialog::login_dialog()
 	m_ui.reset(new Ui::login_dialog());
 	m_ui->setupUi(this);
 
-	connect(m_ui->browse_cert_button, &QPushButton::clicked, [&]
+	connect(m_ui->cert_path, &QPushButton::clicked, [&]
 	{
 		auto filename = QFileDialog::getOpenFileName(this, tr("Open Certificate"));
 		m_ui->cert_path->setText(filename);
 	});
-	connect(m_ui->browse_key_button, &QPushButton::clicked, [&]
+	connect(m_ui->key_path, &QPushButton::clicked, [&]
 	{
 		auto filename = QFileDialog::getOpenFileName(this, tr("Open Key"));
 		m_ui->key_path->setText(filename);
@@ -28,6 +28,10 @@ login_dialog::login_dialog()
 
 	m_ui->cert_path->setText(cfg.value("global/cert").toString());
 	m_ui->key_path->setText(cfg.value("global/key").toString());
+
+#ifdef ANDROID
+	showFullScreen();
+#endif
 }
 
 void login_dialog::do_register_request()
