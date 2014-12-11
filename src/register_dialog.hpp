@@ -1,7 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <QDialog>
-#include "ui_register_dialog.h"
+
+namespace Ui {
+    class register_dialog;
+}
 
 class register_dialog : public QDialog
 {
@@ -20,5 +24,5 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void register_button_clicked(bool);
 private:
-    Ui::register_dialog ui;
+    std::shared_ptr<Ui::register_dialog> ui;
 };
