@@ -3,4 +3,7 @@ add_subdirectory(qrichtext)
 
 add_subdirectory(chatwidget)
 
-set(AVIM_WIDGETS chatwidget richtext PARENT_SCOPE)
+add_subdirectory(login)
+
+set(AVIM_WIDGETS chatwidget richtext login PARENT_SCOPE)
+

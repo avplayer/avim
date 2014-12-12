@@ -1,5 +1,5 @@
 
-QT       += core gui widgets
+QT       += core gui widgets multimedia
 CXXFLAGS += "c++11"
 
 TEMPLATE = subdirs

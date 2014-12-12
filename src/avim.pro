@@ -1,5 +1,5 @@
 
-QT       += core gui widgets
+QT       += core gui widgets multimedia
 CXXFLAGS += "-std=c++11 -DANDROID"
 
 INCLUDEPATH += /home/cai/android/boost_1_57_0
