@@ -9,4 +9,6 @@ add_subdirectory(register)
 
 add_subdirectory(mainwindow)
 
-set(AVIM_WIDGETS chatwidget richtext login register mainwindow PARENT_SCOPE)
+add_subdirectory(systray)
+
+set(AVIM_WIDGETS chatwidget richtext login register mainwindow systray PARENT_SCOPE)
