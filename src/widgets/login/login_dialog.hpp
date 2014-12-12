@@ -14,8 +14,8 @@ class login_dialog : public QDialog
 
 public:
 	login_dialog();
-	   QString get_cert_path();
-	   QString get_key_path();
+	QString get_cert_path();
+	QString get_key_path();
 
 Q_SIGNALS:
 	void request_registering(QString user, QString mailaddr, QString phone);
