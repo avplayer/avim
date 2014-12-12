@@ -1,4 +1,4 @@
-﻿
+﻿...
 #include <cstdlib>
 #include <boost/bind.hpp>
 #include <openssl/pem.h>
@@ -53,6 +53,7 @@ avimApp::avimApp(int argc, char* argv[])
 	m_buddy->push_back("peter@avplayer.org");
 
 	m_group->push_back("group@avplayer.org");
+	m_group->push_back("3597082@avplayer.org");
 
 	// 构建状态机
 	setup_state_machine();
