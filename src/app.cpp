@@ -10,6 +10,7 @@
 #include <QCloseEvent>
 
 #include "avproto.hpp"
+#include "avproto/easyssl.hpp"
 #include "app.hpp"
 #include "chatwidget.hpp"
 #include "system_tray.hpp"
@@ -103,15 +104,12 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
 		std::cout << "omg, key and cert not exist";
 		return false;
 	}
+
 	qDebug() << "cert:" << QString::fromStdString(cur_cert);
 	qDebug() << "key:" << QString::fromStdString(cur_key);
 
-	std::shared_ptr<BIO> bio_key {BIO_new_file(cur_key.c_str(), "r") , BIO_free};
-	std::shared_ptr<BIO> bio_cert {BIO_new_file(cur_cert.c_str(), "r") , BIO_free};
-
-	auto _c_rsa_key = PEM_read_bio_RSAPrivateKey(bio_key.get(), nullptr, [](char * buf, int size, int rwflag, void * parent)->int
+	std::shared_ptr<RSA> user_key = load_RSA_from_file(cur_key, []()->std::string
 	{
-		// 打开窗口, 提升用户输入密码
 		bool ok;
 		QString text = QInputDialog::getText(
 			nullptr,
@@ -120,33 +118,22 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
 			"",
 			&ok
 		);
-
-		if (ok && !text.isEmpty())
-		{
-			strncpy(buf, text.toUtf8().constData(), size);
-			return text.toUtf8().length();
-		}
-		return -1;
-	}, (void*) this);
-
-	std::shared_ptr<RSA> user_key(_c_rsa_key, RSA_free);
+		if (ok)
+			return text.toStdString();
+		return "";
+	});
 
 	if (!user_key)
 	{
 		// TODO 提示错误, 重新输入
 		// 现在暂时暴力退出
-
 		QMessageBox box;
 		box.setText("unable to read the private key!");
 		box.exec();
 		std::exit(1);
 	}
 
-	std::shared_ptr<X509> user_cert
-	{
-		PEM_read_bio_X509(bio_cert.get(), NULL, NULL, NULL),
-		X509_free
-	};
+	std::shared_ptr<X509> user_cert = load_X509_from_file(cur_cert);
 
 	// 设置下 cert 和密码
 	m_avconnection.reset(new AVConnection(m_io_service));
