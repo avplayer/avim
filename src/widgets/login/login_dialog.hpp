@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QSettings>
 
-#include "register_dialog.hpp"
+#include "../register/register_dialog.hpp"
 
 namespace Ui{class login_dialog;}
 
