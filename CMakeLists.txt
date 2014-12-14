@@ -61,10 +61,16 @@ set(BUILD_STATIC ${ENABLE_QT_STATIC})
 
 include(tweakvcflasgs.cmake)
 
+
 find_package(Threads REQUIRED)
 find_package(Boost 1.54 REQUIRED COMPONENTS thread system program_options coroutine context regex date_time chrono filesystem )
 find_package(Protobuf REQUIRED)
+
+if(WIN32)
+add_subdirectory(third_party/openssl)
+else()
 find_package(OpenSSL REQUIRED)
+endif()
 #find_package(PkgConfig REQUIRED)
 
 #pkg_check_modules(PKCS11 REQUIRED libpkcs11-helper-1 )

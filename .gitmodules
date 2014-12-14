@@ -1,3 +1,6 @@
 [submodule "libavim"]
 	path = libavim
 	url = git://github.com/avplayer/libavim.git
+[submodule "third_party/openssl"]
+	path = third_party/openssl
+	url = git://github.com/microcai/openssl-cmake.git
