@@ -80,8 +80,10 @@ include_directories(
 	${OPENSSL_INCLUDE_DIR}
 )
 
-link_directories(${Boost_LIB_DIRS})
-
+link_directories(${Boost_LIBRARY_DIR})
+if(MSVC)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LIBPATH:${Boost_LIBRARY_DIR}")
+endif()
 link_libraries(${OPENSSL_LIBRARIES} ${PKCS11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 if(NOT MSVC)
