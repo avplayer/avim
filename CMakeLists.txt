@@ -18,6 +18,7 @@ if(WIN32)
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
 	add_definitions(-DNOMINMAX)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+	add_definitions(-D_WIN32_WINNT=0x0501)
 endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
