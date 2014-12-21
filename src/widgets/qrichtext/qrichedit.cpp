@@ -120,7 +120,7 @@ void QRichEdit::dropGIF(const QUrl& url, QMovie* gif)
 
 	gif->start();
 
-	connect(gif, &QMovie::updated, this, [this, gif, url](const QRect&)
+	QObject::connect(gif, &QMovie::updated, this, [this, gif, url](const QRect&)
 	{
 		QImage image = gif->currentImage();
 		document()->addResource(QTextDocument::ImageResource, url, image);
