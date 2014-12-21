@@ -12,13 +12,17 @@ before_install:
   - sudo apt-get -y purge cmake
   - sudo apt-get -y install -qq cmake
   - sudo apt-get install -qq wget
+  - wget http://www.cmake.org/files/v3.1/cmake-3.1.0-Linux-x86_64.tar.gz
+  - sudo mkdir -pv /opt/cmake
+  - sudo tar -xvf cmake-3.1.0-Linux-x86_64.tar.gz -C /opt/cmake
+  - export PATH="/opt/cmake/bin:${PATH}"
   - sudo apt-get install -qq boost1.55 libprotobuf-dev protobuf-compiler
   - sudo apt-get -y install qt5-default
   - mkdir -pv build
   - git submodule update --init
 
 before_script:
-  cd build && cmake ..
+  cd build && /opt/cmake/bin/cmake ..
 
 script:
     - make -j2
