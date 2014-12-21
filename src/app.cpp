@@ -26,7 +26,11 @@ avimApp::avimApp(int argc, char* argv[])
 	, m_recent_model(m_recent)
 {
 	// 开启 boost 线程跑 io_service
+#ifdef USE_BOOST_THREAD
+	m_io_thread = boost::thread([this]()
+#else
 	m_io_thread = std::thread([this]()
+#endif
 	{
 		try
 		{

@@ -97,7 +97,12 @@ private:
 	boost::asio::io_service m_io_service;
 	avkernel m_avkernel;
 	boost::asio::io_service::work m_io_work;
-	std::thread m_io_thread;
+#ifdef USE_BOOST_THREAD
+	boost::thread
+#else
+	std::thread
+#endif
+		m_io_thread;
 
 	// UI widgets
 	std::unique_ptr<AVConnection> m_avconnection;

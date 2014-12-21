@@ -18,7 +18,7 @@ before_install:
   - git submodule update --init
 
 before_script:
-  cd build && CXXFLAGS="-fPIC -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/ -I /usr/include/qt5/QtCore -I/usr/include/qt5/QtGui" cmake ..
+  cd build && CXXFLAGS="-fPIC -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/ -I /usr/include/qt5/QtCore -I/usr/include/qt5/QtGui" cmake -DUSE_BOOST_THREAD=ON ..
 
 script:
     - make -j2
