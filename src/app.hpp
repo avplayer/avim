@@ -4,7 +4,11 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#ifdef USE_BOOST_THREAD
+#include <boost/thread.hpp>
+#else
 #include <thread>
+#endif
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 #include <boost/asio.hpp>
