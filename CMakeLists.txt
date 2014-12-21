@@ -5,14 +5,14 @@ project(avim)
 include(CheckCCompilerFlag)
 check_c_compiler_flag(-fvisibility=hidden HAS_VISIVILITY)
 if (HAS_VISIVILITY)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden ")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden ")
 endif()
 
-check_c_compiler_flag(-std=c++11 HAS_CXX11)
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag(-std=c++11 HAS_CXX11)
 if (HAS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
 endif()
 
 if(WIN32)
@@ -29,17 +29,6 @@ endif()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set(CMAKE_COMPILER_IS_CLANGXX 1)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-	if(UNIX)
-		set(CMAKE_COMPILER_IS_UNIX_ICC 1)
-	else()
-		# CMAKE_COMPILER_IS_WIN_ICC 的 c++11 模式命令行参数不一样
-		set(CMAKE_COMPILER_IS_WIN_ICC 1)
-	endif()
-endif()
 
 if(MSVC)
 	add_definitions(-DNOMINMAX)
@@ -94,10 +83,6 @@ link_libraries(${OPENSSL_LIBRARIES} ${PKCS11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT
 
 if(NOT MSVC)
 link_libraries(${Boost_LIBRARIES})
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX OR CMAKE_COMPILER_IS_UNIX_ICC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 endif()
 
 check_library_exists(rt clock_gettime "" HAVE_CLOCK_GETTIME)
