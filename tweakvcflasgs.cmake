@@ -1,5 +1,5 @@
 if(MSVC)
-set (CMAKE_CONFIGURATION_TYPES "Release;Debug")
+
 set(CompilerFlags
         CMAKE_CXX_FLAGS
         CMAKE_CXX_FLAGS_DEBUG
@@ -18,7 +18,7 @@ endforeach()
 
 endif()
 
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS}  /ignore:4099 /NODEFAULTLIB:libcmt.lib")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /ignore:4099 /NODEFAULTLIB:libcmt.lib")
 
 endif(MSVC)
 
