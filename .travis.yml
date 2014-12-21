@@ -17,6 +17,7 @@ before_install:
   - mkdir -pv build
   - git submodule update --init
   - sudo cp third_party/stupid_ubuntu_bugs/qabstractitemmodel.h /usr/include/qt5/QtCore/qabstractitemmodel.h
+  - sudo cp third_party/stupid_ubuntu_bugs/qurl.h /usr/include/qt5/QtCore/qurl.h
 
 before_script:
   cd build && CXXFLAGS="-fPIC -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/ -I /usr/include/qt5/QtCore -I/usr/include/qt5/QtGui" cmake -DUSE_BOOST_THREAD=ON ..
