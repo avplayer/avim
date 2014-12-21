@@ -21,7 +21,7 @@ before_install:
   - git submodule update --init
 
 before_script:
-  cd build && CXXFLAGS="-I/usr/include/qt5/QtWidgets" /opt/cmake-3.1.0-Linux-x86_64/bin/cmake ..
+  cd build && CXXFLAGS="-I/usr/include/qt5/QtWidgets -I/usr/include/qt5/ -I /usr/include/qt5/QtCore -I/usr/include/qt5/QtGui" /opt/cmake-3.1.0-Linux-x86_64/bin/cmake ..
 
 script:
     - make -j2
