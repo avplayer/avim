@@ -1,5 +1,6 @@
 ﻿
 #include <QScrollArea>
+#include <boost/concept_check.hpp>
 
 #include "qrichtextlayout.hpp"
 
@@ -54,14 +55,9 @@ void QRichTextLayout::addItem(QLayoutItem * item)
 
 QLayoutItem* QRichTextLayout::itemAt(int index) const
 {
-	try
-	{
-		return m_item_list.at(index);
-	}
-	catch (const std::out_of_range&)
-	{
+	if ( index >=m_item_list.size())
 		return nullptr;
-	}
+	return m_item_list.at(index);
 }
 
 QLayoutItem* QRichTextLayout::takeAt(int index)
