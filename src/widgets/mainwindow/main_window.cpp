@@ -3,7 +3,6 @@
 #include <functional>
 #include <iostream>
 #include <string>
-#include <thread>
 
 #include <boost/format.hpp>
 
