@@ -13,7 +13,7 @@ before_install:
   - sudo apt-get -y install -qq cmake
   - sudo apt-get install -qq wget
   - sudo apt-get install -qq boost1.55 libprotobuf-dev protobuf-compiler
-  - sudo apt-get -y install qt5-default libqt5widgets5 qtbase5-dev qt5-qmake
+  - sudo apt-get -y install libqt5opengl5-dev  qtbase5-dev  libqt5widgets5
   - mkdir -pv build
   - git submodule update --init
 
