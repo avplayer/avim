@@ -16,6 +16,7 @@ before_install:
   - sudo apt-get -y install libqt5opengl5-dev  qtbase5-dev  libqt5widgets5 qt5-default
   - mkdir -pv build
   - git submodule update --init
+  - sudo cp third_party/stupid_ubuntu_bugs/qabstractitemmodel.h /usr/include/qt5/QtCore/qabstractitemmodel.h
 
 before_script:
   cd build && CXXFLAGS="-fPIC -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/ -I /usr/include/qt5/QtCore -I/usr/include/qt5/QtGui" cmake -DUSE_BOOST_THREAD=ON ..
