@@ -16,7 +16,7 @@ before_install:
   - sudo tar -xvf cmake-3.1.0-Linux-x86_64.tar.gz -C /opt
   - export PATH="/opt/cmake-3.1.0-Linux-x86_64/bin:${PATH}"
   - sudo apt-get install -qq boost1.55 libprotobuf-dev protobuf-compiler
-  - sudo apt-get -y install qt5-default
+  - sudo apt-get -y install qt5-default libqt5widgets5 qtbase5-dev qt5-qmake
   - mkdir -pv build
   - git submodule update --init
 
