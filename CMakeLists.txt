@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0)
 
 project(avim)
 
@@ -9,6 +9,11 @@ if (HAS_VISIVILITY)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 endif()
 
+check_c_compiler_flag(-std=c++11 HAS_CXX11)
+if (HAS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++11")
+endif()
 
 if(WIN32)
 	add_definitions(-DBOOST_ALL_STATIC_LINK)
