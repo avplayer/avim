@@ -312,7 +312,7 @@ void avimApp::recive_coroutine(boost::asio::yield_context yield_context)
 	}
 }
 
-avui::ChatWidget* avimApp::start_chat_with(std::string target, bool is_group)
+ChatWidget* avimApp::start_chat_with(std::string target, bool is_group)
 {
 	// 先找下是否已经有窗口打开了, 直接激活
 	QAbstractListModel* group_data_model = NULL;
@@ -322,7 +322,7 @@ avui::ChatWidget* avimApp::start_chat_with(std::string target, bool is_group)
 	{
 		QWidget * w = chat_widget_it->second;
 		w->activateWindow();
-		return (avui::ChatWidget*) w;
+		return (ChatWidget*) w;
 	}
 
 	if (is_group)
@@ -336,13 +336,13 @@ avui::ChatWidget* avimApp::start_chat_with(std::string target, bool is_group)
 		group_data_model = new BuddyModel(group_data);
 	}
 	// 打开 chat 窗口
-	auto chat_widget = new avui::ChatWidget(target, group_data_model);
+	auto chat_widget = new ChatWidget(target, group_data_model);
 	chat_widget->show();
 
 	if (is_group)
-		connect(chat_widget, &avui::ChatWidget::send_message, std::bind(&avimApp::send_group_message, this, target, std::placeholders::_1));
+		connect(chat_widget, &ChatWidget::send_message, std::bind(&avimApp::send_group_message, this, target, std::placeholders::_1));
 	else
-		connect(chat_widget, &avui::ChatWidget::send_message, std::bind(&avimApp::send_im_message, this, target, std::placeholders::_1));
+		connect(chat_widget, &ChatWidget::send_message, std::bind(&avimApp::send_im_message, this, target, std::placeholders::_1));
 
 	// 如果是个群聊, 开始刷群列表
 	if (is_group)
@@ -400,7 +400,7 @@ avui::ChatWidget* avimApp::start_chat_with(std::string target, bool is_group)
 
 	m_chats.insert(std::pair<std::string, QWidget*>(target, (QWidget*)chat_widget));
 
-	connect(chat_widget, &avui::ChatWidget::windowclosed, this, [this, target, slot_connect]()
+	connect(chat_widget, &ChatWidget::windowclosed, this, [this, target, slot_connect]()
 	{
 		m_chats.erase(target);
 		QObject::disconnect(slot_connect);

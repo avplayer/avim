@@ -34,6 +34,9 @@ public:
 	void set_content(message::message_packet);
 	message::message_packet get_content();
 
+Q_SIGNALS:
+	void enterkey_pressed(bool);
+
 public:
 	virtual bool hasHeightForWidth() const;
 
@@ -43,6 +46,9 @@ public:
     virtual QSize minimumSizeHint() const;
 
 	virtual int heightForWidth(int) const;
+
+    virtual void keyPressEvent(QKeyEvent* e);
+
 public Q_SLOTS:
 	void updateGeometry();
 

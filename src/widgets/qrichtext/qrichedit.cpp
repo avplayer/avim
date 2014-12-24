@@ -386,3 +386,12 @@ void QRichEdit::updateGeometry()
 {
 	QTextEdit::updateGeometry();
 }
+
+void QRichEdit::keyPressEvent(QKeyEvent* e)
+{
+    QTextEdit::keyPressEvent(e);
+	if (e->matches(QKeySequence::InsertLineSeparator) || e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return)
+	{
+		Q_EMIT enterkey_pressed(false);
+	}
+}
