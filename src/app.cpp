@@ -235,6 +235,16 @@ void avimApp::start_main()
 	m_state_online->addTransition(m_avconnection.get(), SIGNAL(interface_removed()), m_state_offline);
 	m_state_online->addTransition(m_avconnection.get(), SIGNAL(login_failed(int)), m_state_offline);
 
+	connect(m_avconnection.get(), &AVConnection::login_failed, this, [this](int reason)
+	{
+		// 不是帐号问题, 就可以直接重连
+		if (reason == 1)
+		{
+			m_avconnection->start_login();
+		}
+
+	}, Qt::QueuedConnection);
+
 	connect(m_avconnection.get(), &AVConnection::login_success, m_avconnection.get(), std::bind(&AVConnection::handover_to_avkernel, m_avconnection.get(), std::ref(m_avkernel)));
 
 	connect(this, &avimApp::login_success, [this]()
