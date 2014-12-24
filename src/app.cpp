@@ -128,7 +128,9 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
 		return "";
 	});
 
-	if (!user_key)
+	std::shared_ptr<X509> user_cert = load_X509_from_file(cur_cert);
+
+	if (!user_key || !user_cert)
 	{
 		// TODO 提示错误, 重新输入
 		// 现在暂时暴力退出
@@ -137,8 +139,6 @@ bool avimApp::load_key_and_cert(std::string cur_key, std::string cur_cert)
 		box.exec();
 		std::exit(1);
 	}
-
-	std::shared_ptr<X509> user_cert = load_X509_from_file(cur_cert);
 
 	// 设置下 cert 和密码
 	m_avconnection.reset(new AVConnection(m_io_service));
