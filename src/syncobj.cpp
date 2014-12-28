@@ -1,4 +1,4 @@
-
+﻿
 #include <functional>
 #include <QMetaType>
 #include "syncobj.hpp"

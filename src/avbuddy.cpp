@@ -1,4 +1,4 @@
-#include "avbuddy.hpp"
+﻿#include "avbuddy.hpp"
 
 avbuddy::avbuddy() {}
 

@@ -1,4 +1,4 @@
-#include "buddymodel.hpp"
+﻿#include "buddymodel.hpp"
 #include <boost/concept_check.hpp>
 
 BuddyModel::BuddyModel(std::shared_ptr<std::vector<avbuddy>> _data, QObject* parent)
