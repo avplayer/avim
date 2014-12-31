@@ -21,6 +21,8 @@ class QRichEdit : public QTextEdit
 	Q_PROPERTY(message::message_packet content READ get_content WRITE set_content STORED false)
 	Q_PROPERTY(bool HeightForWidth READ hasHeightForWidth WRITE set_hasHeightForWidth )
 
+	Q_PROPERTY(bool ClearOnFocusOut READ hasClearOnFocusOut WRITE set_ClearOnFocusOut )
+
 public:
 	explicit QRichEdit(QWidget*);
 	~QRichEdit();
@@ -33,6 +35,9 @@ public:
 
 	void set_content(message::message_packet);
 	message::message_packet get_content();
+
+	bool hasClearOnFocusOut();
+	void set_ClearOnFocusOut(bool);
 
 Q_SIGNALS:
 	void enterkey_pressed(bool);
@@ -49,8 +54,12 @@ public:
 
     virtual void keyPressEvent(QKeyEvent* e);
 
+    virtual void focusOutEvent(QFocusEvent* e);
+
 public Q_SLOTS:
 	void updateGeometry();
+	void clearSelection();
+
 
 protected:
     double do_calc_line_length(const QString& text, const QFont&);
@@ -90,6 +99,7 @@ private:
 	const QByteArray& get_image_data(const QString&);
 
 	bool m_hasHeightForWidth;
+	bool m_ClearOnFocusOut;
 
 	double m_natural_width, m_natural_height;
 

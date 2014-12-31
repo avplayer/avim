@@ -17,10 +17,21 @@ QRichEdit::QRichEdit(QWidget*parent)
 {
 	m_dropped_image_tmp_idx = 0;
 	m_hasHeightForWidth = QTextEdit::hasHeightForWidth();
+	m_ClearOnFocusOut = false;
 }
 
 QRichEdit::~QRichEdit()
 {
+}
+
+bool QRichEdit::hasClearOnFocusOut()
+{
+	return m_ClearOnFocusOut;
+}
+
+void QRichEdit::set_ClearOnFocusOut(bool v)
+{
+	m_ClearOnFocusOut = v;
 }
 
 bool QRichEdit::canInsertFromMimeData(const QMimeData *source) const
@@ -394,4 +405,19 @@ void QRichEdit::keyPressEvent(QKeyEvent* e)
 	{
 		Q_EMIT enterkey_pressed(false);
 	}
+}
+
+void QRichEdit::clearSelection()
+{
+  auto _textCursor = textCursor();
+  _textCursor.clearSelection();
+  setTextCursor( _textCursor );
+}
+
+// 在一个租群里, 只能有一个widget 保留最后一个 focus
+void QRichEdit::focusOutEvent(QFocusEvent* e)
+{
+	if (hasClearOnFocusOut())
+		clearSelection();
+    QTextEdit::focusOutEvent(e);
 }

@@ -73,6 +73,7 @@ void QRichText::on_message_append(msg_block* blk)
 
 	QVariant msg; msg.setValue(blk->msg);
 	richeditor->setProperty("content", msg);
+	richeditor->setProperty("ClearOnFocusOut", true);
 
 	m_layout->addWidget(talk_segment);
 

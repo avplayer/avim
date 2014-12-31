@@ -27,6 +27,9 @@ public Q_SLOTS:
 
 	void group_updated();
 
+private Q_SLOTS:
+	void on_sendButton_clicked();
+
 protected:
 	// 从控件里构建 avim_message_packet
 	message::message_packet get_message();
@@ -39,7 +42,5 @@ private:
 	//recvThread rv_thread_;
 	std::string m_chat_target;
 
-private Q_SLOTS:
 
-	void on_sendButton_clicked();
 };
