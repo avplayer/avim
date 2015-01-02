@@ -101,4 +101,8 @@ else()
 	message( FATAL_ERROR "please run 'git submodule update --init' to get libavim")
 endif()
 
+if(MSVC)
+	set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "/MANIFESTINPUT:${CMAKE_CURRENT_SOURCE_DIR}/dpi.manifest")
+endif()
+
 add_subdirectory(src)
